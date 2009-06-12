@@ -64,8 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  	delete[] string;
  }
  
- String::String(const char* src) : COMMON_INIT,        // <-- Always add this to every constructor initialization list!
-                                   length(strlen(src)) {
+ String::String(const char* src) : length(strlen(src)) {
  	string = new char[length+1];
 	strncpy(string, src, length);
  }
@@ -93,10 +92,10 @@ namespace igraph {
 	template <typename T> struct RvalueType         { typedef T   Type; };  // = IMMOBJ
 	
 	template <typename T>
-	typename T&& RvalueRefParamToMoveType(T&& a) { return a; }		// = CAST_FOR_MMMOVE
+	static inline T&& RvalueRefParamToMoveType(T&& a) { return a; }		// = CAST_FOR_MMMOVE
 }
 #define TMPOBJ_INTERFACE				/// \internal
-#define TMPOBJ_IMPLEMENTATION(cls, ...)	/// \internal
+#define TMPOBJ_IMPLEMENTATION(template_decl, cls, ...)	/// \internal
 #else
 /// \internal
 namespace igraph {
@@ -112,18 +111,18 @@ namespace igraph {
 	template <typename T> struct RvalueType         { typedef       typename GetTemporaryClassImpl<T,sizeof(GetTemporaryClassImpl_B<T>(0))>::v  Type; };
 	
 	template <typename T>
-	typename T::Temporary& RvalueRefParamToMoveType(const typename T::Temporary& a) { return const_cast<typename T::Temporary&>(a); }
+	static inline typename T::Temporary& RvalueRefParamToMoveType(const typename T::Temporary& a) { return const_cast<typename T::Temporary&>(a); }
 }
 /// \internal
 namespace std {
 	template <typename T>
-	typename ::igraph::RvalueRefMoveType<T>::Type move(T& a) { return static_cast<typename igraph::RvalueRefMoveType<T>::Type>(a); }
+	static inline typename ::igraph::RvalueRefMoveType<T>::Type move(T& a) { return static_cast<typename ::igraph::RvalueRefMoveType<T>::Type>(a); }
 }
 /// \internal
 #define TMPOBJ_INTERFACE class Temporary; friend class Temporary
 /// \internal
-#define TMPOBJ_IMPLEMENTATION(cls, ...)                                         \
-class cls __VA_ARGS__::Temporary : public cls __VA_ARGS__ {                     \
+#define TMPOBJ_IMPLEMENTATION(template_decl, cls, ...)                          \
+template_decl class cls __VA_ARGS__::Temporary : public cls __VA_ARGS__ {       \
 public:                                                                         \
 	Temporary(const cls __VA_ARGS__& other) : cls(other) {}                     \
 }
@@ -136,11 +135,21 @@ public:                                                                         
 #pragma mark -
 
 /// \internal
-#define MEMORY_MANAGER_INTERFACE_INTERNAL(xx_typnm, cls, ...)                   \
+namespace igraph {
+	/// \internal
+	struct XXINTRNL_DONT_DEALLOC {
+		bool value;
+		operator bool() { return value; }
+		XXINTRNL_DONT_DEALLOC(bool v = false) : value(v) {}
+	};
+}
+
+/// \internal
+#define XXINTRNL_MEMORY_MANAGER_INTERFACE(xx_typnm, cls, ...)                   \
 public:                                                                         \
 	TMPOBJ_INTERFACE;                                                           \
 protected:                                                                      \
-	bool mm_dont_dealloc;                                                       \
+	igraph::XXINTRNL_DONT_DEALLOC mm_dont_dealloc;                              \
 	void mm_raw_copy(const cls __VA_ARGS__& other);                             \
 	void mm_raw_dealloc();                                                      \
 	void mm_raw_move(xx_typnm ::igraph::RvalueRefMoveType< cls __VA_ARGS__ >::Type other); \
@@ -156,8 +165,8 @@ public:                                                                         
 	cls __VA_ARGS__& operator=(xx_typnm ::igraph::RvalueRefParamType< cls __VA_ARGS__ >::Type other)
 
 /// \internal
-#define MEMORY_MANAGER_IMPLEMENTATION_INTERNAL(template_decl, attrib, xx_typnm, cls, ...) \
-template_decl TMPOBJ_IMPLEMENTATION(cls, __VA_ARGS__);                          \
+#define XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(template_decl, attrib, xx_typnm, cls, ...) \
+TMPOBJ_IMPLEMENTATION(GROUP(template_decl), cls, __VA_ARGS__);                  \
 template_decl attrib void cls __VA_ARGS__::mm_move(xx_typnm ::igraph::RvalueRefMoveType< cls __VA_ARGS__ >::Type other) { \
 	mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_move(other); other.mm_dont_dealloc = true; \
 }                                                                               \
@@ -184,44 +193,42 @@ template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(xx_typnm ::igra
 }
 
 /// \internal
-#define IMPLEMENT_COPY_METHOD_INTERNAL(xx_typnm, other, cls, ...)    void cls __VA_ARGS__::mm_raw_copy(const cls __VA_ARGS__& other)
-#define IMPLEMENT_DEALLOC_METHOD_INTERNAL(xx_typnm, other, cls, ...) void cls __VA_ARGS__::mm_raw_dealloc()
-#define IMPLEMENT_MOVE_METHOD_INTERNAL(xx_typnm, other, cls, ...)    void cls __VA_ARGS__::mm_raw_move(xx_typnm ::igraph::RvalueRefMoveType< cls __VA_ARGS__ >::Type other)
+#define XXINTRNL_IMPLEMENT_COPY_METHOD(xx_typnm, other, cls, ...)    void cls __VA_ARGS__::mm_raw_copy(const cls __VA_ARGS__& other)
+#define XXINTRNL_IMPLEMENT_DEALLOC_METHOD(xx_typnm, other, cls, ...) void cls __VA_ARGS__::mm_raw_dealloc()
+#define XXINTRNL_IMPLEMENT_MOVE_METHOD(xx_typnm, other, cls, ...)    void cls __VA_ARGS__::mm_raw_move(xx_typnm ::igraph::RvalueRefMoveType< cls __VA_ARGS__ >::Type other)
 
 /// \internal
-#define IMMEDIATE_OPERATOR_INTERFACE_RHS_INTERNAL(attrib, xx_typnm, cls, rhs_type) \
+#define XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_RHS(attrib, xx_typnm, cls, rhs_type) \
 attrib xx_typnm ::igraph::RvalueType< cls >::Type operator op (const cls& self, rhs_type other); \
 attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (xx_typnm ::igraph::RvalueRefParamType< cls >::Type self, rhs_type other)
 
 /// \internal
-#define IMMEDIATE_OPERATOR_INTERFACE_LHS_INTERNAL(attrib, xx_typnm, cls, lhs_type) \
+#define XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_LHS(attrib, xx_typnm, cls, lhs_type) \
 attrib xx_typnm ::igraph::RvalueType< cls >::Type operator op (lhs_type other, const cls& self); \
 attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (rhs_type other, xx_typnm ::igraph::RvalueRefParamType< cls >::Type self)
 
 /// \internal
-#define IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_INTERNAL(attrib, xx_typnm, cls, op, rhs_type) \
+#define XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(attrib, xx_typnm, cls, op, rhs_type) \
 attrib xx_typnm ::igraph::RvalueType< cls >::Type operator op (const cls& xx_self, rhs_type other) { \
 	xx_typnm ::igraph::RvalueType< cls >::Type self = xx_self;                  \
 	self op##= other;                                                           \
 	return ::std::move(self);                                                   \
 }                                                                               \
 attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (xx_typnm ::igraph::RvalueRefParamType< cls >::Type xx_self, rhs_type other) { \
-	xx_typnm ::igraph::RvalueRefMoveType< cls >::Type self = ::igraph::RvalueRefParamToMoveType< cls >(xx_self); \
-	self op##= other;                                                           \
-	return ::std::move(self);                                                   \
+	::igraph::RvalueRefParamToMoveType< cls >(xx_self) op##= other;             \
+	return ::std::move(::igraph::RvalueRefParamToMoveType< cls >(xx_self));     \
 }
 
 /// \internal
-#define IMMEDIATE_OPERATOR_IMPLEMENTATION_LHS_INTERNAL(attrib, xx_typnm, cls, op, lhs_type) \
+#define XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_LHS(attrib, xx_typnm, cls, op, lhs_type) \
 attrib xx_typnm ::igraph::RvalueType< cls >::Type operator op (lhs_type other, const cls& xx_self) { \
 	xx_typnm ::igraph::RvalueType< cls >::Type self = xx_self;                  \
 	self op##= other;                                                           \
 	return ::std::move(self);                                                   \
 }                                                                               \
 attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type other, xx_typnm ::igraph::RvalueRefParamType< cls >::Type xx_self) { \
-	xx_typnm ::igraph::RvalueRefMoveType< cls >::Type self = ::igraph::RvalueRefParamToMoveType< cls >(xx_self); \
-	self op##= other;                                                           \
-	return ::std::move(self);                                                   \
+	::igraph::RvalueRefParamToMoveType< cls >(xx_self) op##= other;             \
+	return ::std::move(::igraph::RvalueRefParamToMoveType< cls >(xx_self));     \
 }
 
 //------------------------------------------------------------------------------
@@ -246,8 +253,8 @@ attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type 
  \param cls Class name
  \param ... Template parameters, if any. You must supply the angle brackets.
  */
-#define MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE(cls, ...) MEMORY_MANAGER_INTERFACE_INTERNAL(typename, cls, __VA_ARGS__)
-#define MEMORY_MANAGER_INTERFACE(cls)                    MEMORY_MANAGER_INTERFACE_INTERNAL(        , cls)
+#define MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE(cls, ...) XXINTRNL_MEMORY_MANAGER_INTERFACE(typename, cls, __VA_ARGS__)
+#define MEMORY_MANAGER_INTERFACE(cls)                    XXINTRNL_MEMORY_MANAGER_INTERFACE(        , cls)
 
 /**
  \brief Memory manager implementation with template and attributes.
@@ -266,7 +273,7 @@ attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type 
  \param cls    Class name
  \param template_param Template parameters. You must supply the angle brackets.
  */ 
-#define MEMORY_MANAGER_IMPLEMENTATION_ATTR_WITH_TEMPLATE(template_decl, attrib, cls, ...) MEMORY_MANAGER_IMPLEMENTATION_INTERNAL(GROUP(template_decl), attrib, typename, cls, __VA_ARGS__)
+#define MEMORY_MANAGER_IMPLEMENTATION_ATTR_WITH_TEMPLATE(template_decl, attrib, cls, ...) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(GROUP(template_decl), attrib, typename, cls, __VA_ARGS__)
 
 /**
  \brief Memory manager implementation with attributes.
@@ -276,7 +283,7 @@ attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type 
  \param attrib Attribute
  \param cls    Class name
   */
-#define MEMORY_MANAGER_IMPLEMENTATION_ATTR(attrib, cls) MEMORY_MANAGER_IMPLEMENTATION_INTERNAL(, attrib, , cls)
+#define MEMORY_MANAGER_IMPLEMENTATION_ATTR(attrib, cls) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(, attrib, , cls)
 
 /**
  \brief Memory manager implementation.
@@ -288,18 +295,18 @@ attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type 
 #define MEMORY_MANAGER_IMPLEMENTATION(cls) MEMORY_MANAGER_IMPLEMENTATION_ATTR(, cls)
 
 /// TODO: Documentation
-#define IMPLEMENT_COPY_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) IMPLEMENT_COPY_METHOD_INTERNAL(typename, argname, cls, __VA_ARGS__)
-#define IMPLEMENT_COPY_METHOD_WITH_TEMPLATE(cls, ...)                              IMPLEMENT_COPY_METHOD_INTERNAL(typename, other, cls, __VA_ARGS__)
-#define IMPLEMENT_COPY_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls)                   IMPLEMENT_COPY_METHOD_INTERNAL( , argname, cls)
-#define IMPLEMENT_COPY_METHOD(cls)                                                 IMPLEMENT_COPY_METHOD_INTERNAL( , other, cls)
-#define IMPLEMENT_DEALLOC_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) IMPLEMENT_DEALLOC_METHOD_INTERNAL(typename, argname, cls, __VA_ARGS__)
-#define IMPLEMENT_DEALLOC_METHOD_WITH_TEMPLATE(cls, ...)                              IMPLEMENT_DEALLOC_METHOD_INTERNAL(typename, other, cls, __VA_ARGS__)
-#define IMPLEMENT_DEALLOC_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls)                   IMPLEMENT_DEALLOC_METHOD_INTERNAL(, argname, cls)
-#define IMPLEMENT_DEALLOC_METHOD(cls)                                                 IMPLEMENT_DEALLOC_METHOD_INTERNAL(, other, cls)
-#define IMPLEMENT_MOVE_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) IMPLEMENT_MOVE_METHOD_INTERNAL(typename, argname, cls, __VA_ARGS__)
-#define IMPLEMENT_MOVE_METHOD_WITH_TEMPLATE(cls, ...)                              IMPLEMENT_MOVE_METHOD_INTERNAL(typename, other, cls, __VA_ARGS__)
-#define IMPLEMENT_MOVE_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls)                   IMPLEMENT_MOVE_METHOD_INTERNAL( , argname, cls)
-#define IMPLEMENT_MOVE_METHOD(cls)                                                 IMPLEMENT_MOVE_METHOD_INTERNAL( , other, cls)
+#define IMPLEMENT_COPY_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) XXINTRNL_IMPLEMENT_COPY_METHOD(typename, argname, cls, __VA_ARGS__)
+#define IMPLEMENT_COPY_METHOD_WITH_TEMPLATE(cls, ...)                              XXINTRNL_IMPLEMENT_COPY_METHOD(typename, other, cls, __VA_ARGS__)
+#define IMPLEMENT_COPY_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls)                   XXINTRNL_IMPLEMENT_COPY_METHOD( , argname, cls)
+#define IMPLEMENT_COPY_METHOD(cls)                                                 XXINTRNL_IMPLEMENT_COPY_METHOD( , other, cls)
+#define IMPLEMENT_DEALLOC_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) XXINTRNL_IMPLEMENT_DEALLOC_METHOD(typename, argname, cls, __VA_ARGS__)
+#define IMPLEMENT_DEALLOC_METHOD_WITH_TEMPLATE(cls, ...)                              XXINTRNL_IMPLEMENT_DEALLOC_METHOD(typename, other, cls, __VA_ARGS__)
+#define IMPLEMENT_DEALLOC_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls)                   XXINTRNL_IMPLEMENT_DEALLOC_METHOD(, argname, cls)
+#define IMPLEMENT_DEALLOC_METHOD(cls)                                                 XXINTRNL_IMPLEMENT_DEALLOC_METHOD(, other, cls)
+#define IMPLEMENT_MOVE_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) XXINTRNL_IMPLEMENT_MOVE_METHOD(typename, argname, cls, __VA_ARGS__)
+#define IMPLEMENT_MOVE_METHOD_WITH_TEMPLATE(cls, ...)                              XXINTRNL_IMPLEMENT_MOVE_METHOD(typename, other, cls, __VA_ARGS__)
+#define IMPLEMENT_MOVE_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls)                   XXINTRNL_IMPLEMENT_MOVE_METHOD( , argname, cls)
+#define IMPLEMENT_MOVE_METHOD(cls)                                                 XXINTRNL_IMPLEMENT_MOVE_METHOD( , other, cls)
 
 #pragma mark -
 
@@ -316,7 +323,7 @@ attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type 
  \param op       Operator (e.g. +, -, *, /)
  \param rhs_type Type of the RHS value.
  */
-#define IMMEDIATE_OPERATOR_INTERFACE_RHS_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op, rhs_type) IMMEDIATE_OPERATOR_INTERFACE_RHS_INTERNAL(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type))
+#define IMMEDIATE_OPERATOR_INTERFACE_RHS_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op, rhs_type) XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_RHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type))
 
 /**
  \brief Operator overloading interface that returns a temporary object with custom RHS type.
@@ -331,7 +338,7 @@ attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type 
  \param op       Operator (e.g. +, -, *, /)
  \param rhs_type Type of the RHS value.
  */
-#define IMMEDIATE_OPERATOR_INTERFACE_RHS_ATTR(attrib, cls, op, rhs_type) IMMEDIATE_OPERATOR_INTERFACE_RHS_INTERNAL(attrib, , cls, op, rhs_type)
+#define IMMEDIATE_OPERATOR_INTERFACE_RHS_ATTR(attrib, cls, op, rhs_type) XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_RHS(attrib, , cls, op, rhs_type)
 
 /**
  \brief Operator overloading interface that returns a temporary object using templates.
@@ -344,7 +351,7 @@ attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type 
  \param cls      Class name, with template parameters (e.g. Vector<T>, GROUP(HashTable<K,V>))
  \param op       Operator (e.g. +, -, *, /)
  */
-#define IMMEDIATE_OPERATOR_INTERFACE_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op) IMMEDIATE_OPERATOR_INTERFACE_RHS_INTERNAL(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(const cls&))
+#define IMMEDIATE_OPERATOR_INTERFACE_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op) XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_RHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(const cls&))
 
 /**
  \brief Operator overloading interface that returns a temporary object.
@@ -384,8 +391,8 @@ attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type 
  \param rhs_type Type of the other value.
  */
 #define IMMEDIATE_OPERATOR_INTERFACE_COMMUTATIVE_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op, rhs_type) \
-	IMMEDIATE_OPERATOR_INTERFACE_RHS_INTERNAL(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type)); \
-	IMMEDIATE_OPERATOR_INTERFACE_LHS_INTERNAL(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type))
+	XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_RHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type)); \
+	XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_LHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type))
 
 /**
  \brief Operator overloading interface that returns a temporary object for a commutative operator with custom RHS type.
@@ -400,23 +407,23 @@ attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type 
  \param rhs_type Type of the other value.
  */
 #define IMMEDIATE_OPERATOR_INTERFACE_COMMUTATIVE_ATTR(attrib, cls, op, rhs_type) \
-	IMMEDIATE_OPERATOR_INTERFACE_RHS_INTERNAL(attrib, , cls, op, rhs_type); \
-	IMMEDIATE_OPERATOR_INTERFACE_LHS_INTERNAL(attrib, , cls, op, rhs_type)
+	XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_RHS(attrib, , cls, op, rhs_type); \
+	XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_LHS(attrib, , cls, op, rhs_type)
 
 /// TODO: Documentation.
 #define IMMEDIATE_OPERATOR_INTERFACE_COMMUTATIVE(cls, op, rhs_type) IMMEDIATE_OPERATOR_INTERFACE_COMMUTATIVE_ATTR(, cls, op, rhs_type);
 
-#define IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op, rhs_type) IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_INTERNAL(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type))
-#define IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_ATTR(attrib, cls, op, rhs_type) IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_INTERNAL(attrib, , cls, op, rhs_type)
-#define IMMEDIATE_OPERATOR_IMPLEMENTATION_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op) IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_INTERNAL(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(const cls&))
+#define IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op, rhs_type) XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type))
+#define IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_ATTR(attrib, cls, op, rhs_type) XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(attrib, , cls, op, rhs_type)
+#define IMMEDIATE_OPERATOR_IMPLEMENTATION_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op) XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(const cls&))
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION_ATTR(attrib, cls, op) IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_ATTR(attrib, cls, op, const cls&)
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION(cls, op) IMMEDIATE_OPERATOR_IMPLEMENTATION_ATTR(, cls, op)
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION_COMMUTATIVE_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op, rhs_type) \
-	IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_INTERNAL(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type)); \
-	IMMEDIATE_OPERATOR_IMPLEMENTATION_LHS_INTERNAL(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type))
+	XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type)); \
+	XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_LHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type))
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION_COMMUTATIVE_ATTR(attrib, cls, op, rhs_type) \
-	IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_INTERNAL(attrib, , cls, op, rhs_type); \
-	IMMEDIATE_OPERATOR_IMPLEMENTATION_LHS_INTERNAL(attrib, , cls, op, rhs_type)
+	XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(attrib, , cls, op, rhs_type); \
+	XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_LHS(attrib, , cls, op, rhs_type)
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION_COMMUTATIVE(cls, op, rhs_type) IMMEDIATE_OPERATOR_IMPLEMENTATION_COMMUTATIVE_ATTR(, cls, op, rhs_type);
 
 
@@ -443,13 +450,5 @@ namespace igraph {
  \brief Common initialization for memory manager with ownership transfer
  */
 #define COMMON_INIT_WITH(transfer_mode) mm_dont_dealloc(transfer_mode != ::igraph::OwnershipTransferKeepOriginal)
-
-/**
- \def COMMON_INIT
- \brief Common initialization for memory manager.
- 
- Insert this into every initialization list of the class using the memory manager.
- */
-#define COMMON_INIT mm_dont_dealloc(false)
 
 #endif

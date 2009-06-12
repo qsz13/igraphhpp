@@ -36,8 +36,6 @@
 #include <cstdarg>
 
 namespace igraph {
-	class VertexSelector;
-
 	/**
 	 \class Vector
 	 \brief Wrapper for igraph vectors

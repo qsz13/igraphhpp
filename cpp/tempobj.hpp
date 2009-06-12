@@ -110,7 +110,7 @@ namespace igraph {
 /// \internal
 namespace std {
 	template <typename T>
-	static inline typename ::igraph::RvalueRefMoveType<T>::Type move(T& a) { return static_cast<typename ::igraph::RvalueRefMoveType<T>::Type>(a); }
+	static inline typename ::igraph::RvalueRefMoveType<T>::Type move(T& a) { return (typename ::igraph::RvalueRefMoveType<T>::Type)(a); }
 }
 /// \internal
 #define TMPOBJ_INTERFACE class Temporary; friend class Temporary
@@ -142,15 +142,15 @@ namespace igraph {
 #define XXINTRNL_MEMORY_MANAGER_INTERFACE(xx_typnm, cls, ...)                   \
 public:                                                                         \
 	TMPOBJ_INTERFACE;                                                           \
-protected:                                                                      \
+private:                                                                        \
 	igraph::XXINTRNL_DONT_DEALLOC mm_dont_dealloc;                              \
+protected:                                                                      \
 	void mm_raw_copy(const cls __VA_ARGS__& other);                             \
 	void mm_raw_dealloc();                                                      \
-	void mm_raw_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other); \
-private:                                                                        \
+	void mm_raw_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other);       \
 	void mm_copy(const cls __VA_ARGS__& other) { mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_copy(other); } \
 	void mm_dealloc() { if (!mm_dont_dealloc) { mm_dont_dealloc = true; mm_raw_dealloc(); } } \
-	void mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other); \
+	void mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other);           \
 public:                                                                         \
 	cls(const cls __VA_ARGS__& other);                                          \
 	cls(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other);                   \

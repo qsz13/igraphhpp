@@ -85,15 +85,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus > 199711L
 #include <memory>
-/// \internal
-namespace igraph {
-	template <typename T> struct RvalueRefParamType { typedef T&& Type; };	// = TMPOBJ
-	template <typename T> struct RvalueRefMoveType  { typedef T&& Type; };	// = MMMOBJ
-	template <typename T> struct RvalueType         { typedef T   Type; };  // = IMMOBJ
-	
-	template <typename T>
-	static inline T&& RvalueRefParamToMoveType(T&& a) { return a; }		// = CAST_FOR_MMMOVE
-}
+#define XXINTRNL_PARAMTYPE(xx_typnm, ...) __VA_ARGS__&&		/// \internal // = TMPOBJ
+#define XXINTRNL_MOVETYPE(xx_typnm, ...) __VA_ARGS__&&		/// \internal // = MMMOBJ
+#define XXINTRNL_RVALTYPE(xx_typnm, ...) __VA_ARGS__		/// \internal // = IMMOBJ
+#define XXINTRNL_RRP2MT(xx_typnm, ...)						/// \internal // = CAST_FOR_MMMOVE
 #define TMPOBJ_INTERFACE				/// \internal
 #define TMPOBJ_IMPLEMENTATION(template_decl, cls, ...)	/// \internal
 #else
@@ -106,13 +101,12 @@ namespace igraph {
 	template <typename T, int> struct GetTemporaryClassImpl         { typedef          T            v; };
 	template <typename T>      struct GetTemporaryClassImpl<T, 256> { typedef typename T::Temporary v; };
 	
-	template <typename T> struct RvalueRefParamType { typedef const typename GetTemporaryClassImpl<T,sizeof(GetTemporaryClassImpl_B<T>(0))>::v& Type; };
 	template <typename T> struct RvalueRefMoveType  { typedef       typename GetTemporaryClassImpl<T,sizeof(GetTemporaryClassImpl_B<T>(0))>::v& Type; };
-	template <typename T> struct RvalueType         { typedef       typename GetTemporaryClassImpl<T,sizeof(GetTemporaryClassImpl_B<T>(0))>::v  Type; };
-	
-	template <typename T>
-	static inline typename T::Temporary& RvalueRefParamToMoveType(const typename T::Temporary& a) { return const_cast<typename T::Temporary&>(a); }
 }
+#define XXINTRNL_PARAMTYPE(xx_typnm, ...) const xx_typnm __VA_ARGS__::Temporary&
+#define XXINTRNL_MOVETYPE(xx_typnm, ...) xx_typnm __VA_ARGS__::Temporary&
+#define XXINTRNL_RVALTYPE(xx_typnm, ...) xx_typnm __VA_ARGS__::Temporary
+#define XXINTRNL_RRP2MT(xx_typnm, ...) const_cast<xx_typnm __VA_ARGS__::Temporary&>
 /// \internal
 namespace std {
 	template <typename T>
@@ -152,29 +146,29 @@ protected:                                                                      
 	igraph::XXINTRNL_DONT_DEALLOC mm_dont_dealloc;                              \
 	void mm_raw_copy(const cls __VA_ARGS__& other);                             \
 	void mm_raw_dealloc();                                                      \
-	void mm_raw_move(xx_typnm ::igraph::RvalueRefMoveType< cls __VA_ARGS__ >::Type other); \
+	void mm_raw_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other); \
 private:                                                                        \
 	void mm_copy(const cls __VA_ARGS__& other) { mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_copy(other); } \
 	void mm_dealloc() { if (!mm_dont_dealloc) { mm_dont_dealloc = true; mm_raw_dealloc(); } } \
-	void mm_move(xx_typnm ::igraph::RvalueRefMoveType< cls __VA_ARGS__ >::Type other); \
+	void mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other); \
 public:                                                                         \
 	cls(const cls __VA_ARGS__& other);                                          \
-	cls(xx_typnm ::igraph::RvalueRefParamType< cls __VA_ARGS__ >::Type other);  \
+	cls(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other);                   \
 	~cls();                                                                     \
 	cls __VA_ARGS__& operator=(const cls __VA_ARGS__& other);                   \
-	cls __VA_ARGS__& operator=(xx_typnm ::igraph::RvalueRefParamType< cls __VA_ARGS__ >::Type other)
+	cls __VA_ARGS__& operator=(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other)
 
 /// \internal
 #define XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(template_decl, attrib, xx_typnm, cls, ...) \
 TMPOBJ_IMPLEMENTATION(GROUP(template_decl), cls, __VA_ARGS__);                  \
-template_decl attrib void cls __VA_ARGS__::mm_move(xx_typnm ::igraph::RvalueRefMoveType< cls __VA_ARGS__ >::Type other) { \
+template_decl attrib void cls __VA_ARGS__::mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other) { \
 	mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_move(other); other.mm_dont_dealloc = true; \
 }                                                                               \
 template_decl attrib cls __VA_ARGS__::cls(const cls __VA_ARGS__& other) {       \
 	mm_copy(other);                                                             \
 }                                                                               \
-template_decl attrib cls __VA_ARGS__::cls(xx_typnm ::igraph::RvalueRefParamType< cls __VA_ARGS__ >::Type other) {\
-	mm_move(::igraph::RvalueRefParamToMoveType< cls __VA_ARGS__ >(other));      \
+template_decl attrib cls __VA_ARGS__::cls(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other) {\
+	mm_move(XXINTRNL_RRP2MT(xx_typnm, cls __VA_ARGS__)(other));                 \
 }                                                                               \
 template_decl attrib cls __VA_ARGS__::~cls() { mm_dealloc(); }                  \
 template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(const cls __VA_ARGS__& other) { \
@@ -184,10 +178,10 @@ template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(const cls __VA_
 	}                                                                           \
 	return *this;                                                               \
 }                                                                               \
-template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(xx_typnm ::igraph::RvalueRefParamType< cls __VA_ARGS__ >::Type other) { \
+template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other) { \
 	if (this != &other) {                                                       \
 		mm_dealloc();                                                           \
-		mm_move(::igraph::RvalueRefParamToMoveType< cls __VA_ARGS__ >(other));  \
+		mm_move(XXINTRNL_RRP2MT(xx_typnm, cls __VA_ARGS__)(other));             \
 	}                                                                           \
 	return *this;                                                               \
 }
@@ -195,40 +189,40 @@ template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(xx_typnm ::igra
 /// \internal
 #define XXINTRNL_IMPLEMENT_COPY_METHOD(xx_typnm, other, cls, ...)    void cls __VA_ARGS__::mm_raw_copy(const cls __VA_ARGS__& other)
 #define XXINTRNL_IMPLEMENT_DEALLOC_METHOD(xx_typnm, other, cls, ...) void cls __VA_ARGS__::mm_raw_dealloc()
-#define XXINTRNL_IMPLEMENT_MOVE_METHOD(xx_typnm, other, cls, ...)    void cls __VA_ARGS__::mm_raw_move(xx_typnm ::igraph::RvalueRefMoveType< cls __VA_ARGS__ >::Type other)
+#define XXINTRNL_IMPLEMENT_MOVE_METHOD(xx_typnm, other, cls, ...)    void cls __VA_ARGS__::mm_raw_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other)
 
 /// \internal
 #define XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_RHS(attrib, xx_typnm, cls, rhs_type) \
-attrib xx_typnm ::igraph::RvalueType< cls >::Type operator op (const cls& self, rhs_type other); \
-attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (xx_typnm ::igraph::RvalueRefParamType< cls >::Type self, rhs_type other)
+attrib XXINTRNL_RVALTYPE(xx_typnm, cls) operator op (const cls& self, rhs_type other); \
+attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (XXINTRNL_PARAMTYPE(xx_typnm, cls) self, rhs_type other)
 
 /// \internal
 #define XXINTRNL_IMMEDIATE_OPERATOR_INTERFACE_LHS(attrib, xx_typnm, cls, lhs_type) \
-attrib xx_typnm ::igraph::RvalueType< cls >::Type operator op (lhs_type other, const cls& self); \
-attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (rhs_type other, xx_typnm ::igraph::RvalueRefParamType< cls >::Type self)
+attrib XXINTRNL_RVALTYPE(xx_typnm, cls) operator op (lhs_type other, const cls& self); \
+attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (rhs_type other, XXINTRNL_PARAMTYPE(xx_typnm, cls) self)
 
 /// \internal
 #define XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(attrib, xx_typnm, cls, op, rhs_type) \
-attrib xx_typnm ::igraph::RvalueType< cls >::Type operator op (const cls& xx_self, rhs_type other) { \
-	xx_typnm ::igraph::RvalueType< cls >::Type self = xx_self;                  \
+attrib XXINTRNL_RVALTYPE(xx_typnm, cls) operator op (const cls& xx_self, rhs_type other) { \
+	XXINTRNL_RVALTYPE(xx_typnm, cls) self = xx_self;                            \
 	self op##= other;                                                           \
 	return ::std::move(self);                                                   \
 }                                                                               \
-attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (xx_typnm ::igraph::RvalueRefParamType< cls >::Type xx_self, rhs_type other) { \
-	::igraph::RvalueRefParamToMoveType< cls >(xx_self) op##= other;             \
-	return ::std::move(::igraph::RvalueRefParamToMoveType< cls >(xx_self));     \
+attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (XXINTRNL_PARAMTYPE(xx_typnm, cls) xx_self, rhs_type other) { \
+	XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self) op##= other;                        \
+	return ::std::move(XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self));                \
 }
 
 /// \internal
 #define XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_LHS(attrib, xx_typnm, cls, op, lhs_type) \
-attrib xx_typnm ::igraph::RvalueType< cls >::Type operator op (lhs_type other, const cls& xx_self) { \
-	xx_typnm ::igraph::RvalueType< cls >::Type self = xx_self;                  \
+attrib XXINTRNL_RVALTYPE(xx_typnm, cls) operator op (lhs_type other, const cls& xx_self) { \
+	XXINTRNL_RVALTYPE(xx_typnm, cls) self = xx_self;                  \
 	self op##= other;                                                           \
 	return ::std::move(self);                                                   \
 }                                                                               \
-attrib xx_typnm ::igraph::RvalueRefParamType< cls >::Type operator op (lhs_type other, xx_typnm ::igraph::RvalueRefParamType< cls >::Type xx_self) { \
-	::igraph::RvalueRefParamToMoveType< cls >(xx_self) op##= other;             \
-	return ::std::move(::igraph::RvalueRefParamToMoveType< cls >(xx_self));     \
+attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_PARAMTYPE(xx_typnm, cls) xx_self) { \
+	XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self) op##= other;                        \
+	return ::std::move(XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self));                \
 }
 
 //------------------------------------------------------------------------------

@@ -28,5 +28,5 @@ _Revise these?_
  * Some of these features, however, have been dealt with, so you may freely use them. They are:
    * `__attribute__`
    * `std::move`
- * Avoid using boost features (e.g. foreach). Some people may not bother to download and configure boost.
- * Don't define your own utility macro (e.g. FOR_INDEX). If you must use that, put it in common.hpp and prefix it with XXINTRNL_ so normal people won't see it.
+ * Avoid using boost features (e.g. `foreach`). Some people may not bother to download and configure boost.
+ * Don't define your own utility macro (e.g. `FOR_INDEX`). If you must use that, put it in common.hpp and prefix it with `XXINTRNL_` so normal people won't see it.

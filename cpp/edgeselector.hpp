@@ -33,123 +33,56 @@ namespace igraph {
 	class EdgeSelector {
 	private:
 		igraph_es_t _;
-		Vector retained_vector;
-		
-		EdgeSelector() throw() {
-			retained_vector.mm_dont_dealloc = true;
-		};
+		EdgeVector retained_vector;
 		
 	public:
 		MEMORY_MANAGER_INTERFACE(EdgeSelector);
+		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(EdgeSelector, igraph_es_t);
 		
 		/// Return an EdgeSelector of all edges.
-		static EdgeSelector all(EdgeOrderType ordering = OrderByID) throw(Exception) {
-			EdgeSelector es;
-			TRY(igraph_es_all(&es._, (igraph_edgeorder_type_t)ordering));
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type all(EdgeOrderType ordering = OrderByID) MAY_THROW_EXCEPTION;
 		
 		/// Return a EdgeSelector of the neighbors of a vertex.
-		static EdgeSelector adj(const Vertex which, const NeighboringMode mode = AllNeighbors) throw(Exception) {
-			EdgeSelector es;
-			TRY(igraph_es_adj(&es._, which, (igraph_neimode_t)mode));
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type adj(const Vertex which, const NeighboringMode mode = OutNeighbors) MAY_THROW_EXCEPTION;
 				
 		/// Return a EdgeSelector of nothing.
-		static EdgeSelector none() throw(Exception) {
-			EdgeSelector es;
-			TRY(igraph_es_none(&es._));
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type none() MAY_THROW_EXCEPTION;
 		
 		/// Return a EdgeSelector a single edge.
-		static EdgeSelector single(const Edge which) throw(Exception) {
-			EdgeSelector es;
-			TRY(igraph_es_1(&es._, which));
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type single(const Edge which) MAY_THROW_EXCEPTION;
 		
 		/// Return a EdgeSelector with edges identified as content of the vector.
-		static EdgeSelector vector(const Vector& vec, const OwnershipTransfer transfer = OwnershipTransferKeepOriginal) throw(Exception) {
-			EdgeSelector es;
-			switch (transfer) {
-				case OwnershipTransferCopy:
-					TRY(igraph_es_vector_copy(&es._, &vec._));
-					break;
-				case OwnershipTransferMove:
-					es.retained_vector = std::move(vec);
-					TRY(igraph_es_vector(&es._, &es.retained_vector._));
-					break;
-				case OwnershipTransferKeepOriginal:
-					TRY(igraph_es_vector(&es._, &vec._));
-					break;
-			}
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type vector(const EdgeVector& vec, const OwnershipTransfer transfer = OwnershipTransferMove) MAY_THROW_EXCEPTION;
 		
 		// TODO: Implement igraph_es_vector_small()
 		
 		/// Return an EdgeSelector with edges inside the specified range.
-		static EdgeSelector seq(const Edge fromID, const Edge toID) throw(Exception) {
-			EdgeSelector es;
-			TRY(igraph_es_seq(&es._, fromID, toID));
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type seq(const Edge fromID, const Edge toID) MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector between two vertex sets
-		static EdgeSelector fromto(const VertexSelector& from, const VertexSelector& to) throw(Exception) {
-			EdgeSelector es;
-			TRY(igraph_es_fromto(&es._, from._, to._));
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type fromto(const VertexSelector& from, const VertexSelector& to) MAY_THROW_EXCEPTION;
+		
+		/// Return an EdgeSelector of the single edge between the vertices.
+		static temporary_class<EdgeSelector>::type fromto(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector defined by the endpoints
-		static EdgeSelector pairs(const Vector& vec, const Directedness directedness = Undirected) {
-			EdgeSelector es;
-			TRY(igraph_es_pairs(&es._, &vec._, directedness));
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type pairs(const VertexVector& vec, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		
 		/// ?
-		static EdgeSelector multipairs(const Vector& vec, const Directedness directedness = Undirected) {
-			EdgeSelector es;
-			TRY(igraph_es_multipairs(&es._, &vec._, directedness));
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type multipairs(const VertexVector& vec, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector on a path of vertices.
-		static EdgeSelector path(const Vector& vec, const Directedness directedness = Undirected) {
-			EdgeSelector es;
-			TRY(igraph_es_path(&es._, &vec._, directedness));
-			return es;
-		}
+		static temporary_class<EdgeSelector>::type path(const VertexVector& vec, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		
-		bool is_all() throw(Exception) { return igraph_es_is_all(&_); }
+		int type() const throw() { return igraph_es_type(&_); }
+		bool is_all() throw() { return igraph_es_is_all(&_); }
 		
-		Vector as_vector(const Graph& g) throw(Exception);
-		Integer size(const Graph& g) throw(Exception);
+		temporary_class<EdgeVector>::type as_vector(const Graph& g) const MAY_THROW_EXCEPTION;
+		Integer size(const Graph& g) const MAY_THROW_EXCEPTION;
 		
 		friend class Graph;
 		friend class EdgeIterator;
 	};
-	
-	MEMORY_MANAGER_IMPLEMENTATION(EdgeSelector);
-	
-	IMPLEMENT_COPY_METHOD(EdgeSelector) {
-		igraph_es_copy(&_, &other._);
-		retained_vector = other.retained_vector;
-	}
-	
-	IMPLEMENT_MOVE_METHOD(EdgeSelector) {
-		_ = std::move(other._);
-		retained_vector = std::move(other.retained_vector);
-	}
-	
-	IMPLEMENT_DEALLOC_METHOD(EdgeSelector) {
-		igraph_es_destroy(&_);
-	}
-
 }
 
 #endif

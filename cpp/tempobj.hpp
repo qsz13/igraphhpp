@@ -83,6 +83,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef IGRAPH_TEMPOBJ_HPP
 #define IGRAPH_TEMPOBJ_HPP
 
+#if DEBUG_TEMPOBJ 
+#include <cstdio>
+#include <cstdarg>
+inline void XXINTRNL_PRINTF(int purpose, ...) throw() {
+	static const char* const formats[] = {
+		"Create [%03x] (%s)\n",
+		"Copy [%03x] := [%03x] (%s)\n",
+		"Move [%03x] <- [%03x] (%s)\n",
+		"Dealloc [%03x] (%s)\n",
+	};
+	
+	std::va_list ap;
+	va_start(ap, purpose);
+	std::vprintf(formats[purpose], ap);
+	va_end(ap);
+	// Set a break point here to get the backtrace of what happened.
+}
+#else
+#define XXINTRNL_PRINTF(...)
+#endif
+
 #if __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus > 199711L
 #include <memory>
 #define XXINTRNL_PARAMTYPE(xx_typnm, ...) __VA_ARGS__&&		/// \internal // = TMPOBJ
@@ -90,35 +111,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define XXINTRNL_RVALTYPE(xx_typnm, ...) __VA_ARGS__		/// \internal // = IMMOBJ
 #define XXINTRNL_RRP2MT(xx_typnm, ...)						/// \internal // = CAST_FOR_MMMOVE
 #define TMPOBJ_INTERFACE				/// \internal
-#define TMPOBJ_IMPLEMENTATION(template_decl, cls, ...)	/// \internal
+namespace igraph {
+	template <typename T>
+	struct temporary_class {
+		typedef T type;
+	};
+}
 #else
 /// \internal
 namespace igraph {
-	struct GetTemporaryClassImpl_A {char x[256];};
-	template <typename U> GetTemporaryClassImpl_A GetTemporaryClassImpl_B (const typename U::Temporary* p);
-	template <typename U> char                    GetTemporaryClassImpl_B (...);
+	struct XXINTRNL_GetTmpClsImpl_A {char x[256];};
+	template <typename U> XXINTRNL_GetTmpClsImpl_A XXINTRNL_GetTmpClsImpl_B (const typename U::Temporary* p);
+	template <typename U> char                     XXINTRNL_GetTmpClsImpl_B (...);
 
-	template <typename T, int> struct GetTemporaryClassImpl         { typedef          T            v; };
-	template <typename T>      struct GetTemporaryClassImpl<T, 256> { typedef typename T::Temporary v; };
+	template <typename T, int> struct XXINTRNL_GetTmpClsImpl         { typedef          T            v; };
+	template <typename T>      struct XXINTRNL_GetTmpClsImpl<T, 256> { typedef typename T::Temporary v; };
 	
-	template <typename T> struct RvalueRefMoveType  { typedef       typename GetTemporaryClassImpl<T,sizeof(GetTemporaryClassImpl_B<T>(0))>::v& Type; };
+	template <typename T>
+	struct temporary_class {
+		typedef typename XXINTRNL_GetTmpClsImpl<T,sizeof(XXINTRNL_GetTmpClsImpl_B<T>(0))>::v type;
+	};
 }
 #define XXINTRNL_PARAMTYPE(xx_typnm, ...) const xx_typnm __VA_ARGS__::Temporary&
 #define XXINTRNL_MOVETYPE(xx_typnm, ...) xx_typnm __VA_ARGS__::Temporary&
 #define XXINTRNL_RVALTYPE(xx_typnm, ...) xx_typnm __VA_ARGS__::Temporary
 #define XXINTRNL_RRP2MT(xx_typnm, ...) const_cast<xx_typnm __VA_ARGS__::Temporary&>
-/// \internal
 namespace std {
+	
 	template <typename T>
-	static inline typename ::igraph::RvalueRefMoveType<T>::Type move(T& a) { return (typename ::igraph::RvalueRefMoveType<T>::Type)(a); }
+	struct add_rvalue_reference {
+		typedef typename ::igraph::temporary_class<T>::type& type;
+	};
+	
+	template <typename T>
+	static inline typename add_rvalue_reference<T>::type move(const T& a) {
+		return (typename add_rvalue_reference<T>::type)(a);
+	};
 }
+#include <typeinfo>
 /// \internal
 #define TMPOBJ_INTERFACE class Temporary; friend class Temporary
 /// \internal
 #define TMPOBJ_IMPLEMENTATION(template_decl, cls, ...)                          \
 template_decl class cls __VA_ARGS__::Temporary : public cls __VA_ARGS__ {       \
 public:                                                                         \
-	Temporary(const cls __VA_ARGS__& other) : cls(other) {}                     \
+	Temporary(const cls __VA_ARGS__& other) : cls(other) {} \
+	Temporary(const Temporary& other) : cls(other) {} \
 }
 #endif
 
@@ -148,21 +186,33 @@ protected:                                                                      
 	void mm_raw_copy(const cls __VA_ARGS__& other);                             \
 	void mm_raw_dealloc();                                                      \
 	void mm_raw_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other);       \
-	void mm_copy(const cls __VA_ARGS__& other) { mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_copy(other); } \
-	void mm_dealloc() { if (!mm_dont_dealloc) { mm_dont_dealloc = true; mm_raw_dealloc(); } } \
+	void mm_copy(const cls __VA_ARGS__& other);                                 \
+	void mm_dealloc() throw();                                                  \
 	void mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other);           \
 public:                                                                         \
 	cls(const cls __VA_ARGS__& other);                                          \
 	cls(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other);                   \
-	~cls();                                                                     \
+	~cls() throw();                                                             \
 	cls __VA_ARGS__& operator=(const cls __VA_ARGS__& other);                   \
 	cls __VA_ARGS__& operator=(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other)
 
 /// \internal
 #define XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(template_decl, attrib, xx_typnm, cls, ...) \
-TMPOBJ_IMPLEMENTATION(GROUP(template_decl), cls, __VA_ARGS__);                  \
+TMPOBJ_IMPLEMENTATION(GROUP(template_decl), cls, ## __VA_ARGS__);               \
+template_decl attrib void cls __VA_ARGS__::mm_copy(const cls __VA_ARGS__& other) { \
+	XXINTRNL_PRINTF(1, (((int)this)>>2)&0xFFF, (((int)&other)>>2)&0xFFF, #cls #__VA_ARGS__); \
+	mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_copy(other);                \
+}                                                                               \
 template_decl attrib void cls __VA_ARGS__::mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other) { \
+	XXINTRNL_PRINTF(2, (((int)this)>>2)&0xFFF, (((int)&other)>>2)&0xFFF, #cls #__VA_ARGS__); \
 	mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_move(other); other.mm_dont_dealloc = true; \
+}                                                                               \
+template_decl attrib void cls __VA_ARGS__::mm_dealloc() throw() {               \
+	if (!mm_dont_dealloc) {                                                     \
+        XXINTRNL_PRINTF(3, (((int)this)>>2)&0xFFF, #cls #__VA_ARGS__);          \
+		mm_dont_dealloc = true;                                                 \
+		mm_raw_dealloc();                                                       \
+	}                                                                           \
 }                                                                               \
 template_decl attrib cls __VA_ARGS__::cls(const cls __VA_ARGS__& other) {       \
 	mm_copy(other);                                                             \
@@ -170,7 +220,7 @@ template_decl attrib cls __VA_ARGS__::cls(const cls __VA_ARGS__& other) {       
 template_decl attrib cls __VA_ARGS__::cls(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other) {\
 	mm_move(XXINTRNL_RRP2MT(xx_typnm, cls __VA_ARGS__)(other));                 \
 }                                                                               \
-template_decl attrib cls __VA_ARGS__::~cls() { mm_dealloc(); }                  \
+template_decl attrib cls __VA_ARGS__::~cls() throw() { mm_dealloc(); }          \
 template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(const cls __VA_ARGS__& other) { \
 	if (this != &other) {                                                       \
 		mm_dealloc();                                                           \
@@ -188,7 +238,7 @@ template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(XXINTRNL_PARAMT
 
 /// \internal
 #define XXINTRNL_IMPLEMENT_COPY_METHOD(xx_typnm, other, cls, ...)    void cls __VA_ARGS__::mm_raw_copy(const cls __VA_ARGS__& other)
-#define XXINTRNL_IMPLEMENT_DEALLOC_METHOD(xx_typnm, other, cls, ...) void cls __VA_ARGS__::mm_raw_dealloc()
+#define XXINTRNL_IMPLEMENT_DEALLOC_METHOD(xx_typnm, other, cls, ...) void cls __VA_ARGS__::mm_raw_dealloc() throw()
 #define XXINTRNL_IMPLEMENT_MOVE_METHOD(xx_typnm, other, cls, ...)    void cls __VA_ARGS__::mm_raw_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other)
 
 /// \internal
@@ -262,8 +312,8 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  );
  \endcode 
  
- \param template_decl Template declaration. If there is more than 1 arguments, use the GROUP() macro to group them.
- \param attrib Attribute
+ \param template_decl Template declaration. If there is more than one template arguments, use the GROUP() macro to group them.
+ \param attrib Attribute.
  \param cls    Class name
  \param template_param Template parameters. You must supply the angle brackets.
  */ 
@@ -409,6 +459,7 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
 
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op, rhs_type) XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(rhs_type))
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_ATTR(attrib, cls, op, rhs_type) XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(attrib, , cls, op, rhs_type)
+#define IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(cls, op, rhs_type) IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_ATTR(, cls, op, rhs_type)
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION_ATTR_WITH_TEMPLATE(template_decl_and_attrib, cls, op) XXINTRNL_IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(GROUP(template_decl_and_attrib), typename, GROUP(cls), op, GROUP(const cls&))
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION_ATTR(attrib, cls, op) IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS_ATTR(attrib, cls, op, const cls&)
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION(cls, op) IMMEDIATE_OPERATOR_IMPLEMENTATION_ATTR(, cls, op)
@@ -437,12 +488,35 @@ namespace igraph {
 		OwnershipTransferMove,
 		/// Copy the object to the recipient, therefore ensuring both the previous owner and the recipient have ownership to the same value (but different object).
 		OwnershipTransferCopy,
+		/// The previous "owner" has no ownership on the object it's going to transfer. 
+		OwnershipTransferNoOwnership = OwnershipTransferKeepOriginal,
 	};
 }
 
 /**
  \brief Common initialization for memory manager with ownership transfer
  */
-#define COMMON_INIT_WITH(transfer_mode) mm_dont_dealloc(transfer_mode != ::igraph::OwnershipTransferKeepOriginal)
+#define COMMON_INIT_WITH(transfer_mode) mm_dont_dealloc(transfer_mode == ::igraph::OwnershipTransferKeepOriginal)
+
+/// \internal
+#define XXINTRNL_DEBUG_CALL_INITIALIZER(cls, ...) XXINTRNL_PRINTF(0, (((int)this)>>2)&0xFFF, #cls #__VA_ARGS__)
+
+/// \internal
+#define XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(cls, orig_type, copy_func, ...) \
+cls __VA_ARGS__::cls(const orig_type* pOrig, const OwnershipTransfer transfer) : COMMON_INIT_WITH(transfer) { \
+	if (pOrig != NULL) { \
+		XXINTRNL_DEBUG_CALL_INITIALIZER(cls, ## __VA_ARGS__); \
+		if (transfer == OwnershipTransferCopy) \
+			copy_func(&_, pOrig); \
+		else \
+			_ = ::std::move(*pOrig); \
+	} else \
+		mm_dont_dealloc = true; \
+}
+
+/// \internal
+#define XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(constr_name, orig_type) \
+constr_name(const orig_type* pOrig = NULL, const OwnershipTransfer transfer = OwnershipTransferMove)
+
 
 #endif

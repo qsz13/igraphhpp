@@ -47,78 +47,47 @@ namespace igraph {
 	private:
 		igraph_vector_ptr_t _;
 		
-		PointerVector() throw() {}
-		
 	public:
 		MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE(PointerVector, <T>);
+		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(PointerVector, igraph_vector_ptr_t);
 	
 		/// Create a PointerVector with "count" elements.
-		PointerVector(const long count) throw(Exception) {
-			TRY(igraph_vector_ptr_init(&_, count));
-		}
+		PointerVector(const long count) MAY_THROW_EXCEPTION;
 		
 		/// Copy a C array into a PointerVector.
-		PointerVector(T** const array, const long count) throw(Exception) {
-			TRY(igraph_vector_ptr_init_copy(&_, reinterpret_cast<void**>(array), count));
-		}
-		
-		/// Wrap a C array as a PointerVector.
-		static PointerVector<T> view(void* const* const array, const long count) throw() {
-			PointerVector<T> v;
-			v.mm_dont_dealloc = true;
-			igraph_vector_ptr_view(&v._, array, count);
-			return v;
-		}		
-		
-		/// Wrap or copy an igraph_vector_ptr_t to a PointerVector.
-		PointerVector(const igraph_vector_ptr_t& orig, const OwnershipTransfer transfer = OwnershipTransferKeepOriginal) : COMMON_INIT_WITH(transfer) {
-			if (transfer == OwnershipTransferCopy) {
-				TRY(igraph_vector_ptr_copy(&_, &orig));
-			} else
-				_ = orig;
-		}
+		PointerVector(T** const array, const long count) MAY_THROW_EXCEPTION;
 		
 		/// var_arg method to construct the PointerVector
-		PointerVector(const long count, ...) throw(Exception) {
-#if __GNUC__ >= 3
-			void* arr[count];
-#else
-			void** arr = new void*[count];
-#endif
-			std::va_list va;
-			va_start(va, count);
-			for (long i = 0; i < count; ++ i)
-				arr[i] = va_arg(va, T*);
-			va_end(va);
-			
-			TRY(igraph_vector_ptr_init_copy(&_, arr, count));
-			
-#if !(__GNUC__ >= 3)
-			// FIXME: May cause memory leak when an exception is thrown.
-			delete[] arr;
-#endif
+		PointerVector(const long count, ...) MAY_THROW_EXCEPTION;
+		
+		/// Wrap a C array as a PointerVector.
+		static PointerVector<T> view(T* const* const array, const long count) throw() {
+			igraph_vector_ptr_t _;
+			igraph_vector_ptr_view(&_, array, count);
+			return PointerVector<T>(_, OwnershipTransferNoOwnership);
 		}
 		
-		void null() throw() { igraph_vector_ptr_null(&_); }
+		void null() throw();
+		
 		T** ptr() throw() { return VECTOR(_); }
 		T* const& operator[](const long index) const throw() { return VECTOR(_)[index]; }
 		T*& operator[](const long index) throw() { return VECTOR(_)[index]; }
 		
-		T* e(const long index) const throw() { return igraph_vector_ptr_e(&_, index); }
-		void set(const long index, T* const value) throw() { igraph_vector_ptr_set(&_, index, value); }
+		T* e(const long index) const throw();
+		void set(const long index, T* const value) throw();
 		
-		bool empty() const throw() { return igraph_vector_ptr_empty(&_); }
-		long size() const throw() { return igraph_vector_ptr_size(&_); }
+		bool empty() const throw();
+		long size() const throw();
 		
-		void clear() throw() { igraph_vector_ptr_clear(&_); }
-		void reserve(const long new_size) throw(Exception) { TRY(igraph_vector_ptr_reserve(&_, new_size)); }
-		void resize(const long new_size) throw(Exception) { TRY(igraph_vector_ptr_resize(&_, new_size)); }
-		void push_back(T* const e) throw(Exception) { TRY(igraph_vector_ptr_push_back(&_, e)); }
-		void insert(const long pos, T* const e) throw(Exception) { TRY(igraph_vector_ptr_insert(&_, pos, e)); }
-		void remove(const long pos) throw() { igraph_vector_ptr_remove(&_, pos); }
+		void clear() throw();
+		void reserve(const long new_size) MAY_THROW_EXCEPTION;
+		void resize(const long new_size) MAY_THROW_EXCEPTION;
+		void push_back(T* const e) MAY_THROW_EXCEPTION;
+		void insert(const long pos, T* const e) MAY_THROW_EXCEPTION;
+		void remove(const long pos) throw();
 		
-		void copy_to(T** store) const throw() { igraph_vector_ptr_copy_to(&_, store); }
-		void sort(int(*compar)(const T*, const T*)) { igraph_vector_ptr_sort(&_, compar); }
+		void copy_to(T** store) const throw();
+		void sort(int(*compar)(const T*, const T*));
 		
 		// STL support.
 		typedef T* value_type;
@@ -130,15 +99,15 @@ namespace igraph {
 		typedef value_type* iterator;
 		typedef const value_type* const_iterator;
 		
-		iterator begin() { return _.stor_begin; }
-		iterator end() { return _.end; }
-		const_iterator begin() const { return reinterpret_cast<const_iterator>(_.stor_begin); }
-		const_iterator end() const { return reinterpret_cast<const_iterator>(_.end); }
-		size_type capacity() const { return _.stor_end - _.stor_begin; }
-		reference front() { return *_.stor_begin; }
-		const_reference front() const { *_.stor_begin; }
-		reference back() { return *(_.end-1); }
-		const_reference back() const { return *(_.end-1); }
+		iterator begin() throw() { return _.stor_begin; }
+		iterator end() throw() { return _.end; }
+		const_iterator begin() const throw() { return reinterpret_cast<const_iterator>(_.stor_begin); }
+		const_iterator end() const throw() { return reinterpret_cast<const_iterator>(_.end); }
+		size_type capacity() const throw() { return _.stor_end - _.stor_begin; }
+		reference front() throw() { return *_.stor_begin; }
+		const_reference front() const throw() { *_.stor_begin; }
+		reference back() throw() { return *(_.end-1); }
+		const_reference back() const throw() { return *(_.end-1); }
 		
 		/// Print content of the PointerVector.
 		void print() const throw() {
@@ -148,40 +117,12 @@ namespace igraph {
 		}
 		
 		/// Perform the function on every object of the PointerVector.
-		void perform(void(*fptr)(T*& obj, void* context), void* context = NULL) {
-			for (iterator cit = begin(); cit != end(); ++ cit)
-				fptr(*cit, context);
-		}
+		void perform(void(*fptr)(T*& obj, void* context), void* context = NULL);
 		
-		bool operator==(const PointerVector<T>& other) const {
-			if (size() != other.size())
-				return false;
-			for (const_iterator cit = begin(), cit2 = other.begin(); cit != end(); ++ cit, ++ cit2)
-				if (*cit != *cit2)
-					return false;
-			return true;
-		}
-		bool operator!=(const PointerVector<T>& other) const { return !(*this == other); }
+		bool operator==(const PointerVector<T>& other) const throw();
+		bool operator!=(const PointerVector<T>& other) const throw();
 		
 	};
-	
-	MEMORY_MANAGER_IMPLEMENTATION_ATTR_WITH_TEMPLATE(template<typename T>, inline, PointerVector, <T>);
-	
-	template<typename T>
-	inline IMPLEMENT_COPY_METHOD_WITH_TEMPLATE(PointerVector, <T>) {
-		igraph_vector_ptr_copy(&_, &other._);
-	}
-	
-	template<typename T>
-	inline IMPLEMENT_MOVE_METHOD_WITH_TEMPLATE(PointerVector, <T>) {
-		_ = std::move(other._);
-	}
-	
-	template<typename T>
-	inline IMPLEMENT_DEALLOC_METHOD_WITH_TEMPLATE(PointerVector, <T>) {
-		igraph_vector_ptr_destroy(&_);
-	}
-				   
 }
 
 #endif

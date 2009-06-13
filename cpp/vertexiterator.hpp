@@ -37,10 +37,10 @@ namespace igraph {
 		igraph_vit_t _;
 		
 	public:
-		VertexIterator(const Graph& g, const VertexSelector& vs) throw(Exception) {
+		VertexIterator(const Graph& g, const VertexSelector& vs) MAY_THROW_EXCEPTION {
 			TRY(igraph_vit_create(&g._, vs._, &_));
 		}
-		~VertexIterator() { igraph_vit_destroy(&_); }
+		~VertexIterator() throw() { igraph_vit_destroy(&_); }
 		
 		void next() throw() { IGRAPH_VIT_NEXT(_); }
 		bool at_end() const throw() { return IGRAPH_VIT_END(_); }
@@ -52,11 +52,7 @@ namespace igraph {
 		bool operator==(const VertexIterator& other) const throw() { !std::memcmp(&_, &other._, sizeof(_)); }
 		bool operator!=(const VertexIterator& other) const throw() { std::memcmp(&_, &other._, sizeof(_)); }
 		
-		Vector as_vector() const throw(Exception) {
-			igraph_vector_t res;
-			TRY(igraph_vit_as_vector(&_, &res));
-			return Vector(res, OwnershipTransferMove);
-		}
+		temporary_class<VertexVector>::type as_vector() const MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 		
@@ -65,9 +61,9 @@ namespace igraph {
 		private:
 			VertexIterator* iter;
 		public:
-			VertexIteratorSTLWrapper(VertexIterator* iter_) : iter(iter_) {}
+			VertexIteratorSTLWrapper(VertexIterator* iter_) throw() : iter(iter_) {}
 			
-			bool operator== (const VertexIteratorSTLWrapper& other) {
+			bool operator== (const VertexIteratorSTLWrapper& other) const throw() {
 				if (other.iter == NULL) {
 					if (iter != NULL)
 						return iter->at_end();
@@ -78,10 +74,10 @@ namespace igraph {
 				else
 					return *iter == *other.iter;
 			}
-			bool operator!= (const VertexIteratorSTLWrapper& other) { return !(*this == other); }
+			bool operator!= (const VertexIteratorSTLWrapper& other) const throw() { return !(*this == other); }
 			
-			Vertex operator*() const { return iter->get(); }
-			VertexIteratorSTLWrapper& operator++() { iter->next(); return *this; }
+			Vertex operator*() const throw() { return iter->get(); }
+			VertexIteratorSTLWrapper& operator++() throw() { iter->next(); return *this; }
 			
 #if IGRAPH_DEBUG
 			__attribute__((error("Do not use post-increment for VertexIteratorSTLWrapper!")))
@@ -89,13 +85,12 @@ namespace igraph {
 #endif
 		};
 		
-		
 		typedef VertexIteratorSTLWrapper iterator;
 		typedef VertexIteratorSTLWrapper const_iterator;
 		typedef Vertex value_type;
 		
-		iterator begin() { return VertexIteratorSTLWrapper(this); }
-		iterator end() { return VertexIteratorSTLWrapper(NULL); }
+		iterator begin() throw() { return VertexIteratorSTLWrapper(this); }
+		iterator end() throw() { return VertexIteratorSTLWrapper(NULL); }
 	};	
 }
 

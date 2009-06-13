@@ -1,0 +1,30 @@
+#summary Coding conventions used in this project
+#labels Phase-Design,Phase-QA,Phase-Implementation
+
+= Casing =
+_Revise these?_
+ * Class names should be in `CamelCase`.
+ * Method names should be `concatenated_by_underscores`.
+ * Macros names must be in `ALL_CAPS`.
+
+= Namimg =
+ * Method names should retain the original C method names if possible, e.g.
+   * `igraph_vector_null` → `igraph::Vector.null`
+   * `igraph_degree` → `igraph::Graph.degree`
+   * `igraph_vs_as_vector` → `igraph::VertexSelector.as_vector`
+ * Use the named constructor idiom unless default constructor really express its default meaning, e.g.
+   *  Use `igraph::Vector::seq(Integer, Integer)` instead of `igraph::Vector::Vector(Integer, Integer)`. An uninformed seeing the statement `Vector(5., 12.)` may think you are creating a vector with 2 elements.
+
+= Types =
+ * Use named enums instead of magic booleans to give a clear meaning to the readers.
+ * Use typedef to specify the usage of a general type. For example, Vertex and Edge are both typedefs of the generic type Integer.
+ * Return a wrapper type instead of STL type for containers. (e.g. Vector instead of `std::vector<T>`). Users should be instructed to switch between STL and igraph containers by iterators:
+   * `std::vector<Integer> stl_vector = std::vector<Integer> (igraph_vector.begin(), igraph_vector.end());`
+   * `Vector igraph_vector = Vector (stl_vector.begin(), stl_vector.end());`
+ * Always keep in mind that the igraph Integer is typedef-ed to be a double, not an int.
+
+= Language features =
+ * Avoid use of GCC C extensions, TR1 libraries or C++0x features, as these are not available in every compilers. If you really need these, you must provide an alternative that gives the same result when these feature are absent.
+ * Some of these features, however, have been dealt with, so you may freely use them. They are:
+   * `__attribute__`
+   * `std::move`

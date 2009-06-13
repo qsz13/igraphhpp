@@ -37,10 +37,10 @@ namespace igraph {
 		igraph_eit_t _;
 		
 	public:
-		EdgeIterator(const Graph& g, const EdgeSelector& vs) throw(Exception) {
+		EdgeIterator(const Graph& g, const EdgeSelector& vs) MAY_THROW_EXCEPTION {
 			TRY(igraph_eit_create(&g._, vs._, &_));
 		}
-		~EdgeIterator() { igraph_eit_destroy(&_); }
+		~EdgeIterator() throw() { igraph_eit_destroy(&_); }
 		
 		void next() throw() { IGRAPH_EIT_NEXT(_); }
 		bool at_end() const throw() { return IGRAPH_EIT_END(_); }
@@ -52,11 +52,7 @@ namespace igraph {
 		bool operator==(const EdgeIterator& other) const throw() { !std::memcmp(&_, &other._, sizeof(_)); }
 		bool operator!=(const EdgeIterator& other) const throw() { std::memcmp(&_, &other._, sizeof(_)); }
 		
-		Vector as_vector() const throw(Exception) {
-			igraph_vector_t res;
-			TRY(igraph_eit_as_vector(&_, &res));
-			return Vector(res, OwnershipTransferMove);
-		}
+		temporary_class<EdgeVector>::type as_vector() const MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 		
@@ -65,9 +61,9 @@ namespace igraph {
 		private:
 			EdgeIterator* iter;
 		public:
-			EdgeIteratorSTLWrapper(EdgeIterator* iter_) : iter(iter_) {}
+			EdgeIteratorSTLWrapper(EdgeIterator* iter_) throw() : iter(iter_) {}
 			
-			bool operator== (const EdgeIteratorSTLWrapper& other) {
+			bool operator== (const EdgeIteratorSTLWrapper& other) const throw() {
 				if (other.iter == NULL) {
 					if (iter != NULL)
 						return iter->at_end();
@@ -78,10 +74,10 @@ namespace igraph {
 				else
 					return *iter == *other.iter;
 			}
-			bool operator!= (const EdgeIteratorSTLWrapper& other) { return !(*this == other); }
+			bool operator!= (const EdgeIteratorSTLWrapper& other) const throw() { return !(*this == other); }
 			
-			Edge operator*() const { return iter->get(); }
-			EdgeIteratorSTLWrapper& operator++() { iter->next(); return *this; }
+			Edge operator*() const throw() { return iter->get(); }
+			EdgeIteratorSTLWrapper& operator++() throw() { iter->next(); return *this; }
 			
 #if IGRAPH_DEBUG
 			__attribute__((error("Do not use post-increment for VertexIteratorSTLWrapper!")))
@@ -94,8 +90,8 @@ namespace igraph {
 		typedef EdgeIteratorSTLWrapper const_iterator;
 		typedef Edge value_type;
 		
-		iterator begin() { return EdgeIteratorSTLWrapper(this); }
-		iterator end() { return EdgeIteratorSTLWrapper(NULL); }
+		iterator begin() throw() { return EdgeIteratorSTLWrapper(this); }
+		iterator end() throw() { return EdgeIteratorSTLWrapper(NULL); }
 		
 	};	
 }

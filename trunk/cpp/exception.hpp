@@ -36,8 +36,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if IGRAPH_DEBUG
 #define TRY(func) { int errcode = (func); if (errcode != IGRAPH_SUCCESS) throw Exception(errcode); }
+#define MAY_THROW_EXCEPTION throw(Exception)
 #else
 #define TRY(func) func
+#define MAY_THROW_EXCEPTION throw()
 #endif
 
 namespace igraph {

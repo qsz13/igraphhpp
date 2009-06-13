@@ -111,6 +111,7 @@ inline void XXINTRNL_PRINTF(int purpose, ...) throw() {
 #define XXINTRNL_RVALTYPE(xx_typnm, ...) __VA_ARGS__		/// \internal // = IMMOBJ
 #define XXINTRNL_RRP2MT(xx_typnm, ...)						/// \internal // = CAST_FOR_MMMOVE
 #define TMPOBJ_INTERFACE				/// \internal
+#define TMPOBJ_IMPLEMENTATION(template_decl, cls, ...)	/// \internal
 namespace igraph {
 	template <typename T>
 	struct temporary_class {

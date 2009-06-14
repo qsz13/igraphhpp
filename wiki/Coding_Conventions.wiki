@@ -24,10 +24,14 @@ _Revise these?_
  * Always keep in mind that the igraph Integer is typedef-ed to be a double, not an int.
 
 = Language features =
- * Avoid use of GCC C extensions, TR1 libraries or C++0x features, as these are not available in every compilers. If you really need these, you must provide an alternative that gives the same result when these feature are absent.
+ * Avoid use of GCC C extensions, TR1 libraries or C++0x features, as these are not available in every compilers. If you really need these, you must provide an alternative that gives the same result when these feature are absent. You can test for each of these with:
+   * GCC: `#if __GNUC__`
+   * C++0x: `#if __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus > 199711L`
  * Avoid the use of non-standard library, such as boost libraries. If the functionality of some library is required, all source code should be added them in this project.
  * Some of these features, however, have been dealt with, so you may freely use them. They are:
    * `__attribute__`
    * `std::move`
  * Avoid using boost features (e.g. `foreach`). Some people may not bother to download and configure boost.
- * All internal macro should be prefixed by `XXINTRNL_` so normal people won't see it.  And they should be put it in common.hpp
+ * All internal macro should be prefixed by `XXINTRNL_` so normal people won't see it. They should be used only in the file that defines it. `#undef` them after using if possible.
+   * *FIXME*: `XXINTRNL_WRAPPER_CONSTRUCTOR_***` currently breaks this rule.
+ * Unless you need `realloc()`, always allocate memory with `new[]`/`delete[]` or `alloca()`.

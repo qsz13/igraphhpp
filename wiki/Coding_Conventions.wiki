@@ -11,7 +11,7 @@ _Revise these?_
  * Method names should retain the original C method names if possible, e.g.
    * `igraph_vector_null` → `igraph::Vector.null`
    * `igraph_degree` → `igraph::Graph.degree`
-   * `igraph_vs_as_vector` → `igraph::VertexSelector.as_vector`
+   * `igraph_vs_as_vector` → `igraph::VertexSelector.as_vector` 
  * Use the named constructor idiom unless default constructor really express its default meaning, e.g.
    *  Use `igraph::Vector::seq(Integer, Integer)` instead of `igraph::Vector::Vector(Integer, Integer)`. An uninformed seeing the statement `Vector(5., 12.)` may think you are creating a vector with 2 elements.
 
@@ -25,8 +25,9 @@ _Revise these?_
 
 = Language features =
  * Avoid use of GCC C extensions, TR1 libraries or C++0x features, as these are not available in every compilers. If you really need these, you must provide an alternative that gives the same result when these feature are absent.
+ * Avoid the use of non-standard library, such as boost libraries. If the functionality of some library is required, all source code should be added them in this project.
  * Some of these features, however, have been dealt with, so you may freely use them. They are:
    * `__attribute__`
    * `std::move`
  * Avoid using boost features (e.g. `foreach`). Some people may not bother to download and configure boost.
- * Don't define your own utility macro (e.g. `FOR_INDEX`). If you must use that, put it in common.hpp and prefix it with `XXINTRNL_` so normal people won't see it.
+ * All internal macro should be prefixed by `XXINTRNL_` so normal people won't see it.  And they should be put it in common.hpp

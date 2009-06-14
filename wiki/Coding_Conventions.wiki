@@ -35,3 +35,36 @@ _Revise these?_
  * All internal macro should be prefixed by `XXINTRNL_` so normal people won't see it. They should be used only in the file that defines it. `#undef` them after using if possible.
    * *FIXME*: `XXINTRNL_WRAPPER_CONSTRUCTOR_***` currently breaks this rule.
  * Unless you need `realloc()`, always allocate memory with `new[]`/`delete[]` or `alloca()`.
+
+= Enums =
+ * To avoid polluting the shallower namespaces, if an enum is used by methods in only one class, then that enum must be placed in that class, i.e., instead of
+  {{{
+/** wrong **/
+enum FileType {     // used nowhere else.
+  Binary,
+  ASCII
+};
+class File {
+private:
+  std::FILE* fptr;
+public:
+  File(const char* filename, FileType type); 
+  // ...
+};
+}}}
+ do it like this:
+{{{
+/** correct **/
+class File {
+private:
+  std::FILE* fptr;
+public:
+  enum Type {     // used nowhere else.
+    Binary,
+    ASCII
+  };
+  File(const char* filename, Type type); 
+  // ...
+};
+}}}
+ Outside of the class you'd refer to the enum by File::Type and the values by File::Binary and File::ASCII.)

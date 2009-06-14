@@ -25,18 +25,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/graph.hpp>
 
 namespace igraph {
-	
+
 #if !IGRAPH_NO_ATTRIBUTES
 	__attribute__((constructor))
 #endif
 	void attach_attribute_table() {
 		igraph_i_set_attribute_table(&igraph_cattribute_table);
 	}
-	
-	
+
+
 	MEMORY_MANAGER_IMPLEMENTATION(Graph);
 	XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(Graph, igraph_t, igraph_copy);
-	
+
 	IMPLEMENT_COPY_METHOD(Graph) {
 		igraph_copy(&_, &other._);
 	}
@@ -46,47 +46,47 @@ namespace igraph {
 	IMPLEMENT_DEALLOC_METHOD(Graph) {
 		igraph_destroy(&_);
 	}
-	
-	
+
+
 	Graph::Graph(Integer size, Directedness directedness) MAY_THROW_EXCEPTION {
 		XXINTRNL_DEBUG_CALL_INITIALIZER(Graph);
 		TRY(igraph_empty(&_, size, directedness));
 	}
-	
+
 	::tempobj::temporary_class<Graph>::type Graph::empty(Integer size, Directedness directedness) MAY_THROW_EXCEPTION {
 		return ::std::move(Graph(size, directedness));
 	}
-	
+
 #pragma mark -
 #pragma mark Basic Query Operations
 
-	void Graph::edge(const Edge edge_id, Vertex& from, Vertex& to) const MAY_THROW_EXCEPTION { 
-		TRY(igraph_edge(&_, edge_id, &from, &to)); 
+	void Graph::edge(const Edge edge_id, Vertex& from, Vertex& to) const MAY_THROW_EXCEPTION {
+		TRY(igraph_edge(&_, edge_id, &from, &to));
 	}
 	Edge Graph::get_eid(const Vertex from, const Vertex to, const Directedness arc) const MAY_THROW_EXCEPTION {
 		Edge e;
 		TRY(igraph_get_eid(&_, &e, from, to, arc));
 		return e;
 	}
-	
+
 	::tempobj::temporary_class<VertexVector>::type Graph::neighbors(Vertex vid, NeighboringMode neimode) const MAY_THROW_EXCEPTION {
 		VertexVector res = VertexVector::zeros(0);
 		TRY(igraph_neighbors(&_, &res._, vid, (igraph_neimode_t)neimode));
 		return ::std::move(res);
 	}
-	
+
 	::tempobj::temporary_class<EdgeVector>::type Graph::adjacent(Vertex vid, NeighboringMode neimode) const MAY_THROW_EXCEPTION {
 		EdgeVector res = EdgeVector::zeros(0);
 		TRY(igraph_adjacent(&_, &res._, vid, (igraph_neimode_t)neimode));
 		return ::std::move(res);
 	}
-	
+
 	::tempobj::temporary_class<Vector>::type Graph::degree(const VertexSelector& vids, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
 		Vector res = Vector::zeros(vids.size(*this));
 		TRY(igraph_degree(&_, &res._, vids._, (igraph_neimode_t)neimode, countLoops));
 		return ::std::move(res);
 	}
-	
+
 #pragma mark -
 #pragma mark Adding and Deleting Vertices and Edges
 
@@ -94,33 +94,33 @@ namespace igraph {
 		TRY(igraph_add_edge(&_, from, to));
 		return *this;
 	}
-	
+
 	Graph& Graph::add_edges(const VertexVector& edges, void* const attr) MAY_THROW_EXCEPTION {
 		TRY(igraph_add_edges(&_, &edges._, attr));
 		return *this;
 	}
-	
+
 	Graph& Graph::add_vertices(const Integer nv, void* const attr) MAY_THROW_EXCEPTION {
 		TRY(igraph_add_vertices(&_, nv, attr));
 		return *this;
 	}
-	
+
 	Graph& Graph::delete_edges(const EdgeSelector& es) MAY_THROW_EXCEPTION {
 		TRY(igraph_delete_edges(&_, es._));
 		return *this;
 	}
-	
+
 	Graph& Graph::delete_edge(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION { return delete_edges(EdgeSelector::fromto(from, to)); }
 	Graph& Graph::delete_edge(const Edge eid) MAY_THROW_EXCEPTION { return delete_edges(EdgeSelector::single(eid)); }
-	
+
 	Graph& Graph::delete_vertices(const VertexSelector& vs) MAY_THROW_EXCEPTION {
 		TRY(igraph_delete_vertices(&_, vs._));
 		return *this;
 	}
-	
+
 #pragma mark -
 #pragma mark Deterministic Graph Generators
-	
+
 	::tempobj::temporary_class<Graph>::type Graph::create(const VertexVector& edges, const Integer min_size, const Directedness directedness) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_create(&_, &edges._, min_size, directedness));
@@ -192,19 +192,19 @@ namespace igraph {
 	}
 	::tempobj::temporary_class<Graph>::type Graph::kautz(const Integer m, const Integer n) MAY_THROW_EXCEPTION {
 		igraph_t _;
-		TRY(igraph_de_bruijn(&_, m, n));
+		TRY(igraph_kautz(&_, m, n));
 		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	// TODO: igraph_extended_chordal_ring when Matrix is implemented.
-	
+
 	Graph& Graph::connect_neighborhood(const Integer order, const NeighboringMode neimode) MAY_THROW_EXCEPTION {
 		TRY(igraph_connect_neighborhood(&_, order, (igraph_neimode_t)neimode));
 		return *this;
 	}
-	
+
 #pragma mark -
 #pragma mark Games: Randomized Graph Generators
-	
+
 	::tempobj::temporary_class<Graph>::type Graph::grg_game(const Integer size, const Real radius, const PeriodicLattice periodic) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_grg_game(&_, size, radius, periodic, NULL, NULL));
@@ -225,7 +225,7 @@ namespace igraph {
 		TRY(igraph_barabasi_game(&_, size, 0, &outseq._, outpref, directed));
 		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	
+
 #pragma mark -
 #pragma mark Basic Properties
 
@@ -234,10 +234,10 @@ namespace igraph {
 		TRY(igraph_are_connected(&_, from, to, &res));
 		return res;
 	}
-	
+
 #pragma mark -
 #pragma mark Reading and Writing Graphs from and to Files (GraphWriter)
-	
+
 	::tempobj::temporary_class<GraphWriter>::type Graph::writer(const char* filename) const {
 		return ::std::move(GraphWriter(&_, filename));
 	}
@@ -282,12 +282,12 @@ namespace igraph {
 		}
 		return false;
 	}
-	
+
 	::tempobj::temporary_class<GraphReader>::type Graph::reader(const char* filename) { return ::std::move(GraphReader(filename)); }
 	::tempobj::temporary_class<GraphReader>::type Graph::reader(std::FILE* filestream) throw() { return ::std::move(GraphReader(filestream)); }
-	
+
 	::tempobj::temporary_class<Graph>::type Graph::read(const char* filename, GraphFormat format) {
-		if (format == GraphFormat_auto) 
+		if (format == GraphFormat_auto)
 			format = identify_file_format(filename, false);
 		if (format != GraphFormat_auto) {
 			GraphReader reader = GraphReader(filename);

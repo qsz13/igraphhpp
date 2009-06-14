@@ -85,6 +85,18 @@ namespace igraph {
 #pragma mark -
 #pragma mark Deterministic Graph Generators
 		
+		enum StarMode {
+			StarMode_Out = IGRAPH_STAR_OUT,
+			StarMode_In = IGRAPH_STAR_IN,
+			StarMode_Undirected = IGRAPH_STAR_UNDIRECTED,
+		};
+		
+		enum TreeMode {
+			TreeMode_Out = IGRAPH_TREE_OUT,
+			TreeMode_In = IGRAPH_TREE_IN,
+			TreeMode_Undirected = IGRAPH_TREE_UNDIRECTED,
+		};		
+		
 		static ::tempobj::temporary_class<Graph>::type create(const VertexVector& edges, const Integer min_size = 0, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		// TODO: igraph_adjacency when Matrix is implemented.
 		// TODO: igraph_weighted_adjacency when Matrix is implemented.

@@ -43,26 +43,6 @@ namespace igraph {
 		GraphFormat_adjlist,
 	};
 	
-	enum lglIsolatedVertices {
-		lglIsolatedVertices_Ignore,
-		lglIsolatedVertices_Write,
-	};
-	
-	enum lglNames {
-		lglNames_Ignore,
-		lglNames_Read,
-	};
-	
-	enum lglWeights {
-		lglWeights_Ignore,
-		lglWeights_Read,
-	};
-	
-	enum EdgelistReadEngine {
-		EdgelistReadEngine_igraph,
-		EdgelistReadEngine_igraphhpp
-	};
-	
 	GraphFormat identify_file_format(const char* filename, const bool open_file_to_check = false);
 	
 	class GraphReader {
@@ -71,6 +51,21 @@ namespace igraph {
 		
 	public:
 		MEMORY_MANAGER_INTERFACE(GraphReader);
+		
+		enum lglNames {
+			lglNames_Ignore,
+			lglNames_Read,
+		};
+		
+		enum lglWeights {
+			lglWeights_Ignore,
+			lglWeights_Read,
+		};
+		
+		enum EdgelistReadEngine {
+			EdgelistReadEngine_igraph,
+			EdgelistReadEngine_igraphhpp
+		};
 		
 		GraphReader(const char* filename);
 		GraphReader(std::FILE* filestream) throw();
@@ -96,6 +91,11 @@ namespace igraph {
 		
 	public:
 		MEMORY_MANAGER_INTERFACE(GraphWriter);
+		
+		enum lglIsolatedVertices {
+			lglIsolatedVertices_Ignore,
+			lglIsolatedVertices_Write,
+		};
 		
 		void edgelist(const char* separator = NULL, const char* line_separator = NULL) MAY_THROW_EXCEPTION;
 		void adjlist(const char* first_separator = ", ", const char* separator = ", ", const char* line_separator = "\n") MAY_THROW_EXCEPTION;

@@ -98,18 +98,6 @@ namespace igraph {
 		EdgeMultiplicity_Multiple
 	};
 	
-	enum StarMode {
-		StarMode_Out = IGRAPH_STAR_OUT,
-		StarMode_In = IGRAPH_STAR_IN,
-		StarMode_Undirected = IGRAPH_STAR_UNDIRECTED,
-	};
-	
-	enum TreeMode {
-		TreeMode_Out = IGRAPH_TREE_OUT,
-		TreeMode_In = IGRAPH_TREE_IN,
-		TreeMode_Undirected = IGRAPH_TREE_UNDIRECTED,
-	};
-	
 	enum MutualConnections {
 		MutualConnections_NotMutual,
 		MutualConnections_Mutual,

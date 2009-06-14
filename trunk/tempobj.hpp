@@ -508,7 +508,7 @@ namespace tempobj {
 
 /// \internal
 #define XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(cls, orig_type, copy_func, ...) \
-cls __VA_ARGS__::cls(const orig_type* pOrig, const ::tempobj::OwnershipTransfer transfer) : COMMON_INIT_WITH(transfer) { \
+cls __VA_ARGS__::cls(orig_type const* pOrig, const ::tempobj::OwnershipTransfer transfer) : COMMON_INIT_WITH(transfer) { \
 	if (pOrig != NULL) { \
 		XXINTRNL_DEBUG_CALL_INITIALIZER(cls, ## __VA_ARGS__); \
 		if (transfer == ::tempobj::OwnershipTransferCopy) \
@@ -521,7 +521,7 @@ cls __VA_ARGS__::cls(const orig_type* pOrig, const ::tempobj::OwnershipTransfer 
 
 /// \internal
 #define XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(constr_name, orig_type) \
-constr_name(const orig_type* pOrig = NULL, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove)
+constr_name(orig_type const* pOrig = NULL, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove)
 
 
 #endif

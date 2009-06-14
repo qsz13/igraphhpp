@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IGRAPH_VERTEXSELECTOR_CPP
 
 #include <igraph/cpp/vertexselector.hpp>
+#include <igraph/cpp/graph.hpp>
 
 namespace igraph {
 	MEMORY_MANAGER_IMPLEMENTATION(VertexSelector);
@@ -42,66 +43,66 @@ namespace igraph {
 		igraph_vs_destroy(&_);
 	}
 
-	temporary_class<VertexSelector>::type VertexSelector::all() MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<VertexSelector>::type VertexSelector::all() MAY_THROW_EXCEPTION {
 		igraph_vs_t _ = igraph_vss_all();
-		return ::std::move(VertexSelector(&_, OwnershipTransferNoOwnership));
+		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
-	temporary_class<VertexSelector>::type VertexSelector::adj(const Vertex which, const NeighboringMode mode) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<VertexSelector>::type VertexSelector::adj(const Vertex which, const NeighboringMode mode) MAY_THROW_EXCEPTION {
 		igraph_vs_t _;
 		igraph_vs_adj(&_, which, (igraph_neimode_t)mode);
-		return ::std::move(VertexSelector(&_, OwnershipTransferMove));
+		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	temporary_class<VertexSelector>::type VertexSelector::nonadj(const Vertex which, const NeighboringMode mode) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<VertexSelector>::type VertexSelector::nonadj(const Vertex which, const NeighboringMode mode) MAY_THROW_EXCEPTION {
 		igraph_vs_t _;
 		TRY(igraph_vs_nonadj(&_, which, (igraph_neimode_t)mode));
-		return ::std::move(VertexSelector(&_, OwnershipTransferMove));
+		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	temporary_class<VertexSelector>::type VertexSelector::none() MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<VertexSelector>::type VertexSelector::none() MAY_THROW_EXCEPTION {
 		igraph_vs_t _ = igraph_vss_none();
-		return ::std::move(VertexSelector(&_, OwnershipTransferNoOwnership));
+		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
-	temporary_class<VertexSelector>::type VertexSelector::single(const Vertex which) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<VertexSelector>::type VertexSelector::single(const Vertex which) MAY_THROW_EXCEPTION {
 		igraph_vs_t _ = igraph_vss_1(which);
-		return ::std::move(VertexSelector(&_, OwnershipTransferNoOwnership));
+		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
-	temporary_class<VertexSelector>::type VertexSelector::vector(const VertexVector& vec, const OwnershipTransfer transfer) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<VertexSelector>::type VertexSelector::vector(const VertexVector& vec, const ::tempobj::OwnershipTransfer transfer) MAY_THROW_EXCEPTION {
 		igraph_vs_t _;
 		switch (transfer) {
-			case OwnershipTransferCopy: {
+			case ::tempobj::OwnershipTransferCopy: {
 				TRY(igraph_vs_vector_copy(&_, &vec._));
-				return ::std::move(VertexSelector(&_, OwnershipTransferMove));
+				return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferMove));
 			}
-			case OwnershipTransferMove: {
+			case ::tempobj::OwnershipTransferMove: {
 				_ = igraph_vss_vector(&vec._);
-				VertexSelector vs = VertexSelector(&_, OwnershipTransferNoOwnership);
+				VertexSelector vs = VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership);
 				vs.retained_vector = ::std::move(vec);
 				return ::std::move(vs);
 			}
-			case OwnershipTransferKeepOriginal: {
+			case ::tempobj::OwnershipTransferKeepOriginal: {
 				_ = igraph_vss_vector(&vec._);
-				return ::std::move(VertexSelector(&_, OwnershipTransferNoOwnership));
+				return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership));
 			}
 		}
 		std::unexpected();
 	}
 	
-	temporary_class<VertexSelector>::type VertexSelector::seq(const Vertex fromID, const Vertex toID) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<VertexSelector>::type VertexSelector::seq(const Vertex fromID, const Vertex toID) MAY_THROW_EXCEPTION {
 		igraph_vs_t _ = igraph_vss_seq(fromID, toID);
-		return ::std::move(VertexSelector(&_, OwnershipTransferNoOwnership));
+		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
 	int VertexSelector::type() const throw() { return igraph_vs_type(&_); }
 	bool VertexSelector::is_all() MAY_THROW_EXCEPTION { return igraph_vs_is_all(&_); }
 
-	temporary_class<VertexVector>::type VertexSelector::as_vector(const Graph& g) const MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<VertexVector>::type VertexSelector::as_vector(const Graph& g) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vs_as_vector(&g._, _, &res));
-		return ::std::move(VertexVector(&res, OwnershipTransferMove));
+		return ::std::move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 	
 	Integer VertexSelector::size(const Graph& g) const MAY_THROW_EXCEPTION {

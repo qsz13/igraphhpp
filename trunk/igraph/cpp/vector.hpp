@@ -32,7 +32,6 @@
 #include <igraph/igraph.h>
 #include <igraph/cpp/common.hpp>
 #include <igraph/cpp/exception.hpp>
-#include <igraph/cpp/tempobj.hpp>
 #include <cstdarg>
 
 namespace igraph {
@@ -57,13 +56,13 @@ namespace igraph {
 		Vector(const long count, const Real first, ...) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector sequentially between two values inclusively.
-		static temporary_class<Vector>::type seq(const Real from, const Real to) MAY_THROW_EXCEPTION;
+		static ::tempobj::temporary_class<Vector>::type seq(const Real from, const Real to) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector with "count" elements filled with zero.
-		static temporary_class<Vector>::type zeros(const long count = 0) MAY_THROW_EXCEPTION;
+		static ::tempobj::temporary_class<Vector>::type zeros(const long count = 0) MAY_THROW_EXCEPTION;
 		
 		/// Wrap a C array as a Vector. 
-		static temporary_class<Vector>::type view(const Real* const array, const long count) throw();
+		static ::tempobj::temporary_class<Vector>::type view(const Real* const array, const long count) throw();
 		
 		void null() throw();
 		void fill(const Real e) throw();
@@ -168,16 +167,21 @@ namespace igraph {
 		}
 		
 		/// Calculates the running mean of a vector.
-		temporary_class<Vector>::type running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<Vector>::type running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION;
 		
 		/// Generates an increasing random sequence of integers
-		static temporary_class<Vector>::type random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION;
+		static ::tempobj::temporary_class<Vector>::type random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION;
 		
 		
 		friend class VertexSelector;
 		friend class VertexIterator;
+		friend class EdgeSelector;
+		friend class EdgeIterator;
+		friend class Graph;
 		friend class GraphWriter;
+		friend class GraphReader;
 	};
+	MEMORY_MANAGER_INTERFACE_EX(Vector);
 
 	typedef Vector VertexVector;
 	typedef Vector EdgeVector;

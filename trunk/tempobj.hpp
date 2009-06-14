@@ -42,6 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		String(const char* src); 
 		String& operator+= (const String& other);
  };
+ MEMORY_MANAGER_INTERFACE_EX(String);			// <-- Also include this if you target C++03 *and* want to separate .h from .cpp.
  
  IMMEDIATE_OPERATOR_INTERFACE(String, +);		// <-- Use this to define an immediate operator, given the inplace one.
  
@@ -86,20 +87,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #if DEBUG_TEMPOBJ 
 #include <cstdio>
 #include <cstdarg>
-inline void XXINTRNL_PRINTF(int purpose, ...) throw() {
-	static const char* const formats[] = {
-		"Create [%03x] (%s)\n",
-		"Copy [%03x] := [%03x] (%s)\n",
-		"Move [%03x] <- [%03x] (%s)\n",
-		"Dealloc [%03x] (%s)\n",
-	};
-	
-	std::va_list ap;
-	va_start(ap, purpose);
-	std::vprintf(formats[purpose], ap);
-	va_end(ap);
-	// Set a break point here to get the backtrace of what happened.
+namespace tempobj {
+	inline void debug_printf(int purpose, ...) throw() {
+		static const char* const formats[] = {
+			"Create [%03x] (%s)\n",
+			"Copy [%03x] := [%03x] (%s)\n",
+			"Move [%03x] <- [%03x] (%s)\n",
+			"Dealloc [%03x] (%s)\n",
+		};
+		
+		std::va_list ap;
+		va_start(ap, purpose);
+		std::vprintf(formats[purpose], ap);
+		va_end(ap);
+		// Set a break point here to get the backtrace of what happened.
+	}
 }
+#define XXINTRNL_PRINTF ::tempobj::debug_printf
 #else
 #define XXINTRNL_PRINTF(...)
 #endif
@@ -110,9 +114,9 @@ inline void XXINTRNL_PRINTF(int purpose, ...) throw() {
 #define XXINTRNL_MOVETYPE(xx_typnm, ...) __VA_ARGS__&&		/// \internal // = MMMOBJ
 #define XXINTRNL_RVALTYPE(xx_typnm, ...) __VA_ARGS__		/// \internal // = IMMOBJ
 #define XXINTRNL_RRP2MT(xx_typnm, ...)						/// \internal // = CAST_FOR_MMMOVE
-#define TMPOBJ_INTERFACE				/// \internal
-#define TMPOBJ_IMPLEMENTATION(template_decl, cls, ...)	/// \internal
-namespace igraph {
+#define XXINTRNL_TMPOBJ_INTERFACE				/// \internal
+#define XXINTRNL_MEMORY_MANAGER_INTERFACE_EX(...) /// \internal
+namespace tempobj {
 	template <typename T>
 	struct temporary_class {
 		typedef T type;
@@ -120,7 +124,7 @@ namespace igraph {
 }
 #else
 /// \internal
-namespace igraph {
+namespace tempobj {
 	struct XXINTRNL_GetTmpClsImpl_A {char x[256];};
 	template <typename U> XXINTRNL_GetTmpClsImpl_A XXINTRNL_GetTmpClsImpl_B (const typename U::Temporary* p);
 	template <typename U> char                     XXINTRNL_GetTmpClsImpl_B (...);
@@ -141,7 +145,7 @@ namespace std {
 	
 	template <typename T>
 	struct add_rvalue_reference {
-		typedef typename ::igraph::temporary_class<T>::type& type;
+		typedef typename ::tempobj::temporary_class<T>::type& type;
 	};
 	
 	template <typename T>
@@ -151,13 +155,12 @@ namespace std {
 }
 #include <typeinfo>
 /// \internal
-#define TMPOBJ_INTERFACE class Temporary; friend class Temporary
-/// \internal
-#define TMPOBJ_IMPLEMENTATION(template_decl, cls, ...)                          \
-template_decl class cls __VA_ARGS__::Temporary : public cls __VA_ARGS__ {       \
+#define XXINTRNL_TMPOBJ_INTERFACE class Temporary; friend class Temporary
+#define XXINTRNL_MEMORY_MANAGER_INTERFACE_EX(cls, ...)                          \
+class cls __VA_ARGS__::Temporary : public cls __VA_ARGS__ {                     \
 public:                                                                         \
-	Temporary(const cls __VA_ARGS__& other) : cls(other) {} \
-	Temporary(const Temporary& other) : cls(other) {} \
+	Temporary(const cls __VA_ARGS__& other) : cls(other) {}                     \
+	Temporary(const Temporary& other) : cls(other) {}                           \
 }
 #endif
 
@@ -168,7 +171,7 @@ public:                                                                         
 #pragma mark -
 
 /// \internal
-namespace igraph {
+namespace tempobj {
 	/// \internal
 	struct XXINTRNL_DONT_DEALLOC {
 		bool value;
@@ -180,9 +183,9 @@ namespace igraph {
 /// \internal
 #define XXINTRNL_MEMORY_MANAGER_INTERFACE(xx_typnm, cls, ...)                   \
 public:                                                                         \
-	TMPOBJ_INTERFACE;                                                           \
+	XXINTRNL_TMPOBJ_INTERFACE;                                                  \
 private:                                                                        \
-	igraph::XXINTRNL_DONT_DEALLOC mm_dont_dealloc;                              \
+	::tempobj::XXINTRNL_DONT_DEALLOC mm_dont_dealloc;                           \
 protected:                                                                      \
 	void mm_raw_copy(const cls __VA_ARGS__& other);                             \
 	void mm_raw_dealloc();                                                      \
@@ -198,38 +201,37 @@ public:                                                                         
 	cls __VA_ARGS__& operator=(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other)
 
 /// \internal
-#define XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(template_decl, attrib, xx_typnm, cls, ...) \
-TMPOBJ_IMPLEMENTATION(GROUP(template_decl), cls, ## __VA_ARGS__);               \
-template_decl attrib void cls __VA_ARGS__::mm_copy(const cls __VA_ARGS__& other) { \
+#define XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(template_decl_and_attrib, xx_typnm, cls, ...) \
+template_decl_and_attrib void cls __VA_ARGS__::mm_copy(const cls __VA_ARGS__& other) { \
 	XXINTRNL_PRINTF(1, (((int)this)>>2)&0xFFF, (((int)&other)>>2)&0xFFF, #cls #__VA_ARGS__); \
 	mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_copy(other);                \
 }                                                                               \
-template_decl attrib void cls __VA_ARGS__::mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other) { \
+template_decl_and_attrib void cls __VA_ARGS__::mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other) { \
 	XXINTRNL_PRINTF(2, (((int)this)>>2)&0xFFF, (((int)&other)>>2)&0xFFF, #cls #__VA_ARGS__); \
 	mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_move(other); other.mm_dont_dealloc = true; \
 }                                                                               \
-template_decl attrib void cls __VA_ARGS__::mm_dealloc() throw() {               \
+template_decl_and_attrib void cls __VA_ARGS__::mm_dealloc() throw() {           \
 	if (!mm_dont_dealloc) {                                                     \
         XXINTRNL_PRINTF(3, (((int)this)>>2)&0xFFF, #cls #__VA_ARGS__);          \
 		mm_dont_dealloc = true;                                                 \
 		mm_raw_dealloc();                                                       \
 	}                                                                           \
 }                                                                               \
-template_decl attrib cls __VA_ARGS__::cls(const cls __VA_ARGS__& other) {       \
+template_decl_and_attrib cls __VA_ARGS__::cls(const cls __VA_ARGS__& other) {   \
 	mm_copy(other);                                                             \
 }                                                                               \
-template_decl attrib cls __VA_ARGS__::cls(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other) {\
+template_decl_and_attrib cls __VA_ARGS__::cls(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other) {\
 	mm_move(XXINTRNL_RRP2MT(xx_typnm, cls __VA_ARGS__)(other));                 \
 }                                                                               \
-template_decl attrib cls __VA_ARGS__::~cls() throw() { mm_dealloc(); }          \
-template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(const cls __VA_ARGS__& other) { \
+template_decl_and_attrib cls __VA_ARGS__::~cls() throw() { mm_dealloc(); }      \
+template_decl_and_attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(const cls __VA_ARGS__& other) { \
 	if (this != &other) {                                                       \
 		mm_dealloc();                                                           \
 		mm_copy(other);                                                         \
 	}                                                                           \
 	return *this;                                                               \
 }                                                                               \
-template_decl attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other) { \
+template_decl_and_attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other) { \
 	if (this != &other) {                                                       \
 		mm_dealloc();                                                           \
 		mm_move(XXINTRNL_RRP2MT(xx_typnm, cls __VA_ARGS__)(other));             \
@@ -301,6 +303,9 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
 #define MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE(cls, ...) XXINTRNL_MEMORY_MANAGER_INTERFACE(typename, cls, __VA_ARGS__)
 #define MEMORY_MANAGER_INTERFACE(cls)                    XXINTRNL_MEMORY_MANAGER_INTERFACE(        , cls)
 
+#define MEMORY_MANAGER_INTERFACE_EX(...) XXINTRNL_MEMORY_MANAGER_INTERFACE_EX(__VA_ARGS__)
+#define MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE MEMORY_MANAGER_INTERFACE_EX
+
 /**
  \brief Memory manager implementation with template and attributes.
  
@@ -313,12 +318,11 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  );
  \endcode 
  
- \param template_decl Template declaration. If there is more than one template arguments, use the GROUP() macro to group them.
- \param attrib Attribute.
+ \param template_decl_and_attrib Template declaration and attributes. If there is more than one template arguments, use the GROUP() macro to group them.
  \param cls    Class name
  \param template_param Template parameters. You must supply the angle brackets.
  */ 
-#define MEMORY_MANAGER_IMPLEMENTATION_ATTR_WITH_TEMPLATE(template_decl, attrib, cls, ...) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(GROUP(template_decl), attrib, typename, cls, __VA_ARGS__)
+#define MEMORY_MANAGER_IMPLEMENTATION_WITH_TEMPLATE(template_decl_and_attrib, cls, ...) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(GROUP(template_decl_and_attrib), typename, cls, __VA_ARGS__)
 
 /**
  \brief Memory manager implementation with attributes.
@@ -328,7 +332,7 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  \param attrib Attribute
  \param cls    Class name
   */
-#define MEMORY_MANAGER_IMPLEMENTATION_ATTR(attrib, cls) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(, attrib, , cls)
+#define MEMORY_MANAGER_IMPLEMENTATION_ATTR(attrib, cls) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(attrib, , cls)
 
 /**
  \brief Memory manager implementation.
@@ -473,9 +477,9 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
 #define IMMEDIATE_OPERATOR_IMPLEMENTATION_COMMUTATIVE(cls, op, rhs_type) IMMEDIATE_OPERATOR_IMPLEMENTATION_COMMUTATIVE_ATTR(, cls, op, rhs_type);
 
 
-namespace igraph {
+namespace tempobj {
 	/**
-	 \enum OwnershipTransfer
+	 \enum ::tempobj::OwnershipTransfer
 	 \brief How ownership of an unmanaged object should be transferred.
 	 
 	 This enum is used in custom code when the ownership of an object is to be transferred but cannot tracked by itself.
@@ -497,17 +501,17 @@ namespace igraph {
 /**
  \brief Common initialization for memory manager with ownership transfer
  */
-#define COMMON_INIT_WITH(transfer_mode) mm_dont_dealloc(transfer_mode == ::igraph::OwnershipTransferKeepOriginal)
+#define COMMON_INIT_WITH(transfer_mode) mm_dont_dealloc(transfer_mode == ::tempobj::OwnershipTransferKeepOriginal)
 
 /// \internal
 #define XXINTRNL_DEBUG_CALL_INITIALIZER(cls, ...) XXINTRNL_PRINTF(0, (((int)this)>>2)&0xFFF, #cls #__VA_ARGS__)
 
 /// \internal
 #define XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(cls, orig_type, copy_func, ...) \
-cls __VA_ARGS__::cls(const orig_type* pOrig, const OwnershipTransfer transfer) : COMMON_INIT_WITH(transfer) { \
+cls __VA_ARGS__::cls(const orig_type* pOrig, const ::tempobj::OwnershipTransfer transfer) : COMMON_INIT_WITH(transfer) { \
 	if (pOrig != NULL) { \
 		XXINTRNL_DEBUG_CALL_INITIALIZER(cls, ## __VA_ARGS__); \
-		if (transfer == OwnershipTransferCopy) \
+		if (transfer == ::tempobj::OwnershipTransferCopy) \
 			copy_func(&_, pOrig); \
 		else \
 			_ = ::std::move(*pOrig); \
@@ -517,7 +521,7 @@ cls __VA_ARGS__::cls(const orig_type* pOrig, const OwnershipTransfer transfer) :
 
 /// \internal
 #define XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(constr_name, orig_type) \
-constr_name(const orig_type* pOrig = NULL, const OwnershipTransfer transfer = OwnershipTransferMove)
+constr_name(const orig_type* pOrig = NULL, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove)
 
 
 #endif

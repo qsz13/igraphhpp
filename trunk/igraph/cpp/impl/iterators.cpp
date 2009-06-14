@@ -22,20 +22,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef IGRAPH_ITERATORS_CPP
 #define IGRAPH_ITERATORS_CPP
 
+#include <igraph/cpp/graph.hpp>
 #include <igraph/cpp/vertexiterator.hpp>
 #include <igraph/cpp/edgeiterator.hpp>
 
 namespace igraph {
-	temporary_class<VertexVector>::type VertexIterator::as_vector() const MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<VertexVector>::type VertexIterator::as_vector() const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vit_as_vector(&_, &res));
-		return ::std::move(VertexVector(&res, OwnershipTransferMove));
+		return ::std::move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 	
-	temporary_class<EdgeVector>::type EdgeIterator::as_vector() const MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<EdgeVector>::type EdgeIterator::as_vector() const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_eit_as_vector(&_, &res));
-		return ::std::move(EdgeVector(&res, OwnershipTransferMove));
+		return ::std::move(EdgeVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 }
 

@@ -75,15 +75,15 @@ namespace igraph {
 		GraphReader(const char* filename);
 		GraphReader(std::FILE* filestream) throw();
 		
-		temporary_class<Graph>::type edgelist(const Directedness directedness = Undirected, const EdgelistReadEngine engine = EdgelistReadEngine_igraph) MAY_THROW_EXCEPTION;
-		temporary_class<Graph>::type adjlist(const Directedness directedness = Undirected, const EdgeMultiplicity multiplicity = EdgeMultiplicity_Simple, const char* line_separator = "\n") MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<Graph>::type edgelist(const Directedness directedness = Undirected, const EdgelistReadEngine engine = EdgelistReadEngine_igraph) MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<Graph>::type adjlist(const Directedness directedness = Undirected, const EdgeMultiplicity multiplicity = EdgeMultiplicity_Simple, const char* line_separator = "\n") MAY_THROW_EXCEPTION;
 		// TODO: ncol, after StringVector is implemented.
-		temporary_class<Graph>::type lgl(const lglNames names = lglNames_Ignore, const lglWeights weights = lglWeights_Ignore) MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<Graph>::type lgl(const lglNames names = lglNames_Ignore, const lglWeights weights = lglWeights_Ignore) MAY_THROW_EXCEPTION;
 		// TODO: dimacs, after StringVector is implemented.
-		temporary_class<Graph>::type graphml(const int index = 0) MAY_THROW_EXCEPTION;
-		temporary_class<Graph>::type gml() MAY_THROW_EXCEPTION;
-		temporary_class<Graph>::type pajek() MAY_THROW_EXCEPTION;
-		temporary_class<Graph>::type graphdb(const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<Graph>::type graphml(const int index = 0) MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<Graph>::type gml() MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<Graph>::type pajek() MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<Graph>::type graphdb(const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 	};
 
 	class GraphWriter {
@@ -110,6 +110,9 @@ namespace igraph {
 			
 		friend class Graph;
 	};
+	
+	MEMORY_MANAGER_INTERFACE_EX(GraphReader);
+	MEMORY_MANAGER_INTERFACE_EX(GraphWriter);
 }
 
 #endif

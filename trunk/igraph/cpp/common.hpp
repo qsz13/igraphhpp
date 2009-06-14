@@ -138,4 +138,6 @@ namespace igraph {
 	};
 }
 
+#include <tempobj.hpp>
+
 #endif

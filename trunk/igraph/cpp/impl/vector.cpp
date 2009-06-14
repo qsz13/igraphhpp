@@ -69,16 +69,16 @@ namespace igraph {
 #endif
 	}
 	
-	temporary_class<Vector>::type Vector::seq(const Real from, const Real to) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Vector>::type Vector::seq(const Real from, const Real to) MAY_THROW_EXCEPTION {
 		igraph_vector_t _;
 		TRY(igraph_vector_init_seq(&_, from, to));
-		return ::std::move(Vector(&_, OwnershipTransferMove));
+		return ::std::move(Vector(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	temporary_class<Vector>::type Vector::zeros(const long count) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Vector>::type Vector::zeros(const long count) MAY_THROW_EXCEPTION {
 		igraph_vector_t _;
 		TRY(igraph_vector_init(&_, count));
-		return ::std::move(Vector(&_, OwnershipTransferMove));
+		return ::std::move(Vector(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 #pragma mark -
@@ -98,10 +98,10 @@ namespace igraph {
 #pragma mark -
 #pragma mark Vector views
 	
-	temporary_class<Vector>::type Vector::view(const Real* const array, const long count) throw() {
+	::tempobj::temporary_class<Vector>::type Vector::view(const Real* const array, const long count) throw() {
 		igraph_vector_t _;
 		igraph_vector_view(&_, array, count);
-		return ::std::move(Vector(&_, OwnershipTransferNoOwnership));
+		return ::std::move(Vector(&_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 
 #pragma mark -
@@ -191,18 +191,18 @@ namespace igraph {
 	
 #pragma mark -
 #pragma mark Not Graph Related Functions
-	temporary_class<Vector>::type Vector::running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Vector>::type Vector::running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 0));
 		TRY(igraph_running_mean(&_, &res, binwidth));
-		return ::std::move(Vector(&res, OwnershipTransferMove));
+		return ::std::move(Vector(&res, ::tempobj::OwnershipTransferMove));
 	}
 	
-	temporary_class<Vector>::type Vector::random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Vector>::type Vector::random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION {
 		igraph_vector_t _;
 		TRY(igraph_vector_init(&_, 0));
 		TRY(igraph_random_sample(&_, low, high, vector_length));
-		return ::std::move(Vector(&_, OwnershipTransferMove));
+		return ::std::move(Vector(&_, ::tempobj::OwnershipTransferMove));
 	}
 		
 }

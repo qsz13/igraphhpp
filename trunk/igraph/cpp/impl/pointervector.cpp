@@ -22,11 +22,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef IGRAPH_POINTERVECTOR_CPP
 #define IGRAPH_POINTERVECTOR_CPP
 
-
 #include <igraph/cpp/pointervector.hpp>
+#include <cstdarg>
 
 namespace igraph {
-	MEMORY_MANAGER_IMPLEMENTATION_ATTR_WITH_TEMPLATE(template<typename T>, , PointerVector, <T>);
+	MEMORY_MANAGER_IMPLEMENTATION_WITH_TEMPLATE(template<typename T>, PointerVector, <T>);
 	
 	template<typename T>
 	XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(PointerVector, igraph_vector_ptr_t, igraph_vector_ptr_copy, <T>);

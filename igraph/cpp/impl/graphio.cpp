@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef IGRAPH_GRAPHWRITER_CPP
 #define IGRAPH_GRAPHWRITER_CPP
 
+#include <igraph/cpp/graph.hpp>
 #include <igraph/cpp/graphio.hpp>
 #include <cstring>
 #include <cstdio>
@@ -81,9 +82,9 @@ namespace igraph {
 	}
 	
 	GraphReader::GraphReader(const char* filename) : fptr(::std::fopen(filename, "r")) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphReader); }
-	GraphReader::GraphReader(std::FILE* filestream) throw() : fptr(filestream), COMMON_INIT_WITH(OwnershipTransferNoOwnership) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphReader); }
+	GraphReader::GraphReader(std::FILE* filestream) throw() : fptr(filestream), COMMON_INIT_WITH(::tempobj::OwnershipTransferNoOwnership) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphReader); }
 	
-	temporary_class<Graph>::type GraphReader::edgelist(const Directedness directedness, EdgelistReadEngine engine) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Graph>::type GraphReader::edgelist(const Directedness directedness, EdgelistReadEngine engine) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		
 		if (engine == EdgelistReadEngine_igraph) {
@@ -107,13 +108,13 @@ namespace igraph {
 			igraph_vector_destroy(&resvec);
 		}
 		
-		return ::std::move(Graph(&_, OwnershipTransferMove));
+		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	temporary_class<Graph>::type GraphReader::adjlist(const Directedness directedness, const EdgeMultiplicity multiplicity, const char* line_separator) MAY_THROW_EXCEPTION {
-		unsigned linesep_len = strlen(line_separator);
+	::tempobj::temporary_class<Graph>::type GraphReader::adjlist(const Directedness directedness, const EdgeMultiplicity multiplicity, const char* line_separator) MAY_THROW_EXCEPTION {
+		int linesep_len = strlen(line_separator);
 		long linesep_rewind = 0;
-		for (unsigned i = 1; i < linesep_len; ++ i)
+		for (int i = 1; i < linesep_len; ++ i)
 			if (line_separator[i] == line_separator[0]) {
 				linesep_rewind = i - linesep_len;
 				break;
@@ -123,8 +124,8 @@ namespace igraph {
 		linesep_checker[linesep_len] = '\0';
 		
 		// Problem: We're managing the adjlist ourselves. Is it OK to do so?
-		unsigned capacity = 16;
-		unsigned length = 0;
+		int capacity = 16;
+		int length = 0;
 		igraph_adjlist_t adjlist;
 		adjlist.length = length;
 		adjlist.adjs = reinterpret_cast<igraph_vector_t*>(::std::calloc(capacity, sizeof(igraph_vector_t)));
@@ -177,41 +178,41 @@ namespace igraph {
 			igraph_vector_destroy(adjlist.adjs + i);
 		::std::free(adjlist.adjs);
 		
-		return ::std::move(Graph(&_, OwnershipTransferMove));
+		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	// TODO: ncol, after StringVector is implemented.
 	
-	temporary_class<Graph>::type GraphReader::lgl(const lglNames names, const lglWeights weights) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Graph>::type GraphReader::lgl(const lglNames names, const lglWeights weights) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_lgl(&_, fptr, names, weights));
-		return ::std::move(Graph(&_, OwnershipTransferMove));
+		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	// TODO: dimacs, after StringVector is implemented.
 	
-	temporary_class<Graph>::type GraphReader::graphml(const int index) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Graph>::type GraphReader::graphml(const int index) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_graphml(&_, fptr, index));
-		return ::std::move(Graph(&_, OwnershipTransferMove));
+		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	temporary_class<Graph>::type GraphReader::gml() MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Graph>::type GraphReader::gml() MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_gml(&_, fptr));
-		return ::std::move(Graph(&_, OwnershipTransferMove));
+		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	temporary_class<Graph>::type GraphReader::pajek() MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Graph>::type GraphReader::pajek() MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_pajek(&_, fptr));
-		return ::std::move(Graph(&_, OwnershipTransferMove));
+		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	temporary_class<Graph>::type GraphReader::graphdb(const Directedness directedness) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<Graph>::type GraphReader::graphdb(const Directedness directedness) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_graphdb(&_, fptr, directedness));
-		return ::std::move(Graph(&_, OwnershipTransferMove));
+		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 #pragma mark -
@@ -231,9 +232,9 @@ namespace igraph {
 	}
 	
 	GraphWriter::GraphWriter(const igraph_t* graph, const char* filename)
-		: _(graph), fptr(std::fopen(filename, "w")), COMMON_INIT_WITH(OwnershipTransferMove) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphWriter); }
+		: _(graph), fptr(std::fopen(filename, "w")), COMMON_INIT_WITH(::tempobj::OwnershipTransferMove) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphWriter); }
 	GraphWriter::GraphWriter(const igraph_t* graph, std::FILE* filestream) throw()
-		: _(graph), fptr(filestream), COMMON_INIT_WITH(OwnershipTransferNoOwnership) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphWriter); }
+		: _(graph), fptr(filestream), COMMON_INIT_WITH(::tempobj::OwnershipTransferNoOwnership) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphWriter); }
 
 	void GraphWriter::edgelist(const char* separator, const char* line_separator) MAY_THROW_EXCEPTION {
 		if (separator == NULL && line_separator == NULL) {
@@ -258,7 +259,7 @@ namespace igraph {
 		long vcount = (long)igraph_vcount(_);
 		for (long i = 0; i < vcount; ++ i) {
 			igraph_vector_t* pList = igraph_adjlist_get(&al, i);
-			fprintf(fptr, "%d%s", i, first_separator);
+			fprintf(fptr, "%ld%s", i, first_separator);
 			long deg = igraph_vector_size(pList);
 			for (long j = 0; j < deg; ++ j) {
 				if (j != 0)

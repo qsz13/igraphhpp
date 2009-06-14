@@ -31,7 +31,6 @@
 
 #include <igraph/igraph.h>
 #include <igraph/cpp/common.hpp>
-#include <igraph/cpp/tempobj.hpp>
 #include <igraph/cpp/exception.hpp>
 
 namespace igraph {
@@ -64,7 +63,7 @@ namespace igraph {
 		static PointerVector<T> view(T* const* const array, const long count) throw() {
 			igraph_vector_ptr_t _;
 			igraph_vector_ptr_view(&_, array, count);
-			return PointerVector<T>(_, OwnershipTransferNoOwnership);
+			return PointerVector<T>(_, ::tempobj::OwnershipTransferNoOwnership);
 		}
 		
 		void null() throw();
@@ -123,6 +122,9 @@ namespace igraph {
 		bool operator!=(const PointerVector<T>& other) const throw();
 		
 	};
+	
+	template<typename T>
+	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(PointerVector, <T>);
 }
 
 #endif

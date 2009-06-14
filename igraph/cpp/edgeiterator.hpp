@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/igraph.h>
 #include <igraph/cpp/exception.hpp>
 #include <igraph/cpp/vector.hpp>
-#include <igraph/cpp/graph.hpp>
 #include <cstring>
 
 namespace igraph {
@@ -52,7 +51,7 @@ namespace igraph {
 		bool operator==(const EdgeIterator& other) const throw() { !std::memcmp(&_, &other._, sizeof(_)); }
 		bool operator!=(const EdgeIterator& other) const throw() { std::memcmp(&_, &other._, sizeof(_)); }
 		
-		temporary_class<EdgeVector>::type as_vector() const MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<EdgeVector>::type as_vector() const MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 		

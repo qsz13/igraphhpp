@@ -22,19 +22,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef IGRAPH_HPP
 #define IGRAPH_HPP
 
+
 #include <igraph/cpp/common.hpp>
 #include <igraph/cpp/exception.hpp>
 
 #include <igraph/cpp/vector.hpp>
 #include <igraph/cpp/pointervector.hpp>
 
+#include <igraph/cpp/graph.hpp>
+#include <igraph/cpp/graphio.hpp>
+
 #include <igraph/cpp/vertexselector.hpp>
 #include <igraph/cpp/vertexiterator.hpp>
 #include <igraph/cpp/edgeselector.hpp>
 #include <igraph/cpp/edgeiterator.hpp>
-
-#include <igraph/cpp/graphio.hpp>
-#include <igraph/cpp/graph.hpp>
 
 //------------------------------------------------------------------------------
 

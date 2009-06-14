@@ -40,7 +40,7 @@ namespace igraph {
 		GraphFormat_pajek,
 		GraphFormat_dot,
 		GraphFormat_graphdb,
-		GraphFormat_adjacency,
+		GraphFormat_adjlist,
 	};
 	
 	enum lglIsolatedVertices {
@@ -76,7 +76,7 @@ namespace igraph {
 		GraphReader(std::FILE* filestream) throw();
 		
 		temporary_class<Graph>::type edgelist(const Directedness directedness = Undirected, const EdgelistReadEngine engine = EdgelistReadEngine_igraph) MAY_THROW_EXCEPTION;
-		temporary_class<Graph>::type adjacency(const char* line_separator = NULL, const char* comment_seperator = NULL) MAY_THROW_EXCEPTION;
+		temporary_class<Graph>::type adjlist(const Directedness directedness = Undirected, const EdgeMultiplicity multiplicity = EdgeMultiplicity_Simple, const char* line_separator = "\n") MAY_THROW_EXCEPTION;
 		// TODO: ncol, after StringVector is implemented.
 		temporary_class<Graph>::type lgl(const lglNames names = lglNames_Ignore, const lglWeights weights = lglWeights_Ignore) MAY_THROW_EXCEPTION;
 		// TODO: dimacs, after StringVector is implemented.
@@ -98,7 +98,7 @@ namespace igraph {
 		MEMORY_MANAGER_INTERFACE(GraphWriter);
 		
 		void edgelist(const char* separator = NULL, const char* line_separator = NULL) MAY_THROW_EXCEPTION;
-		void adjacency(const char* first_separator = ", ", const char* separator = ", ", const char* line_separator = "\n") MAY_THROW_EXCEPTION;
+		void adjlist(const char* first_separator = ", ", const char* separator = ", ", const char* line_separator = "\n") MAY_THROW_EXCEPTION;
 		void ncol(const char* names = NULL, const char* weights = NULL) MAY_THROW_EXCEPTION;
 		void lgl(const char* names = NULL, const char* weights = NULL, const lglIsolatedVertices isolates = lglIsolatedVertices_Ignore) MAY_THROW_EXCEPTION;
 		void dimacs(const Vertex source, const Vertex target, const Vector& capacity_of_each_edge) MAY_THROW_EXCEPTION;

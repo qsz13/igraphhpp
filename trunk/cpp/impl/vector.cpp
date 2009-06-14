@@ -188,6 +188,22 @@ namespace igraph {
 #pragma mark Sorting
 	
 	void Vector::sort() throw() { igraph_vector_sort(&_); }
+	
+#pragma mark -
+#pragma mark Not Graph Related Functions
+	temporary_class<Vector>::type Vector::running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION {
+		igraph_vector_t res;
+		TRY(igraph_vector_init(&res, 0));
+		TRY(igraph_running_mean(&_, &res, binwidth));
+		return ::std::move(Vector(&res, OwnershipTransferMove));
+	}
+	
+	temporary_class<Vector>::type Vector::random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION {
+		igraph_vector_t _;
+		TRY(igraph_vector_init(&_, 0));
+		TRY(igraph_random_sample(&_, low, high, vector_length));
+		return ::std::move(Vector(&_, OwnershipTransferMove));
+	}
 		
 }
 

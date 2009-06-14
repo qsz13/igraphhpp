@@ -26,6 +26,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace igraph {
 	
+#if !IGRAPH_NO_ATTRIBUTES
+	__attribute__((constructor))
+#endif
+	void attach_attribute_table() {
+		igraph_i_set_attribute_table(&igraph_cattribute_table);
+	}
+	
+	
 	MEMORY_MANAGER_IMPLEMENTATION(Graph);
 	XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(Graph, igraph_t, igraph_copy);
 	
@@ -111,6 +119,114 @@ namespace igraph {
 	}
 	
 #pragma mark -
+#pragma mark Deterministic Graph Generators
+	
+	temporary_class<Graph>::type Graph::create(const VertexVector& edges, const Integer min_size, const Directedness directedness) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_create(&_, &edges._, min_size, directedness));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	// TODO: igraph_adjacency when Matrix is implemented.
+	// TODO: igraph_weighted_adjacency when Matrix is implemented.
+	// TODO: igraph_adjlist when AdjacencyList is implemented.
+	temporary_class<Graph>::type Graph::star(const Integer n, const StarMode mode, const Vertex center) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_star(&_, n, (igraph_star_mode_t)mode, center));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::lattice(const Vector& dimensions, const PeriodicLattice periodic, const Integer step, const Directedness directedness, const MutualConnections mutual) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_lattice(&_, &dimensions._, step, directedness, mutual, periodic));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::lattice_2d(const Integer width, const Integer length, const PeriodicLattice periodic, const Integer step, const Directedness directedness, const MutualConnections mutual) MAY_THROW_EXCEPTION {
+		Integer raw_dimensions[2] = {width, length};
+		return lattice(Vector::view(raw_dimensions, 2), periodic, step, directedness, mutual);
+	}
+	temporary_class<Graph>::type Graph::lattice_3d(const Integer width, const Integer length, const Integer height, const PeriodicLattice periodic, const Integer step, const Directedness directedness, const MutualConnections mutual) MAY_THROW_EXCEPTION {
+		Integer raw_dimensions[3] = {width, length, height};
+		return lattice(Vector::view(raw_dimensions, 3), periodic, step, directedness, mutual);
+	}
+	temporary_class<Graph>::type Graph::ring(const Integer size, const Directedness directedness, const MutualConnections mutual, const PeriodicLattice periodic) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_ring(&_, size, directedness, mutual, periodic));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::tree(const Integer n, const Integer children, const TreeMode type) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_tree(&_, n, children, (igraph_tree_mode_t)type));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::full(const Integer n, const Directedness directedness, const SelfLoops loops) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_full(&_, n, directedness, loops));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::complete(const Integer n, const Directedness directedness, const SelfLoops loops) MAY_THROW_EXCEPTION {
+		return full(n, directedness, loops);
+	}
+	temporary_class<Graph>::type Graph::full_citation(const Integer n, const Directedness directedness) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_full_citation(&_, n, directedness));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::famous(const char* name) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_famous(&_, name));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::lcf_vector(const Integer n, const Vector& shifts, const Integer repeats) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_lcf_vector(&_, n, &shifts._, repeats));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::atlas(const int number) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_atlas(&_, number));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::de_bruijn(const Integer m, const Integer n) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_de_bruijn(&_, m, n));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::kautz(const Integer m, const Integer n) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_de_bruijn(&_, m, n));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	// TODO: igraph_extended_chordal_ring when Matrix is implemented.
+	
+	Graph& Graph::connect_neighborhood(const Integer order, const NeighboringMode neimode) MAY_THROW_EXCEPTION {
+		TRY(igraph_connect_neighborhood(&_, order, (igraph_neimode_t)neimode));
+		return *this;
+	}
+	
+#pragma mark -
+#pragma mark Games: Randomized Graph Generators
+	
+	temporary_class<Graph>::type Graph::grg_game(const Integer size, const Real radius, const PeriodicLattice periodic) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_grg_game(&_, size, radius, periodic, NULL, NULL));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::grg_game(const Integer size, const Real radius, const PeriodicLattice periodic, Vector& x_coords, Vector& y_coords) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_grg_game(&_, size, radius, periodic, &x_coords._, &y_coords._));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::barabasi_game(const Integer size, const Integer m, const Directedness directed, const BarabasiOutPref outpref) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_barabasi_game(&_, size, m, NULL, outpref, directed));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	temporary_class<Graph>::type Graph::barabasi_game(const Integer size, const Vector& outseq, const Directedness directed, const BarabasiOutPref outpref) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_barabasi_game(&_, size, 0, &outseq._, outpref, directed));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	
+#pragma mark -
 #pragma mark Basic Properties
 
 	bool Graph::are_connected(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION {
@@ -129,14 +245,14 @@ namespace igraph {
 		return ::std::move(GraphWriter(&_, filestream));
 	}
 
-	void write(const char* filename, GraphFormat format = GraphFormat_auto) const MAY_THROW_EXCEPTION {
+	bool Graph::write(const char* filename, GraphFormat format) const MAY_THROW_EXCEPTION {
 		if (format == GraphFormat_auto)
 			format = identify_file_format(filename, false);
 		if (format != GraphFormat_auto) {
-			GraphWriter writer = get_writer(filename);
+			GraphWriter writer = GraphWriter(&_, filename);
 			switch (format) {
-				case GraphFormat_adjacency:
-					writer.adjacency();
+				case GraphFormat_adjlist:
+					writer.adjlist();
 					break;
 				case GraphFormat_dot:
 					writer.dot();
@@ -167,6 +283,37 @@ namespace igraph {
 		return false;
 	}
 	
+	temporary_class<GraphReader>::type Graph::reader(const char* filename) { return ::std::move(GraphReader(filename)); }
+	temporary_class<GraphReader>::type Graph::reader(std::FILE* filestream) throw() { return ::std::move(GraphReader(filestream)); }
+	
+	temporary_class<Graph>::type Graph::read(const char* filename, GraphFormat format) {
+		if (format == GraphFormat_auto) 
+			format = identify_file_format(filename, false);
+		if (format != GraphFormat_auto) {
+			GraphReader reader = GraphReader(filename);
+			switch (format) {
+				case GraphFormat_adjlist:
+					return ::std::move(reader.adjlist());
+//				case GraphFormat_dimacs:
+				case GraphFormat_dot:
+					break;
+				case GraphFormat_edgelist:
+					return ::std::move(reader.edgelist());
+				case GraphFormat_gml:
+					return ::std::move(reader.gml());
+				case GraphFormat_graphdb:
+					return ::std::move(reader.graphdb());
+				case GraphFormat_lgl:
+					return ::std::move(reader.lgl());
+//				case GraphFormat_ncol:
+				case GraphFormat_pajek:
+					return ::std::move(reader.pajek());
+				default:
+					break;
+			}
+		}
+		throw ::std::runtime_error("File type cannot be determined.");
+	}
 }
 
 #endif

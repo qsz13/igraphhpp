@@ -25,12 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/graphio.hpp>
 #include <cstring>
 #include <cstdio>
-#if __unix__ || __MACH__
-#include <sys/stat.h>
-#include <sys/mman.h>
-#else if __WINDOWS__
-#include <windows.h>
-#endif
+#include <cstdlib>
 #if __MSVC__
 #define strcasecmp _stricmp
 #endif
@@ -54,8 +49,8 @@ namespace igraph {
 			else if (strcasecmp("edge", theDot) == 0) return GraphFormat_edgelist;
 			else if (strcasecmp("edges", theDot) == 0) return GraphFormat_edgelist;
 			else if (strcasecmp("edgelist", theDot) == 0) return GraphFormat_edgelist;
-			else if (strcasecmp("adj", theDot) == 0) return GraphFormat_adjacency;
-			else if (strcasecmp("adjacency", theDot) == 0) return GraphFormat_adjacency;
+			else if (strcasecmp("adj", theDot) == 0) return GraphFormat_adjlist;
+			else if (strcasecmp("adjlist", theDot) == 0) return GraphFormat_adjlist;
 			else if (strcasecmp("graphdb", theDot) == 0) return GraphFormat_graphdb;
 			else if (!open_file_to_check) {
 				if (strcasecmp("txt", theDot) == 0) return GraphFormat_edgelist;
@@ -85,10 +80,10 @@ namespace igraph {
 		::std::fclose(fptr);
 	}
 	
-	GraphReader(const char* filename) : fptr(::std::fopen(filename, "r")) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphReader); }
-	GraphReader(std::FILE* filestream) throw() : fptr(filestream), COMMON_INIT_WITH(OwnershipTransferNoOwnership) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphReader); }
+	GraphReader::GraphReader(const char* filename) : fptr(::std::fopen(filename, "r")) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphReader); }
+	GraphReader::GraphReader(std::FILE* filestream) throw() : fptr(filestream), COMMON_INIT_WITH(OwnershipTransferNoOwnership) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphReader); }
 	
-	temporary_class<Graph>::type edgelist(const Directedness directedness, EdgelistReadEngine engine) MAY_THROW_EXCEPTION {
+	temporary_class<Graph>::type GraphReader::edgelist(const Directedness directedness, EdgelistReadEngine engine) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		
 		if (engine == EdgelistReadEngine_igraph) {
@@ -99,7 +94,7 @@ namespace igraph {
 			
 			while (!feof(fptr)) {
 				int num;
-				if (fscanf("%d", &num, fptr) != 0)
+				if (fscanf(fptr, "%d", &num) != 0)
 					igraph_vector_push_back(&resvec, num);
 				else
 					fseek(fptr, 1, SEEK_CUR);
@@ -115,17 +110,109 @@ namespace igraph {
 		return ::std::move(Graph(&_, OwnershipTransferMove));
 	}
 	
-	/*
-	temporary_class<Graph>::type adjacency(const char* line_separator = NULL, const char* comment_seperator = NULL) MAY_THROW_EXCEPTION;
-	// TODO: ncol, after StringVector is implemented.
-	temporary_class<Graph>::type lgl(const lglNames names = lglNames_Ignore, const lglWeights weights = lglWeights_Ignore) MAY_THROW_EXCEPTION;
-	// TODO: dimacs, after StringVector is implemented.
-	temporary_class<Graph>::type graphml(const int index = 0) MAY_THROW_EXCEPTION;
-	temporary_class<Graph>::type gml() MAY_THROW_EXCEPTION;
-	temporary_class<Graph>::type pajek() MAY_THROW_EXCEPTION;
-	temporary_class<Graph>::type graphdb(const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
-	*/
+	temporary_class<Graph>::type GraphReader::adjlist(const Directedness directedness, const EdgeMultiplicity multiplicity, const char* line_separator) MAY_THROW_EXCEPTION {
+		unsigned linesep_len = strlen(line_separator);
+		long linesep_rewind = 0;
+		for (unsigned i = 1; i < linesep_len; ++ i)
+			if (line_separator[i] == line_separator[0]) {
+				linesep_rewind = i - linesep_len;
+				break;
+			}
+		
+		char* linesep_checker = reinterpret_cast<char*>(alloca(linesep_len+1));
+		linesep_checker[linesep_len] = '\0';
+		
+		// Problem: We're managing the adjlist ourselves. Is it OK to do so?
+		unsigned capacity = 16;
+		unsigned length = 0;
+		igraph_adjlist_t adjlist;
+		adjlist.length = length;
+		adjlist.adjs = reinterpret_cast<igraph_vector_t*>(::std::calloc(capacity, sizeof(igraph_vector_t)));
+		
+		igraph_vector_t resvec;
+		igraph_vector_init(&resvec, 0);
+		int num;
+		int head_vertex = -1;
+		
+		while (!feof(fptr)) {
+			if (fscanf(fptr, "%d", &num) != 0) {
+				if (num > length) {
+					length = num;
+					if (num > capacity) {
+						unsigned old_capacity = capacity;
+						capacity *= 2;	// TODO: Nonlinear scaling.
+						adjlist.adjs = reinterpret_cast<igraph_vector_t*>(::std::realloc(adjlist.adjs, sizeof(igraph_vector_t) * capacity));
+						::std::memset(adjlist.adjs - capacity + old_capacity, 0, sizeof(igraph_vector_t) * (capacity - old_capacity));
+					}
+				}
+				if (head_vertex == -1)
+					head_vertex = num;
+				else 
+					igraph_vector_push_back(&resvec, num);
+			} else {
+				fread(linesep_checker, linesep_len, 1, fptr);
+				if (strcmp(linesep_checker, line_separator) == 0) {
+					if (head_vertex != -1) {
+						igraph_vector_t* target_vector = adjlist.adjs + head_vertex;
+						if (target_vector->stor_begin == NULL && target_vector->stor_end == NULL && target_vector->end == NULL) {
+							*target_vector = ::std::move(resvec);
+							igraph_vector_init(&resvec, 0);
+						} else {
+							igraph_vector_append(target_vector, &resvec);
+							igraph_vector_clear(&resvec);
+						}
+						head_vertex = -1;
+					}
+				} else if (linesep_rewind != 0)
+					fseek(fptr, SEEK_CUR, linesep_rewind);
+			}
+		}
+		
+		igraph_vector_destroy(&resvec);
+		
+		igraph_t _;
+		TRY(igraph_adjlist(&_, &adjlist, directedness, multiplicity));
+		
+		for (unsigned i = 0; i < adjlist.length; ++ i)
+			igraph_vector_destroy(adjlist.adjs + i);
+		::std::free(adjlist.adjs);
+		
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
 	
+	// TODO: ncol, after StringVector is implemented.
+	
+	temporary_class<Graph>::type GraphReader::lgl(const lglNames names, const lglWeights weights) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_read_graph_lgl(&_, fptr, names, weights));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	
+	// TODO: dimacs, after StringVector is implemented.
+	
+	temporary_class<Graph>::type GraphReader::graphml(const int index) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_read_graph_graphml(&_, fptr, index));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	
+	temporary_class<Graph>::type GraphReader::gml() MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_read_graph_gml(&_, fptr));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	
+	temporary_class<Graph>::type GraphReader::pajek() MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_read_graph_pajek(&_, fptr));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
+	
+	temporary_class<Graph>::type GraphReader::graphdb(const Directedness directedness) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_read_graph_graphdb(&_, fptr, directedness));
+		return ::std::move(Graph(&_, OwnershipTransferMove));
+	}
 	
 #pragma mark -
 #pragma mark GraphWriter
@@ -165,7 +252,7 @@ namespace igraph {
 		}
 	}
 	
-	void GraphWriter::adjacency(const char* first_separator, const char* separator, const char* line_separator) MAY_THROW_EXCEPTION {
+	void GraphWriter::adjlist(const char* first_separator, const char* separator, const char* line_separator) MAY_THROW_EXCEPTION {
 		igraph_adjlist_t al;
 		TRY(igraph_adjlist_init(_, &al, IGRAPH_OUT));
 		long vcount = (long)igraph_vcount(_);

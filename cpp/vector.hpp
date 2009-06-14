@@ -167,6 +167,13 @@ namespace igraph {
 				mm_dont_dealloc = true;
 		}
 		
+		/// Calculates the running mean of a vector.
+		temporary_class<Vector>::type running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION;
+		
+		/// Generates an increasing random sequence of integers
+		static temporary_class<Vector>::type random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION;
+		
+		
 		friend class VertexSelector;
 		friend class VertexIterator;
 		friend class GraphWriter;

@@ -93,6 +93,38 @@ namespace igraph {
 		ContainSelfLoops = IGRAPH_LOOPS
 	};
 	
+	enum EdgeMultiplicity {
+		EdgeMultiplicity_Simple,
+		EdgeMultiplicity_Multiple
+	};
+	
+	enum StarMode {
+		StarMode_Out = IGRAPH_STAR_OUT,
+		StarMode_In = IGRAPH_STAR_IN,
+		StarMode_Undirected = IGRAPH_STAR_UNDIRECTED,
+	};
+	
+	enum TreeMode {
+		TreeMode_Out = IGRAPH_TREE_OUT,
+		TreeMode_In = IGRAPH_TREE_IN,
+		TreeMode_Undirected = IGRAPH_TREE_UNDIRECTED,
+	};
+	
+	enum MutualConnections {
+		MutualConnections_NotMutual,
+		MutualConnections_Mutual,
+	};
+	
+	enum PeriodicLattice {
+		PeriodicLattice_NotPeriodic,
+		PeriodicLattice_Periodic,
+	};
+	
+	enum BarabasiOutPref {
+		BarabasiOutPref_InDegreeOnly,
+		BarabasiOutPref_TotalDegree,
+	};
+	
 	enum ToUndirectedMode {
 		EachArcToEdge = IGRAPH_TO_UNDIRECTED_EACH,
 		CollapseArcs = IGRAPH_TO_UNDIRECTED_COLLAPSE

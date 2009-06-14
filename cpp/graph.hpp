@@ -81,13 +81,49 @@ namespace igraph {
 		Graph& disconnect(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION { return delete_edge(from, to); }
 		__attribute__((deprecated,warning("Graph::disconnect is deprecated. Use Graph::delete_edge instead.")))
 		Graph& disconnect(const Edge eid) { return delete_edge(eid); }
+
+#pragma mark -
+#pragma mark Deterministic Graph Generators
 		
+		static temporary_class<Graph>::type create(const VertexVector& edges, const Integer min_size = 0, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
+		// TODO: igraph_adjacency when Matrix is implemented.
+		// TODO: igraph_weighted_adjacency when Matrix is implemented.
+		// TODO: igraph_adjlist when AdjacencyList is implemented.
+		static temporary_class<Graph>::type star(const Integer n, const StarMode mode = StarMode_Undirected, const Vertex center = 0) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type lattice(const Vector& dimensions, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type lattice_2d(const Integer width, const Integer length, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type lattice_3d(const Integer width, const Integer length, const Integer height, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type ring(const Integer size, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual, const PeriodicLattice periodic = PeriodicLattice_Periodic) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type tree(const Integer n, const Integer children, const TreeMode type = TreeMode_Undirected) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type full(const Integer n, const Directedness directedness = Undirected, const SelfLoops loops = NoSelfLoops) MAY_THROW_EXCEPTION;
+		__attribute__((deprecated,warning("Graph::complete is deprecated. Use Graph::full instead.")))
+		static temporary_class<Graph>::type complete(const Integer n, const Directedness directedness = Undirected, const SelfLoops loops = NoSelfLoops) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type full_citation(const Integer n, const Directedness directedness = Directed) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type famous(const char* name) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type lcf_vector(const Integer n, const Vector& shifts, const Integer repeats) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type atlas(const int number) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type de_bruijn(const Integer m, const Integer n) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type kautz(const Integer m, const Integer n) MAY_THROW_EXCEPTION;
+		// TODO: igraph_extended_chordal_ring when Matrix is implemented.
+		
+		Graph& connect_neighborhood(const Integer order = 1, const NeighboringMode neimode = OutNeighbors) MAY_THROW_EXCEPTION; 
+		
+#pragma mark -
+#pragma mark Games: Randomized Graph Generators
+		
+		static temporary_class<Graph>::type grg_game(const Integer size, const Real radius, const PeriodicLattice periodic = PeriodicLattice_Periodic) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type grg_game(const Integer size, const Real radius, const PeriodicLattice periodic, Vector& x_coords, Vector& y_coords) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type barabasi_game(const Integer size, const Integer m, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
+		static temporary_class<Graph>::type barabasi_game(const Integer size, const Vector& outseq, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
+				
 #pragma mark -
 #pragma mark Basic Properties
 		bool are_connected(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION;
 		
+
+		
 #pragma mark -
-#pragma mark Reading and Writing Graphs from and to Files (GraphWriter)
+#pragma mark Reading and Writing Graphs from and to Files
 		/// Construct a GraphWriter for writing the Graph into a file.
 		/// The Graph's lifetime must be longer than the GraphWriter's. 
 		temporary_class<GraphWriter>::type writer(const char* filename) const;
@@ -104,13 +140,18 @@ namespace igraph {
 		   - .net, .pajek                         => Pajek
 		   - .dimacs                              => DIMACS
 		   - .edgelist, .edges, .edge, .dat, .txt => Edge list
-		   - .adjacency, .adj                     => Adjacency matrix
+		   - .adjlist                             => Adjacency list
 		 
 		 If the type cannot be determined, nothing will be written.
 		 
 		 \return Whether it has successfully written the file or not.
 		 */
 		bool write(const char* filename, GraphFormat format = GraphFormat_auto) const;
+		
+		static temporary_class<GraphReader>::type reader(const char* filename);
+		static temporary_class<GraphReader>::type reader(std::FILE* filestream) throw();
+		
+		static temporary_class<Graph>::type read(const char* filename, GraphFormat format = GraphFormat_auto);
 		
 	};
 }

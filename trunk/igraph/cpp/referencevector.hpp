@@ -34,7 +34,7 @@
 #include <igraph/cpp/exception.hpp>
 
 namespace igraph {
-	
+		
 	/**
 	 \class ReferenceVector
 	 \brief Wrapper for igraph pointer vectors
@@ -45,38 +45,129 @@ namespace igraph {
 	class ReferenceVector {
 	private:
 		igraph_vector_ptr_t _;
-		int delete_all;
+		bool manage_children_by_new_and_delete;
+		
+		void delete_all () throw() {
+			for (void** it = _.stor_begin; it != _.end; ++ it)
+				delete *it;
+		}
 		
 	public:
-		typedef T& value_type;
-
 		MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE(ReferenceVector, <T>);
 		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(ReferenceVector, igraph_vector_ptr_t);
-	
+		
+		typedef T value_type;
+		typedef T* pointer;
+		typedef const T* const_pointer;
+		typedef value_type& reference;
+		typedef const value_type& const_reference;
+		typedef unsigned size_type;
+		typedef int difference_type;
+		
+		class const_iterator;
+		
+		class iterator {
+			T** m_ptr;
+			iterator(){}
+			static iterator convert(void** ptr_) { iterator x; x.m_ptr = reinterpret_cast<T**>(ptr_); return x; }
+			friend class ReferenceVector<T>;
+		public:
+			iterator(const const_iterator& other) throw();
+			reference operator*() const throw() { return **m_ptr; }
+			pointer ptr() const throw() { return *m_ptr; }
+			pointer operator->() const throw() { return *m_ptr; }
+			iterator& operator++() throw() { ++m_ptr; return *this; }
+			iterator operator++(int) throw() { iterator copy(ptr); ++m_ptr; return copy; }
+			iterator& operator--() throw() { --m_ptr; return *this; }
+			iterator operator--(int) throw() { iterator copy(ptr); --m_ptr; return copy; }
+			iterator& operator+=(const difference_type delta) throw() { m_ptr += delta; return *this; }
+			iterator& operator-=(const difference_type delta) throw() { m_ptr -= delta; return *this; }
+			iterator operator+(const difference_type delta) const throw() { return iterator(m_ptr+delta); }
+			iterator operator-(const difference_type delta) const throw() { return iterator(m_ptr-delta); }
+			difference_type operator-(const iterator& other) const throw() { return m_ptr - other.m_ptr; }
+			reference operator[](const difference_type delta) throw() { return **(m_ptr + delta); }
+			bool operator<(const iterator& other) const throw() { return m_ptr < other.m_ptr; }
+			bool operator>(const iterator& other) const throw() { return m_ptr > other.m_ptr; }
+			bool operator<=(const iterator& other) const throw() { return m_ptr <= other.m_ptr; }
+			bool operator>=(const iterator& other) const throw() { return m_ptr >= other.m_ptr; }
+			bool operator==(const iterator& other) const throw() { return m_ptr == other.m_ptr; }
+			bool operator!=(const iterator& other) const throw() { return m_ptr != other.m_ptr; }
+		};
+		
+		class const_iterator {
+			const T* const* m_ptr;
+			const_iterator(){}
+			static const_iterator convert(void* const* ptr_) { const_iterator x; x.m_ptr = reinterpret_cast<const T* const*>(ptr_); return x; }
+			friend class ReferenceVector<T>;
+		public:
+			const_iterator(const iterator& other) throw() : m_ptr(other.m_ptr) {};
+			const_iterator(T* const* const ptr_) throw() : m_ptr(ptr_) {}
+			const_reference operator*() const throw() { return **m_ptr; }
+			const_pointer ptr() const throw() { return *m_ptr; }
+			const_pointer operator->() const throw() { return *m_ptr; }
+			const_iterator& operator++() throw() { ++m_ptr; return *this; }
+			const_iterator operator++(int) throw() { const_iterator copy(m_ptr); ++m_ptr; return copy; }
+			const_iterator& operator--() throw() { --m_ptr; return *this; }
+			const_iterator operator--(int) throw() { const_iterator copy(m_ptr); --m_ptr; return copy; }
+			const_iterator& operator+=(const difference_type delta) throw() { m_ptr += delta; return *this; }
+			const_iterator& operator-=(const difference_type delta) throw() { m_ptr -= delta; return *this; }
+			const_iterator operator+(const difference_type delta) const throw() { return const_iterator(m_ptr+delta); }
+			const_iterator operator-(const difference_type delta) const throw() { return const_iterator(m_ptr-delta); }
+			difference_type operator-(const const_iterator& other) const throw() { return m_ptr - other.m_ptr; }
+			const_reference operator[](const difference_type delta) throw() { return **(m_ptr + delta); }
+			bool operator<(const const_iterator& other) const throw() { return m_ptr < other.m_ptr; }
+			bool operator>(const const_iterator& other) const throw() { return m_ptr > other.m_ptr; }
+			bool operator<=(const const_iterator& other) const throw() { return m_ptr <= other.m_ptr; }
+			bool operator>=(const const_iterator& other) const throw() { return m_ptr >= other.m_ptr; }
+			bool operator==(const const_iterator& other) const throw() { return m_ptr == other.m_ptr; }
+			bool operator!=(const const_iterator& other) const throw() { return m_ptr != other.m_ptr; }		
+		};
+				
 		/// Create a ReferenceVector with "count" elements.
 		ReferenceVector(const long count) MAY_THROW_EXCEPTION;
 		
-		/// Copy a C array into a ReferenceVector.
-		ReferenceVector(value_type* const array, const long count) MAY_THROW_EXCEPTION;
+		/** \brief Copy a C array into a ReferenceVector.
+		 
+		 Example:
+		 \code
+		 
+		 std::string strings[3];
+		 strings[0] = "foo";
+		 strings[1] = "bar";
+		 strings[2] = "baz";
+		 
+		 ReferenceVector<std::string> vec (strings, 3);
+		 \endcode
+		 */
+		ReferenceVector(const_pointer array, const long count) MAY_THROW_EXCEPTION;
+		
+		/// Move a C pointer array into a ReferenceVector.
+		ReferenceVector(pointer* ptr_array, const long count) MAY_THROW_EXCEPTION;
 		
 		/// var_arg method to construct the ReferenceVector
 		ReferenceVector(const long count, ...) MAY_THROW_EXCEPTION;
+			
+		/// Wrap a C pointer array as a ReferenceVector.
+		static typename RETRIEVE_TEMPORARY_CLASS(ReferenceVector<T>) view(pointer* array, const long count) throw();
 		
-		/// Wrap a C array as a ReferenceVector.
-		static ReferenceVector<T> view(value_type const* const array, const long count) throw() {
-			igraph_vector_ptr_t _;
-			igraph_vector_ptr_view(&_, array, count);
-			return ReferenceVector<T>(_, ::tempobj::OwnershipTransferNoOwnership);
+		/// Move an igraph_vector_ptr_t into a ReferenceVector, and also convert its content into the corresponding C++ types.
+		template <typename OriginalType>
+		static typename RETRIEVE_TEMPORARY_CLASS(ReferenceVector<T>) adopt(igraph_vector_ptr_t& raw) {
+			for (void** it = raw.stor_begin; it != raw.end; ++it)
+				*it = new T(reinterpret_cast<OriginalType const*>(*it), ::tempobj::OwnershipTransferMove);
+			return ::std::move(ReferenceVector<T>(&raw, ::tempobj::OwnershipTransferNoOwnership));
 		}
-		
+
+		 
 		void null() throw();
 		
-		value_type* ptr() throw() { return VECTOR(_); }
-		value_type const& operator[](const long index) const throw() { return VECTOR(_)[index]; }
-		value_type& operator[](const long index) throw() { return VECTOR(_)[index]; }
+		pointer* ptr() throw() { return VECTOR(_); }
+		const_reference operator[](const long index) const throw() { return **reinterpret_cast<const const_pointer*>(VECTOR(_)[index]); }
+		reference operator[](const long index) throw() { return **reinterpret_cast<pointer*>(VECTOR(_)[index]); }
 		
-		value_type& e(const long index) const throw();
-		void set(const long index, value_type const value) throw();
+		pointer e(const long index) const throw();
+		/// Note: DO NOT supply OwnershipTransferKeepOriginal in the last argument.
+		void set(const long index, const_pointer value, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) throw();
 		
 		bool empty() const throw();
 		long size() const throw();
@@ -84,41 +175,29 @@ namespace igraph {
 		void clear() throw();
 		void reserve(const long new_size) MAY_THROW_EXCEPTION;
 		void resize(const long new_size) MAY_THROW_EXCEPTION;
-		void push_back(value_type const e) MAY_THROW_EXCEPTION;
-		void insert(const long pos, value_type const e) MAY_THROW_EXCEPTION;
+		void push_back(const_reference obj, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) MAY_THROW_EXCEPTION { push_back(&obj, transfer); }
+		void push_back(pointer e, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
+		void insert(const long pos, const_reference obj, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) MAY_THROW_EXCEPTION { insert(pos, &obj, transfer); }
+		void insert(const long pos, pointer e, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
 		void remove(const long pos) throw();
 		
-		void copy_to(value_type* store) const throw();
-		void sort(int(*compar)(const value_type, const value_type));
+		void copy_to(pointer* store, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) const throw();
+		void sort(int(*compar)(const_reference, const_reference));
 		
 		// STL support.
-		typedef value_type* pointer;
-		typedef value_type& reference;
-		typedef const value_type& const_reference;
-		typedef unsigned size_type;
-		typedef int difference_type;
-		typedef value_type* iterator;
-		typedef const value_type* const_iterator;
-		
-		iterator begin() throw() { return _.stor_begin; }
-		iterator end() throw() { return _.end; }
-		const_iterator begin() const throw() { return reinterpret_cast<const_iterator>(_.stor_begin); }
-		const_iterator end() const throw() { return reinterpret_cast<const_iterator>(_.end); }
+				
+		iterator begin() throw() { return iterator::convert(_.stor_begin); }
+		iterator end() throw() { return iterator::convert(_.end); }
+		const_iterator begin() const throw() { return const_iterator::convert(_.stor_begin); }
+		const_iterator end() const throw() { return const_iterator::convert(_.end); }
 		size_type capacity() const throw() { return _.stor_end - _.stor_begin; }
-		reference front() throw() { return *_.stor_begin; }
-		const_reference front() const throw() { *_.stor_begin; }
-		reference back() throw() { return *(_.end-1); }
-		const_reference back() const throw() { return *(_.end-1); }
-		
-		/// Print content of the ReferenceVector.
-		void print() const throw() {
-			for (const_iterator cit = begin(); cit != end(); ++ cit)
-				printf("%p, ", *cit);
-			printf("\n");
-		}
-		
+		reference front() throw() { return **reinterpret_cast<pointer*>(_.stor_begin); }
+		const_reference front() const throw() { **reinterpret_cast<const const_pointer*>(_.stor_begin); }
+		reference back() throw() { return **reinterpret_cast<pointer*>(_.end-1); }
+		const_reference back() const throw() { return **reinterpret_cast<const const_pointer*>(_.end-1); }
+				
 		/// Perform the function on every object of the ReferenceVector.
-		void perform(void(*fptr)(value_type& obj, void* context), void* context = NULL);
+		void perform(void(*fptr)(pointer obj, void* context), void* context = NULL);
 		
 		bool operator==(const ReferenceVector<T>& other) const throw();
 		bool operator!=(const ReferenceVector<T>& other) const throw();
@@ -127,6 +206,7 @@ namespace igraph {
 	
 	template<typename T>
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(ReferenceVector, <T>);
+	
 }
 
 #endif

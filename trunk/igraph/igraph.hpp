@@ -45,8 +45,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/impl/vertexselector.cpp>
 #include <igraph/cpp/impl/edgeselector.cpp>
 
-#include <igraph/cpp/impl/graphio.cpp>
 #include <igraph/cpp/impl/graph.cpp>
+#include <igraph/cpp/impl/graphio.cpp>
 
 #include <igraph/cpp/impl/iterators.cpp>
 

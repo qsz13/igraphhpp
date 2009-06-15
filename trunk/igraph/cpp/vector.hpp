@@ -33,6 +33,10 @@
 #include <igraph/cpp/common.hpp>
 #include <igraph/cpp/exception.hpp>
 #include <cstdarg>
+#include <cstdio>
+#if XXINTRNL_CXX0X
+#include <initializer_list>
+#endif
 
 namespace igraph {
 	/**
@@ -52,17 +56,29 @@ namespace igraph {
 		/// Copy a C array into a Vector.
 		Vector(Real* const array, const long count) MAY_THROW_EXCEPTION;
 		
-		/// var_arg method to construct the vector
-		Vector(const long count, const Real first, ...) MAY_THROW_EXCEPTION;
+#if XXINTRNL_CXX0X
+		/// Create a Vector using initializer list (C++0x only.)
+		Vector(::std::initializer_list<Real> elements) MAY_THROW_EXCEPTION;
+#endif
+		/**
+		 \brief Create a Vector using content of string.
+		 
+		 Example:
+		 \code
+		 Vector v = Vector("42 54 64 75");
+		 printf("%lg", v.prod());	// prints 10886400
+		 \endcode
+		*/
+		Vector(const char* stringized_elements) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector sequentially between two values inclusively.
-		static ::tempobj::temporary_class<Vector>::type seq(const Real from, const Real to) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Vector) seq(const Real from, const Real to) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector with "count" elements filled with zero.
-		static ::tempobj::temporary_class<Vector>::type zeros(const long count = 0) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Vector) zeros(const long count = 0) MAY_THROW_EXCEPTION;
 		
 		/// Wrap a C array as a Vector. 
-		static ::tempobj::temporary_class<Vector>::type view(const Real* const array, const long count) throw();
+		static RETRIEVE_TEMPORARY_CLASS(Vector) view(const Real* const array, const long count) throw();
 		
 		void null() throw();
 		void fill(const Real e) throw();
@@ -149,10 +165,16 @@ namespace igraph {
 		const_reference back() const throw() { return *(_.end-1); }
 		
 		/// Print content of the Vector.
-		void print() const throw() {
-			for (const_iterator cit = begin(); cit != end(); ++ cit)
-				printf("%lg, ", *cit);
-			printf("\n");
+		void print(std::FILE* f = stdout) const throw() {
+			bool is_first = true;
+			for (const_iterator cit = begin(); cit != end(); ++ cit) {
+				if (is_first) {
+					::std::fprintf(f, "%lg", *cit);
+					is_first = false;
+				} else
+					::std::fprintf(f, " %lg", *cit);
+			}
+			::std::fprintf(f, "\n");
 		}
 		
 		/// Convert from std::vector.
@@ -167,10 +189,10 @@ namespace igraph {
 		}
 		
 		/// Calculates the running mean of a vector.
-		::tempobj::temporary_class<Vector>::type running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(Vector) running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION;
 		
 		/// Generates an increasing random sequence of integers
-		static ::tempobj::temporary_class<Vector>::type random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Vector) random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION;
 		
 		
 		friend class VertexSelector;

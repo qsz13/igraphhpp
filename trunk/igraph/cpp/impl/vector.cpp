@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IGRAPH_VECTOR_CPP
 
 #include <igraph/cpp/vector.hpp>
+#include <cstring>
 
 namespace igraph {
 	
@@ -47,35 +48,36 @@ namespace igraph {
 		TRY(igraph_vector_init_copy(&_, array, count));
 	}
 	
-	Vector::Vector(const long count, const Real first, ...) MAY_THROW_EXCEPTION {
+#if XXINTRNL_CXX0X
+	Vector::Vector(::std::initializer_list<Real> elements) MAY_THROW_EXCEPTION {
 		XXINTRNL_DEBUG_CALL_INITIALIZER(Vector);
-#if __GNUC__ >= 3
-		Real arr[count];
-#else
-		Real* arr = new Real[count];
+		TRY(igraph_vector_init(&_, elements.size()));
+		Real* q = VECTOR(_);
+		for (auto p = elements.begin(); p != elements.end(); ++p, ++q)
+			*q = *p;
+	}
 #endif
-		arr[0] = first;
-		std::va_list va;
-		va_start(va, first);
-		for (long i = 1; i < count; ++ i)
-			arr[i] = va_arg(va, Real);
-		va_end(va);
-		
-		TRY(igraph_vector_init_copy(&_, arr, count));
-		
-#if !(__GNUC__ >= 3)
-		// FIXME: May cause memory leak when an exception is thrown.
-		delete[] arr;
-#endif
+	Vector::Vector(const char* vertices_as_string) MAY_THROW_EXCEPTION {
+		TRY(igraph_vector_init(&_, 0));
+		const char* end_of_string = ::std::strchr(vertices_as_string, '\0');
+		while (vertices_as_string < end_of_string) {
+			Real value;
+			int consumed_length;
+			if(::std::sscanf(vertices_as_string, "%lf %n", &value, &consumed_length) != 0) {
+				vertices_as_string += consumed_length;
+				TRY(igraph_vector_push_back(&_, value));
+			} else
+				++ vertices_as_string;
+		}
 	}
 	
-	::tempobj::temporary_class<Vector>::type Vector::seq(const Real from, const Real to) MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(Vector) Vector::seq(const Real from, const Real to) MAY_THROW_EXCEPTION {
 		igraph_vector_t _;
 		TRY(igraph_vector_init_seq(&_, from, to));
 		return ::std::move(Vector(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	::tempobj::temporary_class<Vector>::type Vector::zeros(const long count) MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(Vector) Vector::zeros(const long count) MAY_THROW_EXCEPTION {
 		igraph_vector_t _;
 		TRY(igraph_vector_init(&_, count));
 		return ::std::move(Vector(&_, ::tempobj::OwnershipTransferMove));
@@ -98,7 +100,7 @@ namespace igraph {
 #pragma mark -
 #pragma mark Vector views
 	
-	::tempobj::temporary_class<Vector>::type Vector::view(const Real* const array, const long count) throw() {
+	RETRIEVE_TEMPORARY_CLASS(Vector) Vector::view(const Real* const array, const long count) throw() {
 		igraph_vector_t _;
 		igraph_vector_view(&_, array, count);
 		return ::std::move(Vector(&_, ::tempobj::OwnershipTransferNoOwnership));
@@ -191,14 +193,14 @@ namespace igraph {
 	
 #pragma mark -
 #pragma mark Not Graph Related Functions
-	::tempobj::temporary_class<Vector>::type Vector::running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(Vector) Vector::running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 0));
 		TRY(igraph_running_mean(&_, &res, binwidth));
 		return ::std::move(Vector(&res, ::tempobj::OwnershipTransferMove));
 	}
 	
-	::tempobj::temporary_class<Vector>::type Vector::random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(Vector) Vector::random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION {
 		igraph_vector_t _;
 		TRY(igraph_vector_init(&_, 0));
 		TRY(igraph_random_sample(&_, low, high, vector_length));

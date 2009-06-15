@@ -34,7 +34,14 @@ namespace igraph {
 	template<typename T>
 	IMPLEMENT_COPY_METHOD_WITH_TEMPLATE(ReferenceVector, <T>) MAY_THROW_EXCEPTION {
 		delete_all = other.delete_all;
-		TRY(igraph_vector_ptr_copy(&_, &other._));
+		if (delete_all == 1) {
+			TRY(igraph_vector_ptr_resize(&_, igraph_vector_ptr_size(&other._)));
+			const_iterator cit = other.begin();
+			iterator it = begin();
+			for (; cit != other.end(); ++ cit, ++ it)
+				*reinterpret_cast<T**>it = new T(*cit);
+		} else
+			TRY(igraph_vector_ptr_copy(&_, &other._));
 	}
 	
 	template<typename T>
@@ -50,13 +57,7 @@ namespace igraph {
 			case 1:
 				for (iterator it = begin(); it != end(); ++ it) {
 					delete &*it;
-					*reinterpret_cast<pointer>(it) = NULL;
-				}
-				break;
-			case 2:
-				for (iterator it = begin(); it != end(); ++ it) {
-					delete[] &*it;
-					*reinterpret_cast<pointer>(it) = NULL;
+					*reinterpret_cast<T**>(it) = NULL;
 				}
 				break;
 			default:

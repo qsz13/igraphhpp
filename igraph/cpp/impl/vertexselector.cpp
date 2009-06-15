@@ -29,12 +29,12 @@ namespace igraph {
 	MEMORY_MANAGER_IMPLEMENTATION(VertexSelector);
 	XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(VertexSelector, igraph_vs_t, igraph_vs_copy);
 	
-	IMPLEMENT_COPY_METHOD(VertexSelector) MAY_THROW_EXCEPTION {
+	IMPLEMENT_COPY_METHOD(VertexSelector) {
 		TRY(igraph_vs_copy(&_, &other._));
 		retained_vector = other.retained_vector;
 	}
 	
-	IMPLEMENT_MOVE_METHOD(VertexSelector) throw() {
+	IMPLEMENT_MOVE_METHOD(VertexSelector) {
 		_ = ::std::move(other._);
 		retained_vector = ::std::move(other.retained_vector);
 	}

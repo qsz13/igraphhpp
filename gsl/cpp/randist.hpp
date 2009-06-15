@@ -480,7 +480,7 @@ namespace gsl {
 		alpha = new double[K];
 		::std::memcpy(alpha, other.alpha, sizeof(double)*K);
 	}
-	IMPLEMENT_MOVE_METHOD(DirichletDistribution) throw() {
+	IMPLEMENT_MOVE_METHOD(DirichletDistribution) {
 		K = ::std::move(other.K);
 		alpha = ::std::move(other.alpha);
 	}
@@ -501,10 +501,10 @@ namespace gsl {
 	};
 	MEMORY_MANAGER_INTERFACE_EX(GeneralDiscreteDistribution);
 	MEMORY_MANAGER_IMPLEMENTATION(GeneralDiscreteDistribution);
-	IMPLEMENT_COPY_METHOD(GeneralDiscreteDistribution) throw(::std::runtime_error) {
+	IMPLEMENT_COPY_METHOD(GeneralDiscreteDistribution) {
 		throw ::std::runtime_error("Cannot copy GeneralDiscreteDistribution objects. Use ::std::move() for assignment.");
 	}
-	IMPLEMENT_MOVE_METHOD(GeneralDiscreteDistribution) throw() {
+	IMPLEMENT_MOVE_METHOD(GeneralDiscreteDistribution) {
 		g = ::std::move(other.g);
 	}
 	IMPLEMENT_DEALLOC_METHOD(GeneralDiscreteDistribution) {
@@ -575,7 +575,7 @@ namespace gsl {
 		p = new double[K];
 		::std::memcpy(p, other.p, sizeof(double)*K);
 	}
-	IMPLEMENT_MOVE_METHOD(MultinomialDistribution) throw() {
+	IMPLEMENT_MOVE_METHOD(MultinomialDistribution) {
 		K = ::std::move(other.K);
 		N = ::std::move(other.N);
 		p = ::std::move(other.p);

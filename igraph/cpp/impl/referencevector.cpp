@@ -36,7 +36,7 @@ namespace igraph {
 	XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(ReferenceVector, igraph_vector_ptr_t, igraph_vector_ptr_copy, <T>);
 	
 	template<typename T>
-	IMPLEMENT_COPY_METHOD_WITH_TEMPLATE(ReferenceVector, <T>) MAY_THROW_EXCEPTION {
+	IMPLEMENT_COPY_METHOD_WITH_TEMPLATE(ReferenceVector, <T>) {
 		manage_children_by_new_and_delete = other.manage_children_by_new_and_delete;
 		if (manage_children_by_new_and_delete) {
 			TRY(igraph_vector_ptr_init(&_, igraph_vector_ptr_size(&other._)));
@@ -49,7 +49,7 @@ namespace igraph {
 	}
 	
 	template<typename T>
-	IMPLEMENT_MOVE_METHOD_WITH_TEMPLATE(ReferenceVector, <T>) throw() {
+	IMPLEMENT_MOVE_METHOD_WITH_TEMPLATE(ReferenceVector, <T>) {
 		manage_children_by_new_and_delete = ::std::move(other.manage_children_by_new_and_delete);
 		other.manage_children_by_new_and_delete = false;
 		_ = ::std::move(other._);
@@ -113,29 +113,32 @@ namespace igraph {
 	}
 	
 	template<typename T>
-	void ReferenceVector<T>::null() throw() {
+	ReferenceVector<T>& ReferenceVector<T>::null() throw() {
 		if (manage_children_by_new_and_delete)
 			delete_all();
 		igraph_vector_ptr_null(&_);
+		return *this;
 	}
 	
 	template<typename T> typename ReferenceVector<T>::pointer ReferenceVector<T>::e(const long index) const throw() { return igraph_vector_ptr_e(&_, index); }
-	template<typename T> void ReferenceVector<T>::set(const long index, const_pointer value, const ::tempobj::OwnershipTransfer transfer) throw() {
+	template<typename T> ReferenceVector<T>& ReferenceVector<T>::set(const long index, const_pointer value, const ::tempobj::OwnershipTransfer transfer) throw() {
 		if (transfer == ::tempobj::OwnershipTransferCopy && manage_children_by_new_and_delete)
 			value = new T(*value);
 		igraph_vector_ptr_set(&_, index, value);
+		return *this;
 	}
 	
 	template<typename T> bool ReferenceVector<T>::empty() const throw() { return igraph_vector_ptr_empty(&_); }
 	template<typename T> long ReferenceVector<T>::size() const throw() { return igraph_vector_ptr_size(&_); }
 	
-	template<typename T> void ReferenceVector<T>::clear() throw() {
+	template<typename T> ReferenceVector<T>& ReferenceVector<T>::clear() throw() {
 		if (manage_children_by_new_and_delete)
 			delete_all();
 		igraph_vector_ptr_clear(&_);
+		return *this;
 	}
-	template<typename T> void ReferenceVector<T>::reserve(const long new_size) MAY_THROW_EXCEPTION { TRY(igraph_vector_ptr_reserve(&_, new_size)); }
-	template<typename T> void ReferenceVector<T>::resize(const long new_size) MAY_THROW_EXCEPTION { 
+	template<typename T> ReferenceVector<T>& ReferenceVector<T>::reserve(const long new_size) MAY_THROW_EXCEPTION { TRY(igraph_vector_ptr_reserve(&_, new_size)); return *this; }
+	template<typename T> ReferenceVector<T>& ReferenceVector<T>::resize(const long new_size) MAY_THROW_EXCEPTION { 
 		long old_size;
 		if (manage_children_by_new_and_delete) {
 			old_size = _.end - _.stor_begin;
@@ -147,21 +150,25 @@ namespace igraph {
 		if (manage_children_by_new_and_delete)
 			if (new_size > old_size)
 				::std::memset(_.stor_begin + old_size, 0, (new_size - old_size) * sizeof(void*));
+		return *this;
 	}
-	template<typename T> void ReferenceVector<T>::push_back(pointer e, const ::tempobj::OwnershipTransfer transfer) MAY_THROW_EXCEPTION {
+	template<typename T> ReferenceVector<T>& ReferenceVector<T>::push_back(pointer e, const ::tempobj::OwnershipTransfer transfer) MAY_THROW_EXCEPTION {
 		if (manage_children_by_new_and_delete && transfer == ::tempobj::OwnershipTransferCopy)
 			e = new T(*e);
 		TRY(igraph_vector_ptr_push_back(&_, e));
+		return *this;
 	}
-	template<typename T> void ReferenceVector<T>::insert(const long pos, pointer e, const ::tempobj::OwnershipTransfer transfer) MAY_THROW_EXCEPTION {
+	template<typename T> ReferenceVector<T>& ReferenceVector<T>::insert(const long pos, pointer e, const ::tempobj::OwnershipTransfer transfer) MAY_THROW_EXCEPTION {
 		if (manage_children_by_new_and_delete && transfer == ::tempobj::OwnershipTransferCopy)
 			e = new T(*e);
 		TRY(igraph_vector_ptr_insert(&_, pos, e));
+		return *this;
 	}
-	template<typename T> void ReferenceVector<T>::remove(const long pos) throw() {
+	template<typename T> ReferenceVector<T>& ReferenceVector<T>::remove(const long pos) throw() {
 		if (manage_children_by_new_and_delete)
 			delete VECTOR(_)[pos];
 		igraph_vector_ptr_remove(&_, pos);
+		return *this;
 	}
 	
 	template<typename T> void ReferenceVector<T>::copy_to(pointer* store, const ::tempobj::OwnershipTransfer transfer) const throw() {
@@ -175,12 +182,13 @@ namespace igraph {
 		}
 		igraph_vector_ptr_copy_to(&_, store);
 	}
-	template<typename T> void ReferenceVector<T>::sort(int(*compar)(const_reference, const_reference)) { igraph_vector_ptr_sort(&_, compar); }
+	template<typename T> ReferenceVector<T>& ReferenceVector<T>::sort(int(*compar)(const_reference, const_reference)) { igraph_vector_ptr_sort(&_, compar); return *this; }
 	
 	template<typename T>
-	void ReferenceVector<T>::perform(void(*fptr)(pointer obj, void* context), void* context) {
+	ReferenceVector<T>& ReferenceVector<T>::perform(void(*fptr)(pointer obj, void* context), void* context) {
 		for (T* const* cit = _.stor_begin; cit != _.end; ++ cit)
 			fptr(*cit, context);
+		return *this;
 	}
 	
 	template<typename T>

@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/vertexselector.hpp>
 #include <igraph/cpp/edgeselector.hpp>
 #include <igraph/cpp/graphio.hpp>
+#include <igraph/cpp/vector.hpp>
+#include <igraph/cpp/referencevector.hpp>
 
 namespace igraph {
 	
@@ -39,7 +41,7 @@ namespace igraph {
 		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(Graph, igraph_t);
 		
 		Graph(Integer size, Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type empty(Integer size, Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) empty(Integer size, Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 #pragma mark Basic Query Operations
@@ -56,12 +58,12 @@ namespace igraph {
 		__attribute__((deprecated,warning("Graph::end_points is deprecated. Use Graph::edge instead.")))
 		void end_points(const Edge edge_id, Vertex& from, Vertex& to) const MAY_THROW_EXCEPTION { edge(edge_id, from, to); }
 		
-		::tempobj::temporary_class<VertexVector>::type neighbors(const Vertex vid, NeighboringMode neimode = OutNeighbors) const MAY_THROW_EXCEPTION;
-		::tempobj::temporary_class<EdgeVector>::type adjacent(const Vertex vid, NeighboringMode neimode = OutNeighbors) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(VertexVector) neighbors(const Vertex vid, NeighboringMode neimode = OutNeighbors) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(EdgeVector) adjacent(const Vertex vid, NeighboringMode neimode = OutNeighbors) const MAY_THROW_EXCEPTION;
 		
 		Directedness is_directed() const throw() { return igraph_is_directed(&_) ? Directed : Undirected; }
 		
-		::tempobj::temporary_class<Vector>::type degree(const VertexSelector& vids, NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(Vector) degree(const VertexSelector& vids, NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 #pragma mark Adding and Deleting Vertices and Edges
@@ -97,25 +99,25 @@ namespace igraph {
 			TreeMode_Undirected = IGRAPH_TREE_UNDIRECTED,
 		};		
 		
-		static ::tempobj::temporary_class<Graph>::type create(const VertexVector& edges, const Integer min_size = 0, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) create(const VertexVector& edges, const Integer min_size = 0, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		// TODO: igraph_adjacency when Matrix is implemented.
 		// TODO: igraph_weighted_adjacency when Matrix is implemented.
 		// TODO: igraph_adjlist when AdjacencyList is implemented.
-		static ::tempobj::temporary_class<Graph>::type star(const Integer n, const StarMode mode = StarMode_Undirected, const Vertex center = 0) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type lattice(const Vector& dimensions, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type lattice_2d(const Integer width, const Integer length, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type lattice_3d(const Integer width, const Integer length, const Integer height, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type ring(const Integer size, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual, const PeriodicLattice periodic = PeriodicLattice_Periodic) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type tree(const Integer n, const Integer children, const TreeMode type = TreeMode_Undirected) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type full(const Integer n, const Directedness directedness = Undirected, const SelfLoops loops = NoSelfLoops) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) star(const Integer n, const StarMode mode = StarMode_Undirected, const Vertex center = 0) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) lattice(const Vector& dimensions, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) lattice_2d(const Integer width, const Integer length, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) lattice_3d(const Integer width, const Integer length, const Integer height, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) ring(const Integer size, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual, const PeriodicLattice periodic = PeriodicLattice_Periodic) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) tree(const Integer n, const Integer children, const TreeMode type = TreeMode_Undirected) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) full(const Integer n, const Directedness directedness = Undirected, const SelfLoops loops = NoSelfLoops) MAY_THROW_EXCEPTION;
 		__attribute__((deprecated,warning("Graph::complete is deprecated. Use Graph::full instead.")))
-		static ::tempobj::temporary_class<Graph>::type complete(const Integer n, const Directedness directedness = Undirected, const SelfLoops loops = NoSelfLoops) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type full_citation(const Integer n, const Directedness directedness = Directed) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type famous(const char* name) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type lcf_vector(const Integer n, const Vector& shifts, const Integer repeats) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type atlas(const int number) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type de_bruijn(const Integer m, const Integer n) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type kautz(const Integer m, const Integer n) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) complete(const Integer n, const Directedness directedness = Undirected, const SelfLoops loops = NoSelfLoops) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) full_citation(const Integer n, const Directedness directedness = Directed) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) famous(const char* name) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) lcf_vector(const Integer n, const Vector& shifts, const Integer repeats) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) atlas(const int number) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) de_bruijn(const Integer m, const Integer n) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) kautz(const Integer m, const Integer n) MAY_THROW_EXCEPTION;
 		// TODO: igraph_extended_chordal_ring when Matrix is implemented.
 		
 		Graph& connect_neighborhood(const Integer order = 1, const NeighboringMode neimode = OutNeighbors) MAY_THROW_EXCEPTION; 
@@ -123,23 +125,29 @@ namespace igraph {
 #pragma mark -
 #pragma mark Games: Randomized Graph Generators
 		
-		static ::tempobj::temporary_class<Graph>::type grg_game(const Integer size, const Real radius, const PeriodicLattice periodic = PeriodicLattice_Periodic) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type grg_game(const Integer size, const Real radius, const PeriodicLattice periodic, Vector& x_coords, Vector& y_coords) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type barabasi_game(const Integer size, const Integer m, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
-		static ::tempobj::temporary_class<Graph>::type barabasi_game(const Integer size, const Vector& outseq, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) grg_game(const Integer size, const Real radius, const PeriodicLattice periodic = PeriodicLattice_Periodic) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) grg_game(const Integer size, const Real radius, const PeriodicLattice periodic, Vector& x_coords, Vector& y_coords) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game(const Integer size, const Integer m, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game(const Integer size, const Vector& outseq, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
 				
 #pragma mark -
 #pragma mark Basic Properties
 		bool are_connected(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION;
 		
-
+#pragma mark -
+#pragma mark Cliques
+		RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Vector>) cliques(const Integer max_size = 0) const;
+		RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Vector>) cliques(const Integer min_size, const Integer max_size) const;
+		RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Vector>) largest_cliques() const;
+		RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Vector>) maximal_cliques() const;
+		Integer clique_number() const MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 #pragma mark Reading and Writing Graphs from and to Files
 		/// Construct a GraphWriter for writing the Graph into a file.
 		/// The Graph's lifetime must be longer than the GraphWriter's. 
-		::tempobj::temporary_class<GraphWriter>::type writer(const char* filename) const;
-		::tempobj::temporary_class<GraphWriter>::type writer(std::FILE* filestream) const throw();
+		RETRIEVE_TEMPORARY_CLASS(GraphWriter) writer(const char* filename) const;
+		RETRIEVE_TEMPORARY_CLASS(GraphWriter) writer(std::FILE* filestream) const throw();
 		
 		/**
 		 \brief Write to file and match the type by file extension.
@@ -160,10 +168,10 @@ namespace igraph {
 		 */
 		bool write(const char* filename, GraphFormat format = GraphFormat_auto) const;
 		
-		static ::tempobj::temporary_class<GraphReader>::type reader(const char* filename);
-		static ::tempobj::temporary_class<GraphReader>::type reader(std::FILE* filestream) throw();
+		static RETRIEVE_TEMPORARY_CLASS(GraphReader) reader(const char* filename);
+		static RETRIEVE_TEMPORARY_CLASS(GraphReader) reader(std::FILE* filestream) throw();
 		
-		static ::tempobj::temporary_class<Graph>::type read(const char* filename, GraphFormat format = GraphFormat_auto);
+		static RETRIEVE_TEMPORARY_CLASS(Graph) read(const char* filename, GraphFormat format = GraphFormat_auto);
 		
 		
 		friend class VertexSelector;

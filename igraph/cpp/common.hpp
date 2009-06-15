@@ -37,6 +37,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __attribute__(x)
 #endif
 
+#if __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus > 199711L
+#define XXINTRNL_CXX0X 1
+#else
+#define XXINTRNL_CXX0X 0
+#endif
+
 #include <igraph/igraph.h>
 
 namespace igraph {

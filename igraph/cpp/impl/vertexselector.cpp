@@ -43,34 +43,34 @@ namespace igraph {
 		igraph_vs_destroy(&_);
 	}
 
-	::tempobj::temporary_class<VertexSelector>::type VertexSelector::all() MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(VertexSelector) VertexSelector::all() MAY_THROW_EXCEPTION {
 		igraph_vs_t _ = igraph_vss_all();
 		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
-	::tempobj::temporary_class<VertexSelector>::type VertexSelector::adj(const Vertex which, const NeighboringMode mode) MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(VertexSelector) VertexSelector::adj(const Vertex which, const NeighboringMode mode) MAY_THROW_EXCEPTION {
 		igraph_vs_t _;
 		igraph_vs_adj(&_, which, (igraph_neimode_t)mode);
 		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	::tempobj::temporary_class<VertexSelector>::type VertexSelector::nonadj(const Vertex which, const NeighboringMode mode) MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(VertexSelector) VertexSelector::nonadj(const Vertex which, const NeighboringMode mode) MAY_THROW_EXCEPTION {
 		igraph_vs_t _;
 		TRY(igraph_vs_nonadj(&_, which, (igraph_neimode_t)mode));
 		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	::tempobj::temporary_class<VertexSelector>::type VertexSelector::none() MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(VertexSelector) VertexSelector::none() MAY_THROW_EXCEPTION {
 		igraph_vs_t _ = igraph_vss_none();
 		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
-	::tempobj::temporary_class<VertexSelector>::type VertexSelector::single(const Vertex which) MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(VertexSelector) VertexSelector::single(const Vertex which) MAY_THROW_EXCEPTION {
 		igraph_vs_t _ = igraph_vss_1(which);
 		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
-	::tempobj::temporary_class<VertexSelector>::type VertexSelector::vector(const VertexVector& vec, const ::tempobj::OwnershipTransfer transfer) MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(VertexSelector) VertexSelector::vector(const VertexVector& vec, const ::tempobj::OwnershipTransfer transfer) MAY_THROW_EXCEPTION {
 		igraph_vs_t _;
 		switch (transfer) {
 			case ::tempobj::OwnershipTransferCopy: {
@@ -91,7 +91,7 @@ namespace igraph {
 		std::unexpected();
 	}
 	
-	::tempobj::temporary_class<VertexSelector>::type VertexSelector::seq(const Vertex fromID, const Vertex toID) MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(VertexSelector) VertexSelector::seq(const Vertex fromID, const Vertex toID) MAY_THROW_EXCEPTION {
 		igraph_vs_t _ = igraph_vss_seq(fromID, toID);
 		return ::std::move(VertexSelector(&_, ::tempobj::OwnershipTransferNoOwnership));
 	}
@@ -99,7 +99,7 @@ namespace igraph {
 	int VertexSelector::type() const throw() { return igraph_vs_type(&_); }
 	bool VertexSelector::is_all() MAY_THROW_EXCEPTION { return igraph_vs_is_all(&_); }
 
-	::tempobj::temporary_class<VertexVector>::type VertexSelector::as_vector(const Graph& g) const MAY_THROW_EXCEPTION {
+	RETRIEVE_TEMPORARY_CLASS(VertexVector) VertexSelector::as_vector(const Graph& g) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vs_as_vector(&g._, _, &res));
 		return ::std::move(VertexVector(&res, ::tempobj::OwnershipTransferMove));

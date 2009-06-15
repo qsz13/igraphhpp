@@ -82,56 +82,56 @@ namespace gsl {
 #pragma mark Random number generator algorithms
 		
 		/// Call Random::env_setup() once (e.g. in main()) before using this generator.
-		static ::tempobj::temporary_class<Random>::type default_generator() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) default_generator() throw();
 		
-		static ::tempobj::temporary_class<Random>::type mt19937() throw();
-		static ::tempobj::temporary_class<Random>::type ranlxs0() throw();
-		static ::tempobj::temporary_class<Random>::type ranlxs1() throw();
-		static ::tempobj::temporary_class<Random>::type ranlxs2() throw();
-		static ::tempobj::temporary_class<Random>::type ranlxd1() throw();
-		static ::tempobj::temporary_class<Random>::type ranlxd2() throw();
-		static ::tempobj::temporary_class<Random>::type ranlux() throw();
-		static ::tempobj::temporary_class<Random>::type ranlux389() throw();
-		static ::tempobj::temporary_class<Random>::type cmrg() throw();
-		static ::tempobj::temporary_class<Random>::type mrg() throw();
-		static ::tempobj::temporary_class<Random>::type taus() throw();
-		static ::tempobj::temporary_class<Random>::type taus2() throw();
-		static ::tempobj::temporary_class<Random>::type gfsr4() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) mt19937() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) ranlxs0() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) ranlxs1() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) ranlxs2() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) ranlxd1() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) ranlxd2() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) ranlux() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) ranlux389() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) cmrg() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) mrg() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) taus() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) taus2() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) gfsr4() throw();
 		
 #pragma mark -
 #pragma mark Unix random number generators
 		
-		static ::tempobj::temporary_class<Random>::type rand() throw();
-		static ::tempobj::temporary_class<Random>::type random_bsd(const unsigned bitlength = 0) throw();
-		static ::tempobj::temporary_class<Random>::type random_libc5(const unsigned bitlength = 0) throw();
-		static ::tempobj::temporary_class<Random>::type random_glibc2(const unsigned bitlength = 0) throw();
-		static ::tempobj::temporary_class<Random>::type rand48() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) rand() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) random_bsd(const unsigned bitlength = 0) throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) random_libc5(const unsigned bitlength = 0) throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) random_glibc2(const unsigned bitlength = 0) throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) rand48() throw();
 		
 #pragma mark -
 #pragma mark Other random number generators
 		
-		static ::tempobj::temporary_class<Random>::type ranf() throw();
-		static ::tempobj::temporary_class<Random>::type ranmar() throw();
-		static ::tempobj::temporary_class<Random>::type r250() throw();
-		static ::tempobj::temporary_class<Random>::type tt800() throw();
-		static ::tempobj::temporary_class<Random>::type vax() throw();
-		static ::tempobj::temporary_class<Random>::type transputer() throw();
-		static ::tempobj::temporary_class<Random>::type randu() throw();
-		static ::tempobj::temporary_class<Random>::type minstd() throw();
-		static ::tempobj::temporary_class<Random>::type uni() throw();
-		static ::tempobj::temporary_class<Random>::type uni32() throw();
-		static ::tempobj::temporary_class<Random>::type slatec() throw();
-		static ::tempobj::temporary_class<Random>::type zuf() throw();
-		static ::tempobj::temporary_class<Random>::type knuthran2() throw();
-		static ::tempobj::temporary_class<Random>::type knuthran2002() throw();
-		static ::tempobj::temporary_class<Random>::type knuthran() throw();
-		static ::tempobj::temporary_class<Random>::type borosh13() throw();
-		static ::tempobj::temporary_class<Random>::type fishman18() throw();
-		static ::tempobj::temporary_class<Random>::type fishman20() throw();
-		static ::tempobj::temporary_class<Random>::type lecuyer21() throw();
-		static ::tempobj::temporary_class<Random>::type waterman14() throw();		
-		static ::tempobj::temporary_class<Random>::type fishman2x() throw();
-		static ::tempobj::temporary_class<Random>::type coveyou() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) ranf() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) ranmar() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) r250() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) tt800() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) vax() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) transputer() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) randu() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) minstd() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) uni() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) uni32() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) slatec() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) zuf() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) knuthran2() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) knuthran2002() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) knuthran() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) borosh13() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) fishman18() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) fishman20() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) lecuyer21() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) waterman14() throw();		
+		static RETRIEVE_TEMPORARY_CLASS(Random) fishman2x() throw();
+		static RETRIEVE_TEMPORARY_CLASS(Random) coveyou() throw();
 		
 #pragma mark -
 #pragma mark Shuffling and Sampling

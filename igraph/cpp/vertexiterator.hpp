@@ -51,7 +51,7 @@ namespace igraph {
 		bool operator==(const VertexIterator& other) const throw() { !std::memcmp(&_, &other._, sizeof(_)); }
 		bool operator!=(const VertexIterator& other) const throw() { std::memcmp(&_, &other._, sizeof(_)); }
 		
-		::tempobj::temporary_class<VertexVector>::type as_vector() const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(VertexVector) as_vector() const MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 		

@@ -48,32 +48,32 @@ namespace igraph {
 		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(VertexSelector, igraph_vs_t);
 		
 		/// Return a VertexSelector of all vertices.
-		static ::tempobj::temporary_class<VertexSelector>::type all() MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(VertexSelector) all() MAY_THROW_EXCEPTION;
 		
 		/// Return a VertexSelector of the neighbors of a vertex.
-		static ::tempobj::temporary_class<VertexSelector>::type adj(const Vertex which, const NeighboringMode mode = OutNeighbors) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(VertexSelector) adj(const Vertex which, const NeighboringMode mode = OutNeighbors) MAY_THROW_EXCEPTION;
 		
 		/// Return a VertexSelector of the non-neighbors of a vertex.  
-		static ::tempobj::temporary_class<VertexSelector>::type nonadj(const Vertex which, const NeighboringMode mode = OutNeighbors) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(VertexSelector) nonadj(const Vertex which, const NeighboringMode mode = OutNeighbors) MAY_THROW_EXCEPTION;
 		
 		/// Return a VertexSelector of nothing.
-		static ::tempobj::temporary_class<VertexSelector>::type none() MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(VertexSelector) none() MAY_THROW_EXCEPTION;
 		
 		/// Return a VertexSelector a single vertex.
-		static ::tempobj::temporary_class<VertexSelector>::type single(const Vertex which) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(VertexSelector) single(const Vertex which) MAY_THROW_EXCEPTION;
 		
 		/// Return a VertexSelector with vertices identified as content of the vector.
-		static ::tempobj::temporary_class<VertexSelector>::type vector(const VertexVector& vec, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(VertexSelector) vector(const VertexVector& vec, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
 				
 		// TODO: Implement igraph_vs_vector_small()
 		
 		/// Return a VertexSelector with vertices inside the specified range.
-		static ::tempobj::temporary_class<VertexSelector>::type seq(const Vertex fromID, const Vertex toID) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(VertexSelector) seq(const Vertex fromID, const Vertex toID) MAY_THROW_EXCEPTION;
 		
 		int type() const throw();
 		bool is_all() MAY_THROW_EXCEPTION;
 				
-		::tempobj::temporary_class<VertexVector>::type as_vector(const Graph& g) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(VertexVector) as_vector(const Graph& g) const MAY_THROW_EXCEPTION;
 		Integer size(const Graph& g) const MAY_THROW_EXCEPTION;
 		
 		friend class Graph;

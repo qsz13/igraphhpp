@@ -122,6 +122,7 @@ namespace tempobj {
 		typedef T type;
 	};
 }
+#define RETRIEVE_TEMPORARY_CLASS(...) __VA_ARGS__
 #else
 /// \internal
 namespace tempobj {
@@ -141,6 +142,7 @@ namespace tempobj {
 #define XXINTRNL_MOVETYPE(xx_typnm, ...) xx_typnm __VA_ARGS__::Temporary&
 #define XXINTRNL_RVALTYPE(xx_typnm, ...) xx_typnm __VA_ARGS__::Temporary
 #define XXINTRNL_RRP2MT(xx_typnm, ...) const_cast<xx_typnm __VA_ARGS__::Temporary&>
+#define RETRIEVE_TEMPORARY_CLASS(...) __VA_ARGS__::Temporary
 namespace std {
 	
 	template <typename T>

@@ -47,6 +47,8 @@ namespace igraph {
 		igraph_vector_ptr_t _;
 		
 	public:
+		typedef T& value_type;
+
 		MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE(PointerVector, <T>);
 		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(PointerVector, igraph_vector_ptr_t);
 	
@@ -89,7 +91,6 @@ namespace igraph {
 		void sort(int(*compar)(const T*, const T*));
 		
 		// STL support.
-		typedef T* value_type;
 		typedef value_type* pointer;
 		typedef value_type& reference;
 		typedef const value_type& const_reference;

@@ -56,6 +56,9 @@ namespace igraph {
 		/// Copy a C array into a Vector.
 		Vector(Real* const array, const long count) MAY_THROW_EXCEPTION;
 		
+		/// Create a vector with "count" elements.
+		Vector(const long count) MAY_THROW_EXCEPTION;
+		
 #if XXINTRNL_CXX0X
 		/// Create a Vector using initializer list (C++0x only.)
 		Vector(::std::initializer_list<Real> elements) MAY_THROW_EXCEPTION;
@@ -75,13 +78,16 @@ namespace igraph {
 		static RETRIEVE_TEMPORARY_CLASS(Vector) seq(const Real from, const Real to) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector with "count" elements filled with zero.
+		__attribute__((deprecated,warning("Vector::zeros is deprecated. Use the constructor Vector(x) (for x > 0) or Vector::n (for x = 0) instead.")))
 		static RETRIEVE_TEMPORARY_CLASS(Vector) zeros(const long count = 0) MAY_THROW_EXCEPTION;
+		
+		static RETRIEVE_TEMPORARY_CLASS(Vector) n() MAY_THROW_EXCEPTION;
 		
 		/// Wrap a C array as a Vector. 
 		static RETRIEVE_TEMPORARY_CLASS(Vector) view(const Real* const array, const long count) throw();
 		
-		void null() throw();
-		void fill(const Real e) throw();
+		Vector& null() throw();
+		Vector& fill(const Real e) throw();
 		
 		Real* ptr() throw() { return VECTOR(_); }
 		const Real& operator[](const long index) const throw() { return VECTOR(_)[index]; }
@@ -89,16 +95,16 @@ namespace igraph {
 		
 		Real e(const long index) const throw();
 		Real* e_ptr(const long index) const throw();
-		void set(const long index, const Real value) throw();
+		Vector& set(const long index, const Real value) throw();
 		Real tail() const throw();
 		
 		void copy_to(Real* store) const throw();
-		void update(const Vector& update_from) MAY_THROW_EXCEPTION;
-		void append(const Vector& append_from) MAY_THROW_EXCEPTION;
+		Vector& update(const Vector& update_from) MAY_THROW_EXCEPTION;
+		Vector& append(const Vector& append_from) MAY_THROW_EXCEPTION;
 		void swap(Vector& swap_with) MAY_THROW_EXCEPTION;
 		
-		void swap_elements(const long i, const long j) MAY_THROW_EXCEPTION;
-		void reverse() MAY_THROW_EXCEPTION;
+		Vector& swap_elements(const long i, const long j) MAY_THROW_EXCEPTION;
+		Vector& reverse() MAY_THROW_EXCEPTION;
 		
 		Vector& operator+= (const Real k) throw();
 		Vector& operator-= (const Real k) throw();
@@ -123,6 +129,7 @@ namespace igraph {
 		Real sum() const throw();
 		Real prod() const throw();
 		bool isininterval(Real low, Real high) const throw();
+		bool any_smaller(Real upper_limit) const throw();
 		bool operator== (const Vector& other) const throw();
 		bool operator!= (const Vector& other) const throw();
 		Real maxdifference(const Vector& other) const throw();
@@ -133,17 +140,17 @@ namespace igraph {
 		bool binsearch(const Real what) const throw();
 		bool binsearch(const Real what, long& pos) const throw();
 		
-		void clear() throw();
-		void reserve(const long new_size) MAY_THROW_EXCEPTION;
-		void resize(const long new_size) MAY_THROW_EXCEPTION;
-		void push_back(const Real e) MAY_THROW_EXCEPTION;
+		Vector& clear() throw();
+		Vector& reserve(const long new_size) MAY_THROW_EXCEPTION;
+		Vector& resize(const long new_size) MAY_THROW_EXCEPTION;
+		Vector& push_back(const Real e) MAY_THROW_EXCEPTION;
 		Real pop_back() throw();
-		void insert(const long pos, const Real e) MAY_THROW_EXCEPTION;
-		void remove(const long pos) throw();
-		void remove_section(const long from, const long to) throw();
+		Vector& insert(const long pos, const Real e) MAY_THROW_EXCEPTION;
+		Vector& remove(const long pos) throw();
+		Vector& remove_section(const long from, const long to) throw();
 		
-		void sort() throw();
-		
+		Vector& sort() throw();
+				
 		// STL support
 		typedef Real value_type;
 		typedef value_type* pointer;
@@ -160,7 +167,7 @@ namespace igraph {
 		const_iterator end() const throw() { return _.end; }
 		size_type capacity() const throw() { return _.stor_end - _.stor_begin; }
 		reference front() throw() { return *_.stor_begin; }
-		const_reference front() const throw() { *_.stor_begin; }
+		const_reference front() const throw() { return *_.stor_begin; }
 		reference back() throw() { return *(_.end-1); }
 		const_reference back() const throw() { return *(_.end-1); }
 		

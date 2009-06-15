@@ -48,7 +48,7 @@ namespace igraph {
 		bool manage_children_by_new_and_delete;
 		
 		void delete_all () throw() {
-			for (void** it = _.stor_begin; it != _.end; ++ it)
+			for (T** it = reinterpret_cast<T**>(_.stor_begin); it != reinterpret_cast<T**>(_.end); ++ it)
 				delete *it;
 		}
 		
@@ -159,7 +159,7 @@ namespace igraph {
 		}
 
 		 
-		void null() throw();
+		ReferenceVector<T>& null() throw();
 		
 		pointer* ptr() throw() { return VECTOR(_); }
 		const_reference operator[](const long index) const throw() { return **reinterpret_cast<const const_pointer*>(VECTOR(_)[index]); }
@@ -167,22 +167,22 @@ namespace igraph {
 		
 		pointer e(const long index) const throw();
 		/// Note: DO NOT supply OwnershipTransferKeepOriginal in the last argument.
-		void set(const long index, const_pointer value, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) throw();
+		ReferenceVector<T>& set(const long index, const_pointer value, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) throw();
 		
 		bool empty() const throw();
 		long size() const throw();
 		
-		void clear() throw();
-		void reserve(const long new_size) MAY_THROW_EXCEPTION;
-		void resize(const long new_size) MAY_THROW_EXCEPTION;
-		void push_back(const_reference obj, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) MAY_THROW_EXCEPTION { push_back(&obj, transfer); }
-		void push_back(pointer e, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
-		void insert(const long pos, const_reference obj, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) MAY_THROW_EXCEPTION { insert(pos, &obj, transfer); }
-		void insert(const long pos, pointer e, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
-		void remove(const long pos) throw();
+		ReferenceVector<T>& clear() throw();
+		ReferenceVector<T>& reserve(const long new_size) MAY_THROW_EXCEPTION;
+		ReferenceVector<T>& resize(const long new_size) MAY_THROW_EXCEPTION;
+		ReferenceVector<T>& push_back(const_reference obj, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) MAY_THROW_EXCEPTION { return push_back(&obj, transfer); }
+		ReferenceVector<T>& push_back(pointer e, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
+		ReferenceVector<T>& insert(const long pos, const_reference obj, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) MAY_THROW_EXCEPTION { return insert(pos, &obj, transfer); }
+		ReferenceVector<T>& insert(const long pos, pointer e, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
+		ReferenceVector<T>& remove(const long pos) throw();
 		
 		void copy_to(pointer* store, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) const throw();
-		void sort(int(*compar)(const_reference, const_reference));
+		ReferenceVector<T>& sort(int(*compar)(const_reference, const_reference));
 		
 		// STL support.
 				
@@ -197,7 +197,7 @@ namespace igraph {
 		const_reference back() const throw() { return **reinterpret_cast<const const_pointer*>(_.end-1); }
 				
 		/// Perform the function on every object of the ReferenceVector.
-		void perform(void(*fptr)(pointer obj, void* context), void* context = NULL);
+		ReferenceVector<T>& perform(void(*fptr)(pointer obj, void* context), void* context = NULL);
 		
 		bool operator==(const ReferenceVector<T>& other) const throw();
 		bool operator!=(const ReferenceVector<T>& other) const throw();

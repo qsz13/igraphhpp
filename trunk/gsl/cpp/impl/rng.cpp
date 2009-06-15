@@ -31,10 +31,10 @@ namespace gsl {
 	MEMORY_MANAGER_IMPLEMENTATION(Random);
 	XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(Random, gsl_rng*, inplace_copy);
 	
-	IMPLEMENT_COPY_METHOD(Random) throw() {
+	IMPLEMENT_COPY_METHOD(Random) {
 		_ = gsl_rng_clone(other._);
 	}
-	IMPLEMENT_MOVE_METHOD(Random) throw() {
+	IMPLEMENT_MOVE_METHOD(Random) {
 		_ = ::std::move(other._);
 	}
 	IMPLEMENT_DEALLOC_METHOD(Random) {

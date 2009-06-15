@@ -48,8 +48,8 @@ namespace igraph {
 		Vertex get() const throw() { return IGRAPH_VIT_GET(_); }
 		long size() throw() { return IGRAPH_VIT_SIZE(_); }
 		
-		bool operator==(const VertexIterator& other) const throw() { !std::memcmp(&_, &other._, sizeof(_)); }
-		bool operator!=(const VertexIterator& other) const throw() { std::memcmp(&_, &other._, sizeof(_)); }
+		bool operator==(const VertexIterator& other) const throw() { return std::memcmp(&_, &other._, sizeof(_)) == 0; }
+		bool operator!=(const VertexIterator& other) const throw() { return std::memcmp(&_, &other._, sizeof(_)) != 0; }
 		
 		RETRIEVE_TEMPORARY_CLASS(VertexVector) as_vector() const MAY_THROW_EXCEPTION;
 		

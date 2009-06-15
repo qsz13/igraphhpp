@@ -48,8 +48,8 @@ namespace igraph {
 		Edge get() const throw() { return IGRAPH_EIT_GET(_); }
 		long size() const throw() { return IGRAPH_EIT_SIZE(_); }
 		
-		bool operator==(const EdgeIterator& other) const throw() { !std::memcmp(&_, &other._, sizeof(_)); }
-		bool operator!=(const EdgeIterator& other) const throw() { std::memcmp(&_, &other._, sizeof(_)); }
+		bool operator==(const EdgeIterator& other) const throw() { return std::memcmp(&_, &other._, sizeof(_)) == 0; }
+		bool operator!=(const EdgeIterator& other) const throw() { return std::memcmp(&_, &other._, sizeof(_)) != 0; }
 		
 		RETRIEVE_TEMPORARY_CLASS(EdgeVector) as_vector() const MAY_THROW_EXCEPTION;
 		

@@ -71,10 +71,10 @@ namespace igraph {
 	
 	MEMORY_MANAGER_IMPLEMENTATION(GraphReader);
 	
-	IMPLEMENT_COPY_METHOD(GraphReader) throw(std::logic_error) {
+	IMPLEMENT_COPY_METHOD(GraphReader) {
 		throw std::logic_error("GraphReader::mm_raw_copy() called. GraphReader cannot be copied. Use std::move() for assignment.");
 	}
-	IMPLEMENT_MOVE_METHOD(GraphReader) throw() {
+	IMPLEMENT_MOVE_METHOD(GraphReader) {
 		fptr = ::std::move(fptr);
 	}
 	IMPLEMENT_DEALLOC_METHOD(GraphReader) {
@@ -220,10 +220,10 @@ namespace igraph {
 	
 	MEMORY_MANAGER_IMPLEMENTATION(GraphWriter);
 	
-	IMPLEMENT_COPY_METHOD(GraphWriter) throw(std::logic_error) {
+	IMPLEMENT_COPY_METHOD(GraphWriter) {
 		throw std::logic_error("GraphWriter::mm_raw_copy() called. GraphWriter cannot be copied. Use std::move() for assignment.");
 	}
-	IMPLEMENT_MOVE_METHOD(GraphWriter) throw() {
+	IMPLEMENT_MOVE_METHOD(GraphWriter) {
 		_ = ::std::move(other._);
 		fptr = ::std::move(fptr);
 	}

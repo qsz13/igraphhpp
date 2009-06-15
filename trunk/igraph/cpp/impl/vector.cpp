@@ -33,10 +33,10 @@ namespace igraph {
 	MEMORY_MANAGER_IMPLEMENTATION(Vector);
 	XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(Vector, igraph_vector_t, igraph_vector_copy);
 	
-	IMPLEMENT_COPY_METHOD(Vector) MAY_THROW_EXCEPTION {
+	IMPLEMENT_COPY_METHOD(Vector) {
 		TRY(igraph_vector_copy(&_, &other._));
 	}
-	IMPLEMENT_MOVE_METHOD(Vector) throw() {
+	IMPLEMENT_MOVE_METHOD(Vector) {
 		_ = std::move(other._);
 	}
 	IMPLEMENT_DEALLOC_METHOD(Vector) {
@@ -46,6 +46,12 @@ namespace igraph {
 	Vector::Vector(Real* const array, const long count) MAY_THROW_EXCEPTION {
 		XXINTRNL_DEBUG_CALL_INITIALIZER(Vector);
 		TRY(igraph_vector_init_copy(&_, array, count));
+	}
+	
+	/// Create a vector with "count" elements.
+	Vector::Vector(const long count) MAY_THROW_EXCEPTION {
+		XXINTRNL_DEBUG_CALL_INITIALIZER(Vector);
+		TRY(igraph_vector_init(&_, count));
 	}
 	
 #if XXINTRNL_CXX0X
@@ -78,23 +84,27 @@ namespace igraph {
 	}
 	
 	RETRIEVE_TEMPORARY_CLASS(Vector) Vector::zeros(const long count) MAY_THROW_EXCEPTION {
+		return ::std::move(Vector(count));
+	}
+	
+	RETRIEVE_TEMPORARY_CLASS(Vector) Vector::n() MAY_THROW_EXCEPTION {
 		igraph_vector_t _;
-		TRY(igraph_vector_init(&_, count));
+		TRY(igraph_vector_init(&_, 0));
 		return ::std::move(Vector(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 #pragma mark -
 #pragma mark Initializing elements
 	
-	void Vector::null() throw() { igraph_vector_null(&_); }
-	void Vector::fill(const Real e) throw() { igraph_vector_fill(&_, e); }
+	Vector& Vector::null() throw() { igraph_vector_null(&_); return *this; }
+	Vector& Vector::fill(const Real e) throw() { igraph_vector_fill(&_, e); return *this; }
 	
 #pragma mark -
 #pragma mark Accessing elements
 	
 	Real Vector::e(const long index) const throw() { return igraph_vector_e(&_, index); }
 	Real* Vector::e_ptr(const long index) const throw() { return igraph_vector_e_ptr(&_, index); }
-	void Vector::set(const long index, const Real value) throw() { igraph_vector_set(&_, index, value); }
+	Vector& Vector::set(const long index, const Real value) throw() { igraph_vector_set(&_, index, value); return *this; }
 	Real Vector::tail() const throw() { return igraph_vector_tail(&_); }
 	
 #pragma mark -
@@ -110,15 +120,15 @@ namespace igraph {
 #pragma mark Copying vectors
 	
 	void Vector::copy_to(Real* store) const throw() { igraph_vector_copy_to(&_, store); }
-	void Vector::update(const Vector& update_from) MAY_THROW_EXCEPTION { TRY(igraph_vector_update(&_, &update_from._)); }
-	void Vector::append(const Vector& append_from) MAY_THROW_EXCEPTION { TRY(igraph_vector_append(&_, &append_from._)); }
+	Vector& Vector::update(const Vector& update_from) MAY_THROW_EXCEPTION { TRY(igraph_vector_update(&_, &update_from._)); return *this; }
+	Vector& Vector::append(const Vector& append_from) MAY_THROW_EXCEPTION { TRY(igraph_vector_append(&_, &append_from._)); return *this; }
 	void Vector::swap(Vector& swap_with) MAY_THROW_EXCEPTION { TRY(igraph_vector_swap(&_, &swap_with._)); }
 	
 #pragma mark -
 #pragma mark Exchanging elements
 	
-	void Vector::swap_elements(const long i, const long j) MAY_THROW_EXCEPTION { TRY(igraph_vector_swap_elements(&_, i, j)); }
-	void Vector::reverse() MAY_THROW_EXCEPTION { TRY(igraph_vector_reverse(&_)); }
+	Vector& Vector::swap_elements(const long i, const long j) MAY_THROW_EXCEPTION { TRY(igraph_vector_swap_elements(&_, i, j)); return *this; }
+	Vector& Vector::reverse() MAY_THROW_EXCEPTION { TRY(igraph_vector_reverse(&_)); return *this; }
 	
 #pragma mark -
 #pragma mark Vector operations
@@ -161,6 +171,7 @@ namespace igraph {
 	Real Vector::sum() const throw() { return igraph_vector_sum(&_); }
 	Real Vector::prod() const throw() { return igraph_vector_prod(&_); }
 	bool Vector::isininterval(Real low, Real high) const throw() { return igraph_vector_isininterval(&_, low, high); }
+	bool Vector::any_smaller(Real upper_limit) const throw() { return igraph_vector_any_smaller(&_, upper_limit); }
 	bool Vector::operator== (const Vector& other) const throw() { return igraph_vector_is_equal(&_, &other._); }
 	bool Vector::operator!= (const Vector& other) const throw() { return !(*this == other); }
 	Real Vector::maxdifference(const Vector& other) const throw() { return igraph_vector_maxdifference(&_, &other._); }
@@ -177,19 +188,19 @@ namespace igraph {
 #pragma mark -
 #pragma mark Resizing operations
 	
-	void Vector::clear() throw() { igraph_vector_clear(&_); }
-	void Vector::reserve(const long new_size) MAY_THROW_EXCEPTION { TRY(igraph_vector_reserve(&_, new_size)); }
-	void Vector::resize(const long new_size) MAY_THROW_EXCEPTION { TRY(igraph_vector_resize(&_, new_size)); }
-	void Vector::push_back(const Real e) MAY_THROW_EXCEPTION { TRY(igraph_vector_push_back(&_, e)); }
+	Vector& Vector::clear() throw() { igraph_vector_clear(&_); return *this; }
+	Vector& Vector::reserve(const long new_size) MAY_THROW_EXCEPTION { TRY(igraph_vector_reserve(&_, new_size)); return *this; }
+	Vector& Vector::resize(const long new_size) MAY_THROW_EXCEPTION { TRY(igraph_vector_resize(&_, new_size)); return *this; }
+	Vector& Vector::push_back(const Real e) MAY_THROW_EXCEPTION { TRY(igraph_vector_push_back(&_, e)); return *this; }
 	Real Vector::pop_back() throw() { return igraph_vector_pop_back(&_); }
-	void Vector::insert(const long pos, const Real e) MAY_THROW_EXCEPTION { TRY(igraph_vector_insert(&_, pos, e)); }
-	void Vector::remove(const long pos) throw() { igraph_vector_remove(&_, pos); }
-	void Vector::remove_section(const long from, const long to) throw() { igraph_vector_remove_section(&_, from, to); }
+	Vector& Vector::insert(const long pos, const Real e) MAY_THROW_EXCEPTION { TRY(igraph_vector_insert(&_, pos, e)); return *this; }
+	Vector& Vector::remove(const long pos) throw() { igraph_vector_remove(&_, pos); return *this; }
+	Vector& Vector::remove_section(const long from, const long to) throw() { igraph_vector_remove_section(&_, from, to); return *this; }
 	
 #pragma mark -
 #pragma mark Sorting
 	
-	void Vector::sort() throw() { igraph_vector_sort(&_); }
+	Vector& Vector::sort() throw() { igraph_vector_sort(&_); return *this; }
 	
 #pragma mark -
 #pragma mark Not Graph Related Functions
@@ -206,7 +217,7 @@ namespace igraph {
 		TRY(igraph_random_sample(&_, low, high, vector_length));
 		return ::std::move(Vector(&_, ::tempobj::OwnershipTransferMove));
 	}
-		
+			
 }
 
 #endif

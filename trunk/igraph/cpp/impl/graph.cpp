@@ -70,19 +70,19 @@ namespace igraph {
 	}
 
 	RETRIEVE_TEMPORARY_CLASS(VertexVector) Graph::neighbors(Vertex vid, NeighboringMode neimode) const MAY_THROW_EXCEPTION {
-		VertexVector res = VertexVector::zeros(0);
+		VertexVector res = VertexVector::n();
 		TRY(igraph_neighbors(&_, &res._, vid, (igraph_neimode_t)neimode));
 		return ::std::move(res);
 	}
 
 	RETRIEVE_TEMPORARY_CLASS(EdgeVector) Graph::adjacent(Vertex vid, NeighboringMode neimode) const MAY_THROW_EXCEPTION {
-		EdgeVector res = EdgeVector::zeros(0);
+		EdgeVector res = EdgeVector::n();
 		TRY(igraph_adjacent(&_, &res._, vid, (igraph_neimode_t)neimode));
 		return ::std::move(res);
 	}
 
 	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::degree(const VertexSelector& vids, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
-		Vector res = Vector::zeros(vids.size(*this));
+		Vector res ((long)vids.size(*this));
 		TRY(igraph_degree(&_, &res._, vids._, (igraph_neimode_t)neimode, countLoops));
 		return ::std::move(res);
 	}
@@ -279,7 +279,7 @@ namespace igraph {
 		return ::std::move(GraphWriter(&_, filestream));
 	}
 
-	bool Graph::write(const char* filename, GraphFormat format) const MAY_THROW_EXCEPTION {
+	bool Graph::write(const char* filename, GraphFormat format) const {
 		if (format == GraphFormat_auto)
 			format = identify_file_format(filename, false);
 		if (format != GraphFormat_auto) {

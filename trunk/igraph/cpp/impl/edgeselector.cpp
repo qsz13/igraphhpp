@@ -30,12 +30,12 @@ namespace igraph {
 	MEMORY_MANAGER_IMPLEMENTATION(EdgeSelector);
 	XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(EdgeSelector, igraph_es_t, igraph_es_copy);
 	
-	IMPLEMENT_COPY_METHOD(EdgeSelector) MAY_THROW_EXCEPTION {
+	IMPLEMENT_COPY_METHOD(EdgeSelector) {
 		TRY(igraph_es_copy(&_, &other._));
 		retained_vector = other.retained_vector;
 	}
 	
-	IMPLEMENT_MOVE_METHOD(EdgeSelector) throw() {
+	IMPLEMENT_MOVE_METHOD(EdgeSelector) {
 		_ = ::std::move(other._);
 		retained_vector = ::std::move(other.retained_vector);
 	}

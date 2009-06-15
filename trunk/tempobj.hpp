@@ -190,7 +190,7 @@ private:                                                                        
 	::tempobj::XXINTRNL_DONT_DEALLOC mm_dont_dealloc;                           \
 protected:                                                                      \
 	void mm_raw_copy(const cls __VA_ARGS__& other);                             \
-	void mm_raw_dealloc();                                                      \
+	void mm_raw_dealloc() throw();                                              \
 	void mm_raw_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other);       \
 	void mm_copy(const cls __VA_ARGS__& other);                                 \
 	void mm_dealloc() throw();                                                  \

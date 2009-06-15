@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/exception.hpp>
 
 #include <igraph/cpp/vector.hpp>
-#include <igraph/cpp/pointervector.hpp>
+#include <igraph/cpp/referencevector.hpp>
 
 #include <igraph/cpp/graph.hpp>
 #include <igraph/cpp/graphio.hpp>
@@ -40,7 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
 #include <igraph/cpp/impl/vector.cpp>
-#include <igraph/cpp/impl/pointervector.cpp>
+#include <igraph/cpp/impl/referencevector.cpp>
 
 #include <igraph/cpp/impl/vertexselector.cpp>
 #include <igraph/cpp/impl/edgeselector.cpp>

@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/graph.hpp>
 #include <igraph/cpp/graphio.hpp>
 
+#include <igraph/cpp/adjlist.hpp>
+
 #include <igraph/cpp/vertexselector.hpp>
 #include <igraph/cpp/vertexiterator.hpp>
 #include <igraph/cpp/edgeselector.hpp>
@@ -47,6 +49,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <igraph/cpp/impl/graph.cpp>
 #include <igraph/cpp/impl/graphio.cpp>
+
+#include <igraph/cpp/impl/adjlist.cpp>
 
 #include <igraph/cpp/impl/iterators.cpp>
 

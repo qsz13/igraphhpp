@@ -31,12 +31,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/referencevector.hpp>
 
 namespace igraph {
+	class AdjacencyList;
 	
 	class Graph {
 	private:
 		igraph_t _;
 		
 	public:
+		enum ToUndirectedMode {
+			ToUndirectedMode_Each = IGRAPH_TO_UNDIRECTED_EACH,
+			ToUndirectedMode_Collapse = IGRAPH_TO_UNDIRECTED_COLLAPSE,
+			// Backward compatibility.
+			EachArcToEdge = IGRAPH_TO_UNDIRECTED_EACH,
+			CollapseArcs = IGRAPH_TO_UNDIRECTED_COLLAPSE
+		};
+		
 		MEMORY_MANAGER_INTERFACE(Graph);
 		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(Graph, igraph_t);
 		
@@ -98,8 +107,7 @@ namespace igraph {
 			TreeMode_In = IGRAPH_TREE_IN,
 			TreeMode_Undirected = IGRAPH_TREE_UNDIRECTED,
 		};
-		
-		
+	
 		enum PeriodicLattice {
 			PeriodicLattice_NotPeriodic,
 			PeriodicLattice_Periodic,
@@ -109,6 +117,7 @@ namespace igraph {
 		// TODO: igraph_adjacency when Matrix is implemented.
 		// TODO: igraph_weighted_adjacency when Matrix is implemented.
 		// TODO: igraph_adjlist when AdjacencyList is implemented.
+		static RETRIEVE_TEMPORARY_CLASS(Graph) adjlist(const AdjacencyList& lst, const Directedness directedness = Undirected, const ToUndirectedMode duplicate_edges = ToUndirectedMode_Collapse) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) star(const Integer n, const StarMode mode = StarMode_Undirected, const Vertex center = 0) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) lattice(const Vector& dimensions, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) lattice_2d(const Integer width, const Integer length, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
@@ -154,14 +163,6 @@ namespace igraph {
 			// Backward compatibility.
 			EachEdgeToArc = IGRAPH_TO_DIRECTED_ARBITRARY,
 			SplitEdges = IGRAPH_TO_DIRECTED_MUTUAL
-		};
-		
-		enum ToUndirectedMode {
-			ToUndirectedMode_Each = IGRAPH_TO_UNDIRECTED_EACH,
-			ToUndirectedMode_Collapse = IGRAPH_TO_UNDIRECTED_COLLAPSE,
-			// Backward compatibility.
-			EachArcToEdge = IGRAPH_TO_UNDIRECTED_EACH,
-			CollapseArcs = IGRAPH_TO_UNDIRECTED_COLLAPSE
 		};
 		
 		Graph& to_undirected(const ToDirectedMode mode = ToDirectedMode_Mutual) MAY_THROW_EXCEPTION;
@@ -223,6 +224,7 @@ namespace igraph {
 		friend class EdgeSelector;
 		friend class VertexIterator;
 		friend class EdgeIterator;
+		friend class AdjacencyList;
 	};
 	
 	MEMORY_MANAGER_INTERFACE_EX(Graph);

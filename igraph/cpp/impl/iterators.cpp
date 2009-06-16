@@ -1,6 +1,6 @@
 /*
 
-FILE_NAME ... DESCRIPTION
+iterators.cpp ... Implementations for vertex/edge iterators.
 
 Copyright (C) 2009  KennyTM~
 

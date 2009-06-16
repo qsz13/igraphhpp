@@ -1,6 +1,6 @@
 /*
 
-graphwriter.hpp ... Graph writer.
+graphio.hpp ... Graph I/O.
 
 Copyright (C) 2009  KennyTM~
 

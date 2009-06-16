@@ -150,6 +150,8 @@ template<> bool XXINTRNL_sscanf(const char*& str_io, type& res) throw() { \
 	
 #undef XXINTRNL_DEFINE_SSCANF
 	
+	void XXINTRNL_nop(...) {};
+	
 	
 }
 

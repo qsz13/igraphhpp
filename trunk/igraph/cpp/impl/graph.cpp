@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IGRAPH_GRAPH_CPP
 
 #include <igraph/cpp/graph.hpp>
+#include <igraph/cpp/adjlist.hpp>
 #include <stdexcept>
 
 namespace igraph {
@@ -129,7 +130,12 @@ namespace igraph {
 	}
 	// TODO: igraph_adjacency when Matrix is implemented.
 	// TODO: igraph_weighted_adjacency when Matrix is implemented.
-	// TODO: igraph_adjlist when AdjacencyList is implemented.
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::adjlist(const AdjacencyList& lst, const Directedness directedness, const ToUndirectedMode duplicate_edges) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_adjlist(&_, &lst._, directedness, duplicate_edges == ToUndirectedMode_Each));
+		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
+	}
+	
 	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::star(const Integer n, const StarMode mode, const Vertex center) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_star(&_, n, (igraph_star_mode_t)mode, center));

@@ -1,5 +1,5 @@
-Compiler=g++-4.2
-Options=-Wall -O2 -ligraph -I../
+Compiler=g++-4.4
+Options=-std=gnu++0x -O2 -ligraph -I../
 
 %.exe:	%.cpp
 	$(Compiler) $(Options) -o $@ $^

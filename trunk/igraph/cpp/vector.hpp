@@ -39,30 +39,34 @@
 #endif
 
 namespace igraph {
+	
+	XXINTRNL_PREPARE_UNDERLYING_TYPES(BasicVector, vector);	
 	/**
 	 \class Vector
 	 \brief Wrapper for igraph vectors
 	 
-	 This class is a wrapper of the igraph_vector_t type, which is an array of Real.
+	 This template class is a wrapper of the igraph vectors type.
+	 In igraph there are four kinds of vectors: Vectors of Reals, longs, chars and Booleans.
 	 */
-	class Vector {
-	private:
-		igraph_vector_t _;
+	template <typename T>
+	class BasicVector {
+		XXINTRNL_UNDERLYING_TYPE(BasicVector) _;
 		
 	public:
-		MEMORY_MANAGER_INTERFACE(Vector);
-		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(Vector, igraph_vector_t);
-				
+		MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE(BasicVector, <T>);
+		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(BasicVector, XXINTRNL_UNDERLYING_TYPE(BasicVector));
+		
 		/// Copy a C array into a Vector.
-		Vector(Real* const array, const long count) MAY_THROW_EXCEPTION;
+		BasicVector(T* const array, const long count) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector with "count" elements.
-		Vector(const long count) MAY_THROW_EXCEPTION;
+		BasicVector(const long count) MAY_THROW_EXCEPTION;
 		
 #if XXINTRNL_CXX0X
 		/// Create a Vector using initializer list (C++0x only.)
-		Vector(::std::initializer_list<Real> elements) MAY_THROW_EXCEPTION;
+		BasicVector(::std::initializer_list<T> elements) MAY_THROW_EXCEPTION;
 #endif
+		
 		/**
 		 \brief Create a Vector using content of string.
 		 
@@ -71,89 +75,90 @@ namespace igraph {
 		 Vector v = Vector("42 54 64 75");
 		 printf("%lg", v.prod());	// prints 10886400
 		 \endcode
-		*/
-		Vector(const char* stringized_elements) MAY_THROW_EXCEPTION;
+		 */
+		BasicVector(const char* stringized_elements) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector sequentially between two values inclusively.
-		static RETRIEVE_TEMPORARY_CLASS(Vector) seq(const Real from, const Real to) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(BasicVector<T>) seq(const T from, const T to) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector with "count" elements filled with zero.
-		__attribute__((deprecated,warning("Vector::zeros is deprecated. Use the constructor Vector(x) (for x > 0) or Vector::n (for x = 0) instead.")))
-		static RETRIEVE_TEMPORARY_CLASS(Vector) zeros(const long count = 0) MAY_THROW_EXCEPTION;
+		__attribute__((deprecated,warning("BasicVector<T>::zeros is deprecated. Use the constructor BasicVector(x) (for x > 0) or BasicVector<T>::n (for x = 0) instead.")))
+		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(BasicVector<T>) zeros(const long count = 0) MAY_THROW_EXCEPTION;
 		
-		static RETRIEVE_TEMPORARY_CLASS(Vector) n() MAY_THROW_EXCEPTION;
+		/// Create a vector with "count" elements filled with zero.
+		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(BasicVector<T>) n() MAY_THROW_EXCEPTION;
 		
 		/// Wrap a C array as a Vector. 
-		static RETRIEVE_TEMPORARY_CLASS(Vector) view(const Real* const array, const long count) throw();
+		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(BasicVector<T>) view(const T* const array, const long count) throw();
 		
-		Vector& null() throw();
-		Vector& fill(const Real e) throw();
+		BasicVector<T>& null();
+		BasicVector<T>& fill(const T e) throw();
 		
-		Real* ptr() throw() { return VECTOR(_); }
-		const Real& operator[](const long index) const throw() { return VECTOR(_)[index]; }
-		Real& operator[](const long index) throw() { return VECTOR(_)[index]; }
+		T* ptr() throw() { return VECTOR(_); }
+		const T& operator[](const long index) const throw() { return VECTOR(_)[index]; }
+		T& operator[](const long index) throw() { return VECTOR(_)[index]; }
 		
-		Real e(const long index) const throw();
-		Real* e_ptr(const long index) const throw();
-		Vector& set(const long index, const Real value) throw();
-		Real tail() const throw();
+		T e(const long index) const throw();
+		T* e_ptr(const long index) const throw();
+		BasicVector<T>& set(const long index, const T value) throw();
+		T tail() const throw();
 		
-		void copy_to(Real* store) const throw();
-		Vector& update(const Vector& update_from) MAY_THROW_EXCEPTION;
-		Vector& append(const Vector& append_from) MAY_THROW_EXCEPTION;
-		void swap(Vector& swap_with) MAY_THROW_EXCEPTION;
+		void copy_to(T* store) const throw();
+		BasicVector<T>& update(const BasicVector<T>& update_from) MAY_THROW_EXCEPTION;
+		BasicVector<T>& append(const BasicVector<T>& append_from) MAY_THROW_EXCEPTION;
+		void swap(BasicVector<T>& swap_with) MAY_THROW_EXCEPTION;
 		
-		Vector& swap_elements(const long i, const long j) MAY_THROW_EXCEPTION;
-		Vector& reverse() MAY_THROW_EXCEPTION;
+		BasicVector<T>& swap_elements(const long i, const long j) MAY_THROW_EXCEPTION;
+		BasicVector<T>& reverse() MAY_THROW_EXCEPTION;
 		
-		Vector& operator+= (const Real k) throw();
-		Vector& operator-= (const Real k) throw();
-		Vector& operator*= (const Real k) throw();
-		Vector& operator/= (const Real k) throw();
+		BasicVector<T>& operator+= (const T k) throw();
+		BasicVector<T>& operator-= (const T k) throw();
+		BasicVector<T>& operator*= (const T k) throw();
+		BasicVector<T>& operator/= (const T k) throw();
 		
-		Vector& operator+= (const Vector& k) MAY_THROW_EXCEPTION;
-		Vector& operator-= (const Vector& k) MAY_THROW_EXCEPTION;
-		Vector& operator*= (const Vector& k) MAY_THROW_EXCEPTION;
-		Vector& operator/= (const Vector& k) MAY_THROW_EXCEPTION;
+		BasicVector<T>& operator+= (const BasicVector<T>& k) MAY_THROW_EXCEPTION;
+		BasicVector<T>& operator-= (const BasicVector<T>& k) MAY_THROW_EXCEPTION;
+		BasicVector<T>& operator*= (const BasicVector<T>& k) MAY_THROW_EXCEPTION;
+		BasicVector<T>& operator/= (const BasicVector<T>& k) MAY_THROW_EXCEPTION;
 		
-		Real min() const throw();
-		Real max() const throw();
+		T min() const throw();
+		T max() const throw();
 		long which_min() const throw();
 		long which_max() const throw();
-		void minmax(Real& minStore, Real& maxStore) const MAY_THROW_EXCEPTION;
+		void minmax(T& minStore, T& maxStore) const MAY_THROW_EXCEPTION;
 		void which_minmax(long& minStore, long& maxStore) const MAY_THROW_EXCEPTION;
 		
 		bool empty() const throw();
 		long size() const throw();
 		
-		Real sum() const throw();
-		Real prod() const throw();
+		T sum() const throw();
+		T prod() const throw();
 		bool isnull() const throw();
-		bool isininterval(Real low, Real high) const throw();
-		bool any_smaller(Real upper_limit) const throw();
-		bool operator== (const Vector& other) const throw();
-		bool operator!= (const Vector& other) const throw();
-		Real maxdifference(const Vector& other) const throw();
+		bool isininterval(T low, T high) const throw();
+		bool any_smaller(T upper_limit) const throw();
+		bool operator== (const BasicVector<T>& other) const throw();
+		bool operator!= (const BasicVector<T>& other) const throw();
+		T maxdifference(const BasicVector<T>& other) const throw();
 		
-		bool contains(const Real e) const throw();
-		bool search(const Real what, const long from = 0) const throw();
-		bool search(const Real what, const long from, long& pos) const throw();
-		bool binsearch(const Real what) const throw();
-		bool binsearch(const Real what, long& pos) const throw();
+		bool contains(const T e) const throw();
+		bool search(const T what, const long from = 0) const throw();
+		bool search(const T what, const long from, long& pos) const throw();
+		bool binsearch(const T what) const throw();
+		bool binsearch(const T what, long& pos) const throw();
 		
-		Vector& clear() throw();
-		Vector& reserve(const long new_size) MAY_THROW_EXCEPTION;
-		Vector& resize(const long new_size) MAY_THROW_EXCEPTION;
-		Vector& push_back(const Real e) MAY_THROW_EXCEPTION;
-		Real pop_back() throw();
-		Vector& insert(const long pos, const Real e) MAY_THROW_EXCEPTION;
-		Vector& remove(const long pos) throw();
-		Vector& remove_section(const long from, const long to) throw();
+		BasicVector<T>& clear() throw();
+		BasicVector<T>& reserve(const long new_size) MAY_THROW_EXCEPTION;
+		BasicVector<T>& resize(const long new_size) MAY_THROW_EXCEPTION;
+		BasicVector<T>& push_back(const T e) MAY_THROW_EXCEPTION;
+		T pop_back() throw();
+		BasicVector<T>& insert(const long pos, const T e) MAY_THROW_EXCEPTION;
+		BasicVector<T>& remove(const long pos) throw();
+		BasicVector<T>& remove_section(const long from, const long to) throw();
 		
-		Vector& sort() throw();
+		BasicVector<T>& sort() throw();
 				
 		// STL support
-		typedef Real value_type;
+		typedef T value_type;
 		typedef value_type* pointer;
 		typedef value_type& reference;
 		typedef const value_type& const_reference;
@@ -173,36 +178,12 @@ namespace igraph {
 		const_reference back() const throw() { return *(_.end-1); }
 		
 		/// Print content of the Vector.
-		void print(std::FILE* f = stdout) const throw() {
-			bool is_first = true;
-			for (const_iterator cit = begin(); cit != end(); ++ cit) {
-				if (is_first) {
-					::std::fprintf(f, "%lg", *cit);
-					is_first = false;
-				} else
-					::std::fprintf(f, " %lg", *cit);
-			}
-			::std::fprintf(f, "\n");
-		}
+		void print(std::FILE* f = stdout) const throw();
 		
 		/// Convert from std::vector.
 		template<typename InputIterator>
-		Vector(const InputIterator from, const InputIterator to) MAY_THROW_EXCEPTION {
-			if (from != to) {
-				TRY(igraph_vector_init(&_, 1));
-				for (const InputIterator cit = from; cit != to; ++ cit)
-					TRY(igraph_vector_push_back(&_, *cit));
-			} else
-				mm_dont_dealloc = true;
-		}
-		
-		/// Calculates the running mean of a vector.
-		RETRIEVE_TEMPORARY_CLASS(Vector) running_mean(const Integer binwidth) const MAY_THROW_EXCEPTION;
-		
-		/// Generates an increasing random sequence of integers
-		static RETRIEVE_TEMPORARY_CLASS(Vector) random_sample(const Integer low, const Integer high, const Integer vector_length) MAY_THROW_EXCEPTION;
-		
-		
+		BasicVector(const InputIterator from, const InputIterator to) MAY_THROW_EXCEPTION;
+				
 		friend class VertexSelector;
 		friend class VertexIterator;
 		friend class EdgeSelector;
@@ -211,8 +192,10 @@ namespace igraph {
 		friend class GraphWriter;
 		friend class GraphReader;
 	};
-	MEMORY_MANAGER_INTERFACE_EX(Vector);
-
+	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicVector, <T>);
+	
+	typedef BasicVector<Real> Vector;
+	typedef BasicVector<bool> BoolVector;
 	typedef Vector VertexVector;
 	typedef Vector EdgeVector;
 }

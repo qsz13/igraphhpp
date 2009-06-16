@@ -128,6 +128,7 @@ namespace igraph {
 		
 		Real sum() const throw();
 		Real prod() const throw();
+		bool isnull() const throw();
 		bool isininterval(Real low, Real high) const throw();
 		bool any_smaller(Real upper_limit) const throw();
 		bool operator== (const Vector& other) const throw();

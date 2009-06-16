@@ -167,6 +167,7 @@ namespace igraph {
 	
 	bool Vector::empty() const throw() { return igraph_vector_empty(&_); }
 	long Vector::size() const throw() { return igraph_vector_size(&_); }
+	bool Vector::isnull() const throw() { return igraph_vector_isnull(&_); }
 	
 	Real Vector::sum() const throw() { return igraph_vector_sum(&_); }
 	Real Vector::prod() const throw() { return igraph_vector_prod(&_); }

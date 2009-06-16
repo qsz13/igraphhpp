@@ -178,12 +178,22 @@ namespace igraph {
 		const_reference back() const throw() { return *(_.end-1); }
 		
 		/// Print content of the Vector.
-		void print(std::FILE* f = stdout) const throw();
+		void print(std::FILE* f = stdout) const throw() {
+			bool is_first = true;
+			for (const_iterator cit = begin(); cit != end(); ++ cit) {
+				if (is_first)
+					is_first = false;
+				else
+					::std::fprintf(f, " ");
+				XXINTRNL_fprintf(f, *cit);
+			}
+			::std::fprintf(f, "\n");
+		}
 		
 		/// Convert from std::vector.
 		template<typename InputIterator>
 		BasicVector(const InputIterator from, const InputIterator to) MAY_THROW_EXCEPTION;
-				
+		
 		friend class VertexSelector;
 		friend class VertexIterator;
 		friend class EdgeSelector;
@@ -195,7 +205,7 @@ namespace igraph {
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicVector, <T>);
 	
 	typedef BasicVector<Real> Vector;
-	typedef BasicVector<bool> BoolVector;
+	typedef BasicVector<Boolean> BoolVector;
 	typedef Vector VertexVector;
 	typedef Vector EdgeVector;
 }

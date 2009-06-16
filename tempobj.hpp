@@ -354,16 +354,16 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
 /// TODO: Documentation
 #define IMPLEMENT_COPY_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) XXINTRNL_IMPLEMENT_COPY_METHOD(typename, argname, cls, __VA_ARGS__)
 #define IMPLEMENT_COPY_METHOD_WITH_TEMPLATE(cls, ...)                              XXINTRNL_IMPLEMENT_COPY_METHOD(typename, other, cls, __VA_ARGS__)
-#define IMPLEMENT_COPY_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls)                   XXINTRNL_IMPLEMENT_COPY_METHOD( , argname, cls)
-#define IMPLEMENT_COPY_METHOD(cls)                                                 XXINTRNL_IMPLEMENT_COPY_METHOD( , other, cls)
+#define IMPLEMENT_COPY_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls, ...)              XXINTRNL_IMPLEMENT_COPY_METHOD( , argname, cls, __VA_ARGS__)
+#define IMPLEMENT_COPY_METHOD(cls, ...)                                            XXINTRNL_IMPLEMENT_COPY_METHOD( , other, cls, __VA_ARGS__)
 #define IMPLEMENT_DEALLOC_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) XXINTRNL_IMPLEMENT_DEALLOC_METHOD(typename, argname, cls, __VA_ARGS__)
 #define IMPLEMENT_DEALLOC_METHOD_WITH_TEMPLATE(cls, ...)                              XXINTRNL_IMPLEMENT_DEALLOC_METHOD(typename, other, cls, __VA_ARGS__)
-#define IMPLEMENT_DEALLOC_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls)                   XXINTRNL_IMPLEMENT_DEALLOC_METHOD(, argname, cls)
-#define IMPLEMENT_DEALLOC_METHOD(cls)                                                 XXINTRNL_IMPLEMENT_DEALLOC_METHOD(, other, cls)
+#define IMPLEMENT_DEALLOC_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls, ...)              XXINTRNL_IMPLEMENT_DEALLOC_METHOD(, argname, cls, __VA_ARGS__)
+#define IMPLEMENT_DEALLOC_METHOD(cls, ...)                                            XXINTRNL_IMPLEMENT_DEALLOC_METHOD(, other, cls, __VA_ARGS__)
 #define IMPLEMENT_MOVE_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) XXINTRNL_IMPLEMENT_MOVE_METHOD(typename, argname, cls, __VA_ARGS__)
 #define IMPLEMENT_MOVE_METHOD_WITH_TEMPLATE(cls, ...)                              XXINTRNL_IMPLEMENT_MOVE_METHOD(typename, other, cls, __VA_ARGS__)
-#define IMPLEMENT_MOVE_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls)                   XXINTRNL_IMPLEMENT_MOVE_METHOD( , argname, cls)
-#define IMPLEMENT_MOVE_METHOD(cls)                                                 XXINTRNL_IMPLEMENT_MOVE_METHOD( , other, cls)
+#define IMPLEMENT_MOVE_METHOD_WITH_CUSTOM_ARG_NAME(argname, cls, ...)              XXINTRNL_IMPLEMENT_MOVE_METHOD( , argname, cls, __VA_ARGS__)
+#define IMPLEMENT_MOVE_METHOD(cls, ...)                                            XXINTRNL_IMPLEMENT_MOVE_METHOD( , other, cls, __VA_ARGS__)
 
 #pragma mark -
 

@@ -148,11 +148,11 @@ namespace igraph {
 		ReferenceVector(const long count, ...) MAY_THROW_EXCEPTION;
 			
 		/// Wrap a C pointer array as a ReferenceVector.
-		static typename RETRIEVE_TEMPORARY_CLASS(ReferenceVector<T>) view(pointer* array, const long count) throw();
+		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) view(pointer* array, const long count) throw();
 		
 		/// Move an igraph_vector_ptr_t into a ReferenceVector, and also convert its content into the corresponding C++ types.
 		template <typename OriginalType>
-		static typename RETRIEVE_TEMPORARY_CLASS(ReferenceVector<T>) adopt(igraph_vector_ptr_t& raw) {
+		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) adopt(igraph_vector_ptr_t& raw) {
 			for (void** it = raw.stor_begin; it != raw.end; ++it)
 				*it = new T(reinterpret_cast<OriginalType const*>(*it), ::tempobj::OwnershipTransferMove);
 			return ::std::move(ReferenceVector<T>(&raw, ::tempobj::OwnershipTransferNoOwnership));
@@ -204,9 +204,6 @@ namespace igraph {
 		
 	};
 	
-	template<typename T>
-	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(ReferenceVector, <T>);
-	
-}
+	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, ReferenceVector, <T>);
 
 #endif

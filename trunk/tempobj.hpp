@@ -123,6 +123,7 @@ namespace tempobj {
 	};
 }
 #define RETRIEVE_TEMPORARY_CLASS(...) __VA_ARGS__
+#define RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(...) __VA_ARGS__
 #else
 /// \internal
 namespace tempobj {
@@ -143,6 +144,7 @@ namespace tempobj {
 #define XXINTRNL_RVALTYPE(xx_typnm, ...) xx_typnm __VA_ARGS__::Temporary
 #define XXINTRNL_RRP2MT(xx_typnm, ...) const_cast<xx_typnm __VA_ARGS__::Temporary&>
 #define RETRIEVE_TEMPORARY_CLASS(...) __VA_ARGS__::Temporary
+#define RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(...) typename __VA_ARGS__::Temporary
 namespace std {
 	
 	template <typename T>
@@ -306,7 +308,11 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
 #define MEMORY_MANAGER_INTERFACE(cls)                    XXINTRNL_MEMORY_MANAGER_INTERFACE(        , cls)
 
 #define MEMORY_MANAGER_INTERFACE_EX(...) XXINTRNL_MEMORY_MANAGER_INTERFACE_EX(__VA_ARGS__)
-#define MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE MEMORY_MANAGER_INTERFACE_EX
+#if __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus > 199711L
+#define MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(...) 
+#else
+#define MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(templ_decl, ...) templ_decl MEMORY_MANAGER_INTERFACE_EX(__VA_ARGS__)
+#endif
 
 /**
  \brief Memory manager implementation with template and attributes.

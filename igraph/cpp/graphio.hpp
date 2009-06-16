@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/common.hpp>
 #include <igraph/cpp/exception.hpp>
 #include <cstdio>
-#include <stdexcept>
 
 namespace igraph {
 	enum GraphFormat {

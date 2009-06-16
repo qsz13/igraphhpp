@@ -259,8 +259,18 @@ namespace igraph {
 		TRY(igraph_is_simple(&_, &res));
 		return res;
 	}
-	// TODO: igraph_is_loop after BoolVector is implemented.
-	// TODO: igraph_is_multiple after BoolVector is implemented.
+	RETRIEVE_TEMPORARY_CLASS(BoolVector) Graph::is_loop(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
+		igraph_vector_bool_t res;
+		TRY(igraph_vector_bool_init(&res, 0));
+		TRY(igraph_is_loop(&_, &res, es._));
+		return ::std::move(BoolVector(&res, ::tempobj::OwnershipTransferMove));
+	}
+	RETRIEVE_TEMPORARY_CLASS(BoolVector) Graph::is_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
+		igraph_vector_bool_t res;
+		TRY(igraph_vector_bool_init(&res, 0));
+		TRY(igraph_is_multiple(&_, &res, es._));
+		return ::std::move(BoolVector(&res, ::tempobj::OwnershipTransferMove));
+	}	
 	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::count_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 0));

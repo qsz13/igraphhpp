@@ -170,8 +170,8 @@ namespace igraph {
 #pragma mark -
 #pragma mark Non-simple graphs: multiple and loop edges
 		bool is_simple() const MAY_THROW_EXCEPTION;
-		// TODO: igraph_is_loop after BoolVector is implemented.
-		// TODO: igraph_is_multiple after BoolVector is implemented.
+		RETRIEVE_TEMPORARY_CLASS(BoolVector) is_loop(const EdgeSelector& es) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(BoolVector) is_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION;
 		RETRIEVE_TEMPORARY_CLASS(Vector) count_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION;
 		
 		Graph& simplify() MAY_THROW_EXCEPTION;

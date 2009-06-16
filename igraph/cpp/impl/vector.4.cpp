@@ -182,3 +182,17 @@ template<> BasicVector<BASE>& BasicVector<BASE>::remove_section(const long from,
 
 template<> BasicVector<BASE>& BasicVector<BASE>::sort() throw() { FUNC(sort)(&_); return *this; }
 
+#pragma mark -
+#pragma mark Etc.
+
+/// Convert from std::vector.
+template<>
+template<typename InputIterator>
+BasicVector<BASE>::BasicVector(const InputIterator from, const InputIterator to) MAY_THROW_EXCEPTION {
+	if (from != to) {
+		TRY(FUNC(init)(&_, 0));
+		for (InputIterator cit = from; cit != to; ++ cit)
+			TRY(FUNC(push_back)(&_, *cit));
+	} else
+		mm_dont_dealloc = true;
+}

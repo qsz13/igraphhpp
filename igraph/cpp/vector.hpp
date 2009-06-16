@@ -91,7 +91,7 @@ namespace igraph {
 		/// Wrap a C array as a Vector. 
 		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(BasicVector<T>) view(const T* const array, const long count) throw();
 		
-		BasicVector<T>& null();
+		BasicVector<T>& null() throw();
 		BasicVector<T>& fill(const T e) throw();
 		
 		T* ptr() throw() { return VECTOR(_); }

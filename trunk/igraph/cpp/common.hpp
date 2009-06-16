@@ -108,28 +108,6 @@ namespace igraph {
 		MutualConnections_NotMutual,
 		MutualConnections_Mutual,
 	};
-	
-	enum PeriodicLattice {
-		PeriodicLattice_NotPeriodic,
-		PeriodicLattice_Periodic,
-	};
-	
-	enum BarabasiOutPref {
-		BarabasiOutPref_InDegreeOnly,
-		BarabasiOutPref_TotalDegree,
-	};
-	
-	enum ToUndirectedMode {
-		EachArcToEdge = IGRAPH_TO_UNDIRECTED_EACH,
-		CollapseArcs = IGRAPH_TO_UNDIRECTED_COLLAPSE
-	};
-	
-	enum ToDirectedMode {
-		/// the number of edges in the graph stays the same, an arbitrarily directed edge is created for each undirected edge
-		EachEdgeToArc = IGRAPH_TO_DIRECTED_ARBITRARY,
-		/// two directed edges are created for each undirected edge, one in each direction.
-		SplitEdges = IGRAPH_TO_DIRECTED_MUTUAL
-	};
 }
 
 #include <tempobj.hpp>

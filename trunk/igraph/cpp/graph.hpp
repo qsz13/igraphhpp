@@ -97,7 +97,13 @@ namespace igraph {
 			TreeMode_Out = IGRAPH_TREE_OUT,
 			TreeMode_In = IGRAPH_TREE_IN,
 			TreeMode_Undirected = IGRAPH_TREE_UNDIRECTED,
-		};		
+		};
+		
+		
+		enum PeriodicLattice {
+			PeriodicLattice_NotPeriodic,
+			PeriodicLattice_Periodic,
+		};
 		
 		static RETRIEVE_TEMPORARY_CLASS(Graph) create(const VertexVector& edges, const Integer min_size = 0, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		// TODO: igraph_adjacency when Matrix is implemented.
@@ -124,15 +130,54 @@ namespace igraph {
 		
 #pragma mark -
 #pragma mark Games: Randomized Graph Generators
+		enum BarabasiOutPref {
+			BarabasiOutPref_InDegreeOnly,
+			BarabasiOutPref_TotalDegree,
+		};		
 		
 		static RETRIEVE_TEMPORARY_CLASS(Graph) grg_game(const Integer size, const Real radius, const PeriodicLattice periodic = PeriodicLattice_Periodic) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) grg_game(const Integer size, const Real radius, const PeriodicLattice periodic, Vector& x_coords, Vector& y_coords) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game(const Integer size, const Integer m, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game(const Integer size, const Vector& outseq, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
+		
+		Graph& rewire_edges(const Real prob) MAY_THROW_EXCEPTION;
 				
 #pragma mark -
 #pragma mark Basic Properties
 		bool are_connected(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION;
+		
+#pragma mark -
+#pragma mark Directedness conversion
+		enum ToDirectedMode {
+			ToDirectedMode_Arbitrary = IGRAPH_TO_DIRECTED_ARBITRARY,
+			ToDirectedMode_Mutual = IGRAPH_TO_DIRECTED_MUTUAL,
+			// Backward compatibility.
+			EachEdgeToArc = IGRAPH_TO_DIRECTED_ARBITRARY,
+			SplitEdges = IGRAPH_TO_DIRECTED_MUTUAL
+		};
+		
+		enum ToUndirectedMode {
+			ToUndirectedMode_Each = IGRAPH_TO_UNDIRECTED_EACH,
+			ToUndirectedMode_Collapse = IGRAPH_TO_UNDIRECTED_COLLAPSE,
+			// Backward compatibility.
+			EachArcToEdge = IGRAPH_TO_UNDIRECTED_EACH,
+			CollapseArcs = IGRAPH_TO_UNDIRECTED_COLLAPSE
+		};
+		
+		Graph& to_undirected(const ToDirectedMode mode = ToDirectedMode_Mutual) MAY_THROW_EXCEPTION;
+		Graph& to_directed(const ToUndirectedMode mode = ToUndirectedMode_Collapse) MAY_THROW_EXCEPTION;
+		
+#pragma mark -
+#pragma mark Non-simple graphs: multiple and loop edges
+		bool is_simple() const MAY_THROW_EXCEPTION;
+		// TODO: igraph_is_loop after BoolVector is implemented.
+		// TODO: igraph_is_multiple after BoolVector is implemented.
+		RETRIEVE_TEMPORARY_CLASS(Vector) count_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION;
+		
+		Graph& simplify() MAY_THROW_EXCEPTION;
+		Graph& simplify_loops() MAY_THROW_EXCEPTION;
+		Graph& simplify_multiple_edges() MAY_THROW_EXCEPTION;
+		
 		
 #pragma mark -
 #pragma mark Cliques

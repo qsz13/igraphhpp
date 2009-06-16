@@ -32,6 +32,7 @@
 #include <igraph/igraph.h>
 #include <igraph/cpp/common.hpp>
 #include <igraph/cpp/exception.hpp>
+#include <iterator>
 
 namespace igraph {
 		
@@ -72,6 +73,13 @@ namespace igraph {
 			static iterator convert(void** ptr_) { iterator x; x.m_ptr = reinterpret_cast<T**>(ptr_); return x; }
 			friend class ReferenceVector<T>;
 		public:
+			// To support iterator_traits
+			typedef int difference_type;
+			typedef T value_type;
+			typedef T* pointer;
+			typedef T& reference;
+			typedef ::std::random_access_iterator_tag iterator_category;			
+			
 			iterator(const const_iterator& other) throw();
 			reference operator*() const throw() { return **m_ptr; }
 			pointer ptr() const throw() { return *m_ptr; }
@@ -100,11 +108,18 @@ namespace igraph {
 			static const_iterator convert(void* const* ptr_) { const_iterator x; x.m_ptr = reinterpret_cast<const T* const*>(ptr_); return x; }
 			friend class ReferenceVector<T>;
 		public:
+			// To support iterator_traits
+			typedef int difference_type;
+			typedef T value_type;
+			typedef const T* pointer;
+			typedef const T& reference;
+			typedef ::std::random_access_iterator_tag iterator_category;			
+			
 			const_iterator(const iterator& other) throw() : m_ptr(other.m_ptr) {};
 			const_iterator(T* const* const ptr_) throw() : m_ptr(ptr_) {}
-			const_reference operator*() const throw() { return **m_ptr; }
-			const_pointer ptr() const throw() { return *m_ptr; }
-			const_pointer operator->() const throw() { return *m_ptr; }
+			reference operator*() const throw() { return **m_ptr; }
+			pointer ptr() const throw() { return *m_ptr; }
+			pointer operator->() const throw() { return *m_ptr; }
 			const_iterator& operator++() throw() { ++m_ptr; return *this; }
 			const_iterator operator++(int) throw() { const_iterator copy(m_ptr); ++m_ptr; return copy; }
 			const_iterator& operator--() throw() { --m_ptr; return *this; }
@@ -114,13 +129,13 @@ namespace igraph {
 			const_iterator operator+(const difference_type delta) const throw() { return const_iterator(m_ptr+delta); }
 			const_iterator operator-(const difference_type delta) const throw() { return const_iterator(m_ptr-delta); }
 			difference_type operator-(const const_iterator& other) const throw() { return m_ptr - other.m_ptr; }
-			const_reference operator[](const difference_type delta) throw() { return **(m_ptr + delta); }
+			reference operator[](const difference_type delta) throw() { return **(m_ptr + delta); }
 			bool operator<(const const_iterator& other) const throw() { return m_ptr < other.m_ptr; }
 			bool operator>(const const_iterator& other) const throw() { return m_ptr > other.m_ptr; }
 			bool operator<=(const const_iterator& other) const throw() { return m_ptr <= other.m_ptr; }
 			bool operator>=(const const_iterator& other) const throw() { return m_ptr >= other.m_ptr; }
 			bool operator==(const const_iterator& other) const throw() { return m_ptr == other.m_ptr; }
-			bool operator!=(const const_iterator& other) const throw() { return m_ptr != other.m_ptr; }		
+			bool operator!=(const const_iterator& other) const throw() { return m_ptr != other.m_ptr; }
 		};
 				
 		/// Create a ReferenceVector with "count" elements.

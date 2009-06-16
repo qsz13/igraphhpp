@@ -226,6 +226,11 @@ namespace igraph {
 		TRY(igraph_barabasi_game(&_, size, 0, &outseq._, outpref, directed));
 		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
+	
+	Graph& Graph::rewire_edges(const Real prob) MAY_THROW_EXCEPTION {
+		TRY(igraph_rewire_edges(&_, prob));
+		return *this;
+	}
 
 #pragma mark -
 #pragma mark Basic Properties
@@ -235,6 +240,47 @@ namespace igraph {
 		TRY(igraph_are_connected(&_, from, to, &res));
 		return res;
 	}
+	
+#pragma mark -
+#pragma mark Directedness conversion	
+	Graph& Graph::to_undirected(const ToDirectedMode mode) MAY_THROW_EXCEPTION {
+		TRY(igraph_to_undirected(&_, (igraph_to_undirected_t)mode));
+		return *this;
+	}
+	Graph& Graph::to_directed(const ToUndirectedMode mode) MAY_THROW_EXCEPTION {
+		TRY(igraph_to_directed(&_, (igraph_to_directed_t)mode));
+		return *this;
+	}
+	
+#pragma mark -
+#pragma mark Non-simple graphs: multiple and loop edges
+	bool Graph::is_simple() const MAY_THROW_EXCEPTION {
+		igraph_bool_t res;
+		TRY(igraph_is_simple(&_, &res));
+		return res;
+	}
+	// TODO: igraph_is_loop after BoolVector is implemented.
+	// TODO: igraph_is_multiple after BoolVector is implemented.
+	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::count_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
+		igraph_vector_t res;
+		TRY(igraph_vector_init(&res, 0));
+		TRY(igraph_count_multiple(&_, &res, es._));
+		return ::std::move(Vector(&res, ::tempobj::OwnershipTransferMove));
+	}
+	
+	Graph& Graph::simplify() MAY_THROW_EXCEPTION {
+		TRY(igraph_simplify(&_, true, true));
+		return *this;
+	}
+	Graph& Graph::simplify_loops() MAY_THROW_EXCEPTION {
+		TRY(igraph_simplify(&_, false, true));
+		return *this;
+	}
+	Graph& Graph::simplify_multiple_edges() MAY_THROW_EXCEPTION {
+		TRY(igraph_simplify(&_, true, false));
+		return *this;
+	}
+	
 
 #pragma mark -
 #pragma mark Cliques

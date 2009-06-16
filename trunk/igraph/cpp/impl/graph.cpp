@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IGRAPH_GRAPH_CPP
 
 #include <igraph/cpp/graph.hpp>
+#include <stdexcept>
 
 namespace igraph {
 

@@ -205,5 +205,5 @@ namespace igraph {
 	};
 	
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, ReferenceVector, <T>);
-
+}
 #endif

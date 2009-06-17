@@ -194,6 +194,11 @@ namespace igraph {
 		template<typename InputIterator>
 		BasicVector(const InputIterator from, const InputIterator to) MAY_THROW_EXCEPTION;
 		
+		/// Utility functions.
+		BasicVector<T>& remove_first_matching(const T e) throw();
+		BasicVector<T>& remove_all_matching(const T e) throw();
+		BasicVector<T>& remove_first_matching_assume_sorted(const T e) throw();
+		
 		friend class VertexSelector;
 		friend class VertexIterator;
 		friend class EdgeSelector;

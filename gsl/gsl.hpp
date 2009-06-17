@@ -28,4 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <gsl/cpp/rng.hpp>
 #include <gsl/cpp/randist.hpp>
 
+#include <gsl/cpp/impl/rng.cpp>
+
 #endif

@@ -197,20 +197,20 @@ BasicVector<BASE>::BasicVector(const InputIterator from, const InputIterator to)
 		mm_dont_dealloc = true;
 }
 
-template<> BasicVector<BASE>& remove_first_matching(const BASE e) throw() {
+template<> BasicVector<BASE>& BasicVector<BASE>::remove_first_matching(const BASE e) throw() {
 	long pos;
 	if (search(e, 0, pos))
 		remove(pos);
 	return *this;
 }
 
-template<> BasicVector<BASE>& remove_all_matching(const BASE e) throw() {
+template<> BasicVector<BASE>& BasicVector<BASE>::remove_all_matching(const BASE e) throw() {
 	for (long i = size()-1; i >= 0; -- i)
 		if (VECTOR(_)[i] == e)
 			FUNC(remove)(&_, i);
 	return *this;
 }
-template<> BasicVector<BASE>& remove_first_matching_assume_sorted(const BASE e) throw() {
+template<> BasicVector<BASE>& BasicVector<BASE>::remove_first_matching_assume_sorted(const BASE e) throw() {
 	long pos;
 	if (binsearch(e, 0, pos))
 		remove(pos);

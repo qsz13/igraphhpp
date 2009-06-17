@@ -163,6 +163,23 @@ namespace igraph {
 		bool are_connected(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION;
 		
 #pragma mark -
+#pragma mark Graph Components
+		enum Connectedness {
+			WeaklyConnected = IGRAPH_WEAK,
+			StronglyConnected = IGRAPH_STRONG
+		};
+		
+		RETRIEVE_TEMPORARY_CLASS(VertexVector) subcomponent(const Vertex representative, const NeighboringMode mode = OutNeighbors) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(Graph) subgraph(const VertexSelector& vs) const MAY_THROW_EXCEPTION;
+		void cluster(Vector& cluster_id_each_vertex_belongs_to, Vector& size_of_each_cluster, Connectedness connectedness = WeaklyConnected) const MAY_THROW_EXCEPTION;
+		Integer cluster_count(const Connectedness connectedness = WeaklyConnected) const MAY_THROW_EXCEPTION;
+		
+		bool is_connected(const Connectedness connectedness = WeaklyConnected) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Graph>) decompose(Connectedness connectedness = WeaklyConnected, long max_component_number = -1, long min_size_of_components = -1);
+		// TODO: igraph_biconnected_components
+		RETRIEVE_TEMPORARY_CLASS(VertexVector) articulation_points() const MAY_THROW_EXCEPTION;
+		
+#pragma mark -
 #pragma mark Directedness conversion
 		enum ToDirectedMode {
 			ToDirectedMode_Arbitrary = IGRAPH_TO_DIRECTED_ARBITRARY,

@@ -262,6 +262,51 @@ namespace igraph {
 	}
 	
 #pragma mark -
+#pragma mark Graph Components
+	
+	RETRIEVE_TEMPORARY_CLASS(VertexVector) Graph::subcomponent(const Vertex representative, const NeighboringMode mode) const MAY_THROW_EXCEPTION {
+		igraph_vector_t res;
+		TRY(igraph_vector_init(&res, 0));
+		TRY(igraph_subcomponent(&_, &res, representative, (igraph_neimode_t)mode));
+		return ::std::move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::subgraph(const VertexSelector& vs) const MAY_THROW_EXCEPTION {
+		igraph_t res;
+		TRY(igraph_subgraph(&_, &res, vs._));
+		return ::std::move(Graph(&res, ::tempobj::OwnershipTransferMove));
+	}
+	void Graph::cluster(Vector& cluster_id_each_vertex_belongs_to, Vector& size_of_each_cluster, Connectedness connectedness) const MAY_THROW_EXCEPTION {
+		igraph_vector_t membership, csize;
+		TRY(igraph_vector_init(&membership, 0));
+		TRY(igraph_vector_init(&csize, 0));
+		TRY(igraph_clusters(&_, &membership, &csize, NULL, (igraph_connectedness_t)connectedness));
+		cluster_id_each_vertex_belongs_to = ::std::move(Vector(&membership, ::tempobj::OwnershipTransferMove));
+		size_of_each_cluster = ::std::move(Vector(&csize, ::tempobj::OwnershipTransferMove));
+	}
+	Integer Graph::cluster_count(const Connectedness connectedness) const MAY_THROW_EXCEPTION {
+		Integer res;
+		TRY(igraph_clusters(&_, NULL, NULL, &res, (igraph_connectedness_t)connectedness));
+		return res;
+	}
+	bool Graph::is_connected(const Connectedness connectedness) const MAY_THROW_EXCEPTION {
+		Boolean res;
+		TRY(igraph_is_connected(&_, &res, (igraph_connectedness_t)connectedness));
+		return res;
+	}
+	RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Graph>) Graph::decompose(Connectedness connectedness, long max_component_number, long min_size_of_components) {
+		igraph_vector_ptr_t res;
+		TRY(igraph_vector_ptr_init(&res, 0));
+		TRY(igraph_decompose(&_, &res, (igraph_connectedness_t)connectedness, max_component_number, min_size_of_components));
+		return ReferenceVector<Graph>::adopt<igraph_t>(res);
+	}
+	RETRIEVE_TEMPORARY_CLASS(VertexVector) Graph::articulation_points() const MAY_THROW_EXCEPTION {
+		igraph_vector_t res;
+		TRY(igraph_vector_init(&res, 0));
+		TRY(igraph_articulation_points(&_, &res));
+		return ::std::move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
+	}
+	
+#pragma mark -
 #pragma mark Directedness conversion	
 	Graph& Graph::to_undirected(const ToDirectedMode mode) MAY_THROW_EXCEPTION {
 		TRY(igraph_to_undirected(&_, (igraph_to_undirected_t)mode));

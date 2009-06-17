@@ -49,7 +49,7 @@ namespace igraph {
 		std::FILE* fptr;
 		
 	public:
-		MEMORY_MANAGER_INTERFACE(GraphReader);
+		MEMORY_MANAGER_INTERFACE_NO_COPYING(GraphReader);
 		
 		enum lglNames {
 			lglNames_Ignore,
@@ -89,7 +89,7 @@ namespace igraph {
 		GraphWriter(const igraph_t* graph, std::FILE* filestream) throw();
 		
 	public:
-		MEMORY_MANAGER_INTERFACE(GraphWriter);
+		MEMORY_MANAGER_INTERFACE_NO_COPYING(GraphWriter);
 		
 		enum lglIsolatedVertices {
 			lglIsolatedVertices_Ignore,

@@ -109,6 +109,12 @@ namespace tempobj {
 #endif
 
 #if __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus > 199711L
+#define XXINTRNL_CXX0X 1
+#else
+#define XXINTRNL_CXX0X 0
+#endif
+
+#if XXINTRNL_CXX0X
 #include <memory>
 #define XXINTRNL_PARAMTYPE(xx_typnm, ...) __VA_ARGS__&&		/// \internal // = TMPOBJ
 #define XXINTRNL_MOVETYPE(xx_typnm, ...) __VA_ARGS__&&		/// \internal // = MMMOBJ
@@ -205,11 +211,33 @@ public:                                                                         
 	cls __VA_ARGS__& operator=(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other)
 
 /// \internal
-#define XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(template_decl_and_attrib, xx_typnm, cls, ...) \
-template_decl_and_attrib void cls __VA_ARGS__::mm_copy(const cls __VA_ARGS__& other) { \
-	XXINTRNL_PRINTF(1, (((int)this)>>2)&0xFFF, (((int)&other)>>2)&0xFFF, #cls #__VA_ARGS__); \
-	mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_copy(other);                \
-}                                                                               \
+#if XXINTRNL_CXX0X
+#define XXINTRNL_DISABLE_COPYING = delete
+#else
+#define XXINTRNL_DISABLE_COPYING __attribute__((error("This class cannot be copied. Please use ::std::move for assignment.")))
+#endif
+
+#define XXINTRNL_MEMORY_MANAGER_INTERFACE_NO_COPYING(xx_typnm, cls, ...)        \
+public:                                                                         \
+	XXINTRNL_TMPOBJ_INTERFACE;                                                  \
+private:                                                                        \
+	::tempobj::XXINTRNL_DONT_DEALLOC mm_dont_dealloc;                           \
+protected:                                                                      \
+	void mm_raw_copy(const cls __VA_ARGS__& other) XXINTRNL_DISABLE_COPYING;    \
+	void mm_raw_dealloc() throw();                                              \
+	void mm_raw_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other);       \
+	void mm_copy(const cls __VA_ARGS__& other) XXINTRNL_DISABLE_COPYING;        \
+	void mm_dealloc() throw();                                                  \
+	void mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other);           \
+public:                                                                         \
+	cls(const cls __VA_ARGS__& other) XXINTRNL_DISABLE_COPYING;                 \
+	cls(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other);                   \
+	~cls() throw();                                                             \
+	cls __VA_ARGS__& operator=(const cls __VA_ARGS__& other) XXINTRNL_DISABLE_COPYING; \
+	cls __VA_ARGS__& operator=(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other)
+
+/// \internal
+#define XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(template_decl_and_attrib, xx_typnm, cls, ...) \
 template_decl_and_attrib void cls __VA_ARGS__::mm_move(XXINTRNL_MOVETYPE(xx_typnm, cls __VA_ARGS__) other) { \
 	XXINTRNL_PRINTF(2, (((int)this)>>2)&0xFFF, (((int)&other)>>2)&0xFFF, #cls #__VA_ARGS__); \
 	mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_move(other); other.mm_dont_dealloc = true; \
@@ -221,24 +249,32 @@ template_decl_and_attrib void cls __VA_ARGS__::mm_dealloc() throw() {           
 		mm_raw_dealloc();                                                       \
 	}                                                                           \
 }                                                                               \
-template_decl_and_attrib cls __VA_ARGS__::cls(const cls __VA_ARGS__& other) {   \
-	mm_copy(other);                                                             \
-}                                                                               \
 template_decl_and_attrib cls __VA_ARGS__::cls(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other) {\
 	mm_move(XXINTRNL_RRP2MT(xx_typnm, cls __VA_ARGS__)(other));                 \
 }                                                                               \
 template_decl_and_attrib cls __VA_ARGS__::~cls() throw() { mm_dealloc(); }      \
-template_decl_and_attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(const cls __VA_ARGS__& other) { \
-	if (this != &other) {                                                       \
-		mm_dealloc();                                                           \
-		mm_copy(other);                                                         \
-	}                                                                           \
-	return *this;                                                               \
-}                                                                               \
 template_decl_and_attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(XXINTRNL_PARAMTYPE(xx_typnm, cls __VA_ARGS__) other) { \
 	if (this != &other) {                                                       \
 		mm_dealloc();                                                           \
 		mm_move(XXINTRNL_RRP2MT(xx_typnm, cls __VA_ARGS__)(other));             \
+	}                                                                           \
+	return *this;                                                               \
+}
+
+/// \internal
+#define XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(template_decl_and_attrib, xx_typnm, cls, ...) \
+XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(GROUP(template_decl_and_attrib), xx_typnm, cls, ##__VA_ARGS__); \
+template_decl_and_attrib void cls __VA_ARGS__::mm_copy(const cls __VA_ARGS__& other) { \
+	XXINTRNL_PRINTF(1, (((int)this)>>2)&0xFFF, (((int)&other)>>2)&0xFFF, #cls #__VA_ARGS__); \
+	mm_dont_dealloc = other.mm_dont_dealloc; mm_raw_copy(other);                \
+}                                                                               \
+template_decl_and_attrib cls __VA_ARGS__::cls(const cls __VA_ARGS__& other) {   \
+	mm_copy(other);                                                             \
+}                                                                               \
+template_decl_and_attrib cls __VA_ARGS__& cls __VA_ARGS__::operator=(const cls __VA_ARGS__& other) { \
+	if (this != &other) {                                                       \
+		mm_dealloc();                                                           \
+		mm_copy(other);                                                         \
 	}                                                                           \
 	return *this;                                                               \
 }
@@ -305,14 +341,29 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  \param ... Template parameters, if any. You must supply the angle brackets.
  */
 #define MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE(cls, ...) XXINTRNL_MEMORY_MANAGER_INTERFACE(typename, cls, __VA_ARGS__)
-#define MEMORY_MANAGER_INTERFACE(cls)                    XXINTRNL_MEMORY_MANAGER_INTERFACE(        , cls)
+#define MEMORY_MANAGER_INTERFACE(cls, ...)               XXINTRNL_MEMORY_MANAGER_INTERFACE(        , cls, ##__VA_ARGS__)
 
+/**
+ \brief Extra memory manager interface.
+ 
+ Insert the an extra class to support move semantic in C++03. You must put it after the original class definition is complete.
+ 
+ */
 #define MEMORY_MANAGER_INTERFACE_EX(...) XXINTRNL_MEMORY_MANAGER_INTERFACE_EX(__VA_ARGS__)
-#if __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus > 199711L
+#if XXINTRNL_CXX0X
 #define MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(...) 
 #else
 #define MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(templ_decl, ...) templ_decl MEMORY_MANAGER_INTERFACE_EX(__VA_ARGS__)
 #endif
+
+/**
+ \brief Memory manager interface that supports only moving.
+ 
+ Copying is explicitly deleted (in C++0x) or produce an error (compile-time error in GCC and run-time error in others).
+ 
+ */
+#define MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE_NO_COPYING(cls, ...) XXINTRNL_MEMORY_MANAGER_INTERFACE_NO_COPYING(typename, cls, __VA_ARGS__)
+#define MEMORY_MANAGER_INTERFACE_NO_COPYING(cls, ...)               XXINTRNL_MEMORY_MANAGER_INTERFACE_NO_COPYING(        , cls, ##__VA_ARGS__) 
 
 /**
  \brief Memory manager implementation with template and attributes.
@@ -331,6 +382,7 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  \param template_param Template parameters. You must supply the angle brackets.
  */ 
 #define MEMORY_MANAGER_IMPLEMENTATION_WITH_TEMPLATE(template_decl_and_attrib, cls, ...) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(GROUP(template_decl_and_attrib), typename, cls, __VA_ARGS__)
+#define MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING_WITH_TEMPLATE(template_decl_and_attrib, cls, ...) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(GROUP(template_decl_and_attrib), typename, cls, __VA_ARGS__)
 
 /**
  \brief Memory manager implementation with attributes.
@@ -340,7 +392,8 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  \param attrib Attribute
  \param cls    Class name
   */
-#define MEMORY_MANAGER_IMPLEMENTATION_ATTR(attrib, cls) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(attrib, , cls)
+#define MEMORY_MANAGER_IMPLEMENTATION_ATTR(attrib, cls, ...) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION(attrib, , cls, ##__VA_ARGS__)
+#define MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING_ATTR(attrib, cls, ...) XXINTRNL_MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(attrib, , cls, ##__VA_ARGS__)
 
 /**
  \brief Memory manager implementation.
@@ -349,7 +402,8 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  
  \param cls    Class name
  */
-#define MEMORY_MANAGER_IMPLEMENTATION(cls) MEMORY_MANAGER_IMPLEMENTATION_ATTR(, cls)
+#define MEMORY_MANAGER_IMPLEMENTATION(cls, ...) MEMORY_MANAGER_IMPLEMENTATION_ATTR(, cls, ##__VA_ARGS__)
+#define MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(cls, ...) MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING_ATTR(, cls, ##__VA_ARGS__)
 
 /// TODO: Documentation
 #define IMPLEMENT_COPY_METHOD_WITH_TEMPLATE_AND_CUSTOM_ARG_NAME(argname, cls, ...) XXINTRNL_IMPLEMENT_COPY_METHOD(typename, argname, cls, __VA_ARGS__)

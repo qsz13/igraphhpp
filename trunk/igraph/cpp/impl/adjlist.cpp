@@ -24,12 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdexcept>
 
 namespace igraph {
-	MEMORY_MANAGER_IMPLEMENTATION(AdjacencyList);
+	MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(AdjacencyList);
 	XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(AdjacencyList, igraph_adjlist_t, XXINTRNL_nop);
 	
-	IMPLEMENT_COPY_METHOD(AdjacencyList) {
-		throw std::logic_error("AdjacencyList::mm_raw_copy() called. AdjacencyList cannot be copied. Use std::move() for assignment.");
-	}
 	IMPLEMENT_MOVE_METHOD(AdjacencyList) {
 		_ = ::std::move(other._);
 	}

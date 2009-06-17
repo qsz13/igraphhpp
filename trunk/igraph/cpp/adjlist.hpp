@@ -31,7 +31,7 @@ namespace igraph {
 	class AdjacencyList {
 		igraph_adjlist_t _;
 	public:
-		MEMORY_MANAGER_INTERFACE(AdjacencyList);
+		MEMORY_MANAGER_INTERFACE_NO_COPYING(AdjacencyList);
 		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(AdjacencyList, igraph_adjlist_t);
 		
 		AdjacencyList(const Graph& g, NeighboringMode mode = OutNeighbors) MAY_THROW_EXCEPTION;

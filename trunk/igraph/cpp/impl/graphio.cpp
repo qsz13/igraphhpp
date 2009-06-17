@@ -69,11 +69,8 @@ namespace igraph {
 #pragma mark -
 #pragma mark GraphReader
 	
-	MEMORY_MANAGER_IMPLEMENTATION(GraphReader);
+	MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(GraphReader);
 	
-	IMPLEMENT_COPY_METHOD(GraphReader) {
-		throw std::logic_error("GraphReader::mm_raw_copy() called. GraphReader cannot be copied. Use std::move() for assignment.");
-	}
 	IMPLEMENT_MOVE_METHOD(GraphReader) {
 		fptr = ::std::move(fptr);
 	}
@@ -218,11 +215,8 @@ namespace igraph {
 #pragma mark -
 #pragma mark GraphWriter
 	
-	MEMORY_MANAGER_IMPLEMENTATION(GraphWriter);
+	MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(GraphWriter);
 	
-	IMPLEMENT_COPY_METHOD(GraphWriter) {
-		throw std::logic_error("GraphWriter::mm_raw_copy() called. GraphWriter cannot be copied. Use std::move() for assignment.");
-	}
 	IMPLEMENT_MOVE_METHOD(GraphWriter) {
 		_ = ::std::move(other._);
 		fptr = ::std::move(fptr);

@@ -204,13 +204,13 @@ template<> BasicVector<BASE>& remove_first_matching(const BASE e) throw() {
 	return *this;
 }
 
-BasicVector<T>& remove_all_matching(const T e) throw() {
+template<> BasicVector<BASE>& remove_all_matching(const BASE e) throw() {
 	for (long i = size()-1; i >= 0; -- i)
 		if (VECTOR(_)[i] == e)
 			FUNC(remove)(&_, i);
 	return *this;
 }
-BasicVector<T>& remove_first_matching_assume_sorted(const T e) throw() {
+template<> BasicVector<BASE>& remove_first_matching_assume_sorted(const BASE e) throw() {
 	long pos;
 	if (binsearch(e, 0, pos))
 		remove(pos);

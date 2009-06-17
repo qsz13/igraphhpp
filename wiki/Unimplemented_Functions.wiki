@@ -1,0 +1,154 @@
+#summary What have not been done
+#labels Phase-Design,Phase-Implementation
+
+Items in <font color="red">red</font> are more urgent ones that should be done first.
+
+= 4 About igraph graphs, the basic interface =
+== 4.2 The basic interface ==
+= 4.2.1 Graph Constructors and Destructors =
+ * `igraph_empty_attr`
+
+= 5 Error Handling =
+All unimplemented
+
+= 6 Data structure library =
+
+== 6.3 Matrices ==
+<font color="red">All unimplemented.</font>
+
+== 6.4 Sparse matrices ==
+All unimplemented.
+
+== 6.5 Stacks ==
+All unimplemented.
+
+== 6.6 Double-ended queues ==
+All unimplemented.
+
+== 6.7 Maximum and minimum heaps ==
+All unimplemented.
+
+== 6.8 String vectors ==
+<font color="red">All unimplemented.</font>
+
+== 6.9 Adjacency lists ==
+=== 6.9.2 Adjacent edges ===
+All unimplemented.
+=== 6.9.3 Lazy adjacency list for vertices ===
+All unimplemented.
+=== 6.9.4 Lazy adjacency list for edges ===
+All unimplemented.
+
+= 7 Graph Generators ==
+== 7.1 Deterministic Graph Generators ==
+ * `igraph_adjacency` _requires_ <font color="red">Matrix</font>.
+ * `igraph_weighted_adjacency` _requires_ <font color="red">Matrix</font> and Edge attributes.
+ * `igraph_extended_chordal_ring` _requires_ <font color="red">Matrix</font>.
+
+== 7.2 Games: Randomized Graph Generators ==
+ * `igraph_nonlinear_barabasi_game`
+ * <font color="red">`igraph_erdos_renyi_game`</font>
+ * <font color="red">`igraph_watts_strogatz_game `</font>
+ * `igraph_degree_sequence_game`
+ * `igraph_forest_fire_game`
+ * <font color="red">`igraph_rewire`</font>
+ * `igraph_growing_random_game`
+ * `igraph_callaway_traits_game` _requires_ <font color="red">Matrix</font>
+ * `igraph_establishment_game` _requires_ <font color="red">Matrix</font>
+ * `igraph_preference_game` _requires_ <font color="red">Matrix</font>
+ * `igraph_asymmetric_preference_game` _requires_ <font color="red">Matrix</font>
+ * `igraph_recent_degree_game`
+ * `igraph_barabasi_aging_game`
+ * `igraph_recent_degree_aging_game`
+ * `igraph_cited_type_game`
+ * `igraph_citing_cited_type_game` _requires_ <font color="red">Matrix</font>
+
+Besides wrapping the original ones, we also need to create the corresponding ones that give simple graphs. See issue 1. They should include<font color="red">
+ * Barabási-Albert model
+ * Rewire (preserve degree distribution)
+ * Watts-Strogatz model
+ * Erdős–Rényi model.
+</font>
+ * ~~Random rewire (done) ~~
+
+= 9 Graph, Vertex and Edge Attributes =
+All unimplemented.
+
+= 10 Structural Properties of Graphs ==
+== 10.2 Shortest Path Related Functions ==
+All unimplemented.
+
+== 10.3 Neighborhood of a vertex ==
+All unimplemented.
+
+== 10.4 Graph Components ==
+ * `igraph_biconnected_components`
+
+== 10.5 Centrality Measures ==
+All unimplemented.
+
+== 10.6 Estimating Centrality Measures ==
+All unimplemented.
+
+== 10.7 Similarity Measures ==
+All unimplemented.
+
+== 10.8 Spanning Tree ==
+All unimplemented.
+
+== 10.9 Transitivity or Clustering Coefficient ==
+<font color="red">All unimplemented.</font>
+
+== 10.11 Spectral properties ==
+ * <font color="red">` igraph_laplacian`</font> _requires_ <font color="red">Matrix</font>
+
+== 10.13 K-Cores ==
+All unimplemented.
+
+== 10.14 Topological sorting ==
+All unimplemented.
+
+== 10.15 Line graphs ==
+All unimplemented.
+
+== 10.16 Unfolding a graph into a tree ==
+All unimplemented.
+
+== 10.17 Other Operations ==
+All unimplemented.
+
+= 11 Cliques and Independent Vertex Sets =
+== 11.2 Independent Vertex Sets ==
+All unimplemented.
+
+= 12 Graph Isomorphism =
+All unimplemented.
+
+= 13 Graph Motifs, Dyad Census and Triad Census =
+All unimplemented.
+
+= 14 Generating Layouts for Graph Drawing =
+All unimplemented.
+
+= 15 Reading and Writing Graphs from and to Files =
+== 15.1 Simple edge list and similar formats ==
+ * `igraph_read_graph_ncol` _requires_ <font color="red">!StringVector</font>
+ * `igraph_read_graph_dimacs` _requires_ <font color="red">!StringVector</font>
+
+= 16 Maximum Flows, Minimum Cuts and related measures =
+All unimplemented.
+
+= 17 Detecting Community Structure =
+All unimplemented.
+
+= 18 Graph Operators =
+All unimplemented. See issue 2.
+
+= 19 Using ARPACK for igraph graphs =
+All unimplemented.
+
+= 20 Bipartite, i.e. two-mode graphs =
+All unimplemented.
+
+= 21 Not Graph Related Functions =
+All unimplemented (again).

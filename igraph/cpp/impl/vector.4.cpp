@@ -212,7 +212,7 @@ template<> BasicVector<BASE>& BasicVector<BASE>::remove_all_matching(const BASE 
 }
 template<> BasicVector<BASE>& BasicVector<BASE>::remove_first_matching_assume_sorted(const BASE e) throw() {
 	long pos;
-	if (binsearch(e, 0, pos))
+	if (binsearch(e, pos))
 		remove(pos);
 	return *this;
 }

@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <igraph/cpp/graph.hpp>
 #include <igraph/cpp/adjlist.hpp>
+#include <gsl/cpp/rng.hpp>
 #include <stdexcept>
 
 namespace igraph {
@@ -235,6 +236,21 @@ namespace igraph {
 	
 	Graph& Graph::rewire_edges(const Real prob) MAY_THROW_EXCEPTION {
 		TRY(igraph_rewire_edges(&_, prob));
+		return *this;
+	}
+	Graph& Graph::rewire_edges_simple(const Real prob, const ::gsl::Random& rangen) MAY_THROW_EXCEPTION {
+		// Will this create some sort of bias?
+		for (long i = vcount()-1; i >= 0; -- i) {
+			if (rangen.uniform() < prob) {
+				EdgeVector adj_edges = EdgeSelector::adj(i, OutNeighbors).as_vector(*this);
+				VertexVector nonadj_vertices = VertexSelector::nonadj(i, OutNeighbors).as_vector(*this);
+				long loc;
+				nonadj_vertices.binsearch(i, loc);
+				nonadj_vertices.remove(loc);
+				delete_edge(adj_edges[rangen.uniform_int(adj_edges.size())]);
+				add_edge(i, nonadj_vertices[rangen.uniform_int(nonadj_vertices.size())]);
+			}
+		}
 		return *this;
 	}
 

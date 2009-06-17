@@ -132,6 +132,7 @@ namespace igraph {
 		
 	RETRIEVE_TEMPORARY_CLASS(EdgeVector) EdgeSelector::as_vector(const Graph& g) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
+		igraph_vector_init(&res, 0);
 		TRY(igraph_es_as_vector(&g._, _, &res));
 		return ::std::move(EdgeVector(&res, ::tempobj::OwnershipTransferMove));
 	}

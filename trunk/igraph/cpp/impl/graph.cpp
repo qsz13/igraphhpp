@@ -240,15 +240,13 @@ namespace igraph {
 	}
 	Graph& Graph::rewire_edges_simple(const Real prob, const ::gsl::Random& rangen) MAY_THROW_EXCEPTION {
 		// Will this create some sort of bias?
-		for (long i = vcount()-1; i >= 0; -- i) {
+		for (long eid = ecount()-1; eid >= 0; -- eid) {
 			if (rangen.uniform() < prob) {
-				EdgeVector adj_edges = EdgeSelector::adj(i, OutNeighbors).as_vector(*this);
-				VertexVector nonadj_vertices = VertexSelector::nonadj(i, OutNeighbors).as_vector(*this);
-				long loc;
-				nonadj_vertices.binsearch(i, loc);
-				nonadj_vertices.remove(loc);
-				delete_edge(adj_edges[rangen.uniform_int(adj_edges.size())]);
-				add_edge(i, nonadj_vertices[rangen.uniform_int(nonadj_vertices.size())]);
+				Vertex head, tail;
+				edge(eid, head, tail);
+				VertexVector nonadj_vertices = VertexSelector::nonadj(head, OutNeighbors).as_vector(*this).remove_first_matching_assume_sorted(head);
+				delete_edge(eid);
+				add_edge(head, nonadj_vertices[rangen.uniform_int(nonadj_vertices.size())]);
 			}
 		}
 		return *this;

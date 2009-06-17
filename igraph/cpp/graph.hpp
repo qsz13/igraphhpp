@@ -30,6 +30,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/vector.hpp>
 #include <igraph/cpp/referencevector.hpp>
 
+namespace gsl {
+	class Random;
+};
+
 namespace igraph {
 	class AdjacencyList;
 	
@@ -150,6 +154,9 @@ namespace igraph {
 		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game(const Integer size, const Vector& outseq, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
 		
 		Graph& rewire_edges(const Real prob) MAY_THROW_EXCEPTION;
+		/// Randomly rewire edges and produce a simple graph.
+		Graph& rewire_edges_simple(const Real prob) MAY_THROW_EXCEPTION;
+		Graph& rewire_edges_simple(const Real prob, const ::gsl::Random& rangen) MAY_THROW_EXCEPTION;
 				
 #pragma mark -
 #pragma mark Basic Properties

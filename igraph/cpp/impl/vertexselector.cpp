@@ -101,6 +101,7 @@ namespace igraph {
 
 	RETRIEVE_TEMPORARY_CLASS(VertexVector) VertexSelector::as_vector(const Graph& g) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
+		igraph_vector_init(&res, 0);
 		TRY(igraph_vs_as_vector(&g._, _, &res));
 		return ::std::move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
 	}

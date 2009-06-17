@@ -5,7 +5,7 @@ Items in <font color="red">red</font> are more urgent ones that should be done f
 
 = 4 About igraph graphs, the basic interface =
 == 4.2 The basic interface ==
-= 4.2.1 Graph Constructors and Destructors =
+=== 4.2.1 Graph Constructors and Destructors ===
  * `igraph_empty_attr`
 
 = 5 Error Handling =

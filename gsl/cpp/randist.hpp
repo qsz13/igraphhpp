@@ -495,15 +495,12 @@ namespace gsl {
 		gsl_ran_discrete_t* g;
 	public:
 		GeneralDiscreteDistribution(size_t K, const double p[]) : g(gsl_ran_discrete_preproc(K, p)) {}
-		MEMORY_MANAGER_INTERFACE(GeneralDiscreteDistribution);
+		MEMORY_MANAGER_INTERFACE_NO_COPYING(GeneralDiscreteDistribution);
 		XXINTRNL_RANDIST_DECLARE_GET__METHOD_WITH_TYPE(size_t, discrete, g);
 		XXINTRNL_RANDIST_DECLARE_PDF__METHOD_WITH_TYPE(size_t, discrete, g);
 	};
 	MEMORY_MANAGER_INTERFACE_EX(GeneralDiscreteDistribution);
-	MEMORY_MANAGER_IMPLEMENTATION(GeneralDiscreteDistribution);
-	IMPLEMENT_COPY_METHOD(GeneralDiscreteDistribution) {
-		throw ::std::runtime_error("Cannot copy GeneralDiscreteDistribution objects. Use ::std::move() for assignment.");
-	}
+	MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(GeneralDiscreteDistribution);
 	IMPLEMENT_MOVE_METHOD(GeneralDiscreteDistribution) {
 		g = ::std::move(other.g);
 	}

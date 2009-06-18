@@ -84,11 +84,21 @@ namespace igraph {
 		return ::std::move(res);
 	}
 
+	Real Graph::degree(Vertex i, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
+		Vector res (1);
+		TRY(igraph_degree(&_, &res._, igraph_vss_1(i), (igraph_neimode_t)neimode, countLoops));
+		return res[0];
+	}
 	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::degree(const VertexSelector& vids, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
 		Vector res ((long)vids.size(*this));
 		TRY(igraph_degree(&_, &res._, vids._, (igraph_neimode_t)neimode, countLoops));
 		return ::std::move(res);
 	}
+	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::degree(NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
+		Vector res (this->size());
+		TRY(igraph_degree(&_, &res._, igraph_vss_all(), (igraph_neimode_t)neimode, countLoops));
+		return ::std::move(res);
+	}	
 
 #pragma mark -
 #pragma mark Adding and Deleting Vertices and Edges
@@ -120,65 +130,6 @@ namespace igraph {
 		TRY(igraph_delete_vertices(&_, vs._));
 		return *this;
 	}
-
-
-#pragma mark -
-#pragma mark Graph Operation
-
-#define XXINTRNL_FORWARD_GRAPH_CREATION(temp, statement) \
-	igraph_t temp; \
-	TRY(statement); \
-	return ::std::move(Graph(&temp, ::tempobj::OwnershipTransferMove)); \
-
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::disjoint_union(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union(&tmp, &g1._, &g2._) );
-	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::disjoint_union(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union_many(&tmp, &gg._) );
-	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::merge(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union(&tmp, &g1._, &g2._) );
-	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::merge(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union_many(&tmp, &gg._) );
-	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::intersection(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection(&tmp, &g1._, &g2._) );
-	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::intersection(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection_many(&tmp, &gg._) );
-	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::difference(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_difference(&tmp, &g1._, &g2._) );
-	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::complementer(const Graph& g1, SelfLoops loops) MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_complementer(&tmp, &g1._, (igraph_bool_t)loops) );
-	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::compose(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_compose(&tmp, &g1._, &g2._) );
-	}
-
-	Graph& Graph::operator|=(const Graph& other) {
-		*this = Graph::merge(*this,other);
-		return *this;
-	}
-	Graph& Graph::operator^=(const Graph& other) {
-		*this = Graph::disjoint_union(*this,other);
-		return *this;
-	}
-	Graph& Graph::operator&=(const Graph& other) {
-		*this = Graph::intersection(*this,other);
-		return *this;
-	}
-	Graph& Graph::operator-=(const Graph& other) {
-		*this = Graph::difference(*this,other);
-		return *this;
-	}
-
-	IMMEDIATE_OPERATOR_IMPLEMENTATION(Graph, |);
-	IMMEDIATE_OPERATOR_IMPLEMENTATION(Graph, ^);
-	IMMEDIATE_OPERATOR_IMPLEMENTATION(Graph, &);
-	IMMEDIATE_OPERATOR_IMPLEMENTATION(Graph, -);
 
 #pragma mark -
 #pragma mark Deterministic Graph Generators
@@ -377,6 +328,35 @@ namespace igraph {
 		TRY(igraph_articulation_points(&_, &res));
 		return ::std::move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
 	}
+
+#pragma mark -
+#pragma mark 10.9 Transitivity or Clustering Coefficient
+
+	Real Graph::transitivity() const MAY_THROW_EXCEPTION {
+		Real res;
+		TRY(igraph_transitivity_undirected(&_, &res));
+		return res;
+	}
+	Real Graph::transitivity_local(Vertex i) const MAY_THROW_EXCEPTION {
+		Vector res (1);
+		TRY(igraph_transitivity_local_undirected(&_, &res._, igraph_vss_1(i)));
+		return res[0];
+	}
+	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::transitivity_local(const VertexSelector& vids) const MAY_THROW_EXCEPTION {
+		Vector res ((long)vids.size(*this));
+		TRY(igraph_transitivity_local_undirected(&_, &res._, ));
+		return res;
+	}
+	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::transitivity_local() const MAY_THROW_EXCEPTION {
+		Vector res (this->size());
+		TRY(igraph_transitivity_local_undirected(&_, &res._, igraph_vss_all()));
+		return ::std::move(res);
+	}
+	Real Graph::transitivity_avglocal() const MAY_THROW_EXCEPTION {
+		Real res;
+		TRY(igraph_transitivity_avglocal_undirected(&_, &res));
+		return res;
+	}
 	
 #pragma mark -
 #pragma mark Directedness conversion	
@@ -542,6 +522,71 @@ namespace igraph {
 		}
 		throw ::std::runtime_error("File type cannot be determined.");
 	}
-}
+
+#pragma mark -
+#pragma mark 18. Graph Operators
+
+#define XXINTRNL_FORWARD_GRAPH_CREATION(temp, statement) \
+	igraph_t temp; \
+	TRY(statement); \
+	return ::std::move(Graph(&temp, ::tempobj::OwnershipTransferMove)); \
+
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::disjoint_union(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union(&tmp, &x._, &y._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::disjoint_union(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union_many(&tmp, &gg._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::merge(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union(&tmp, &x._, &y._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::merge(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union_many(&tmp, &gg._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::intersection(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection(&tmp, &x._, &y._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::intersection(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection_many(&tmp, &gg._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::difference(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_difference(&tmp, &x._, &y._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::complementer(const Graph& x, SelfLoops loops) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_complementer(&tmp, &x._, (igraph_bool_t)loops) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::compose(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_compose(&tmp, &x._, &y._) );
+	}
+
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator^ (const Graph& other) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union(&tmp, &_, &other._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator| (const Graph& other) MAY_THROW_EXCEPTION  {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union(&tmp, &_, &other._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator& (const Graph& other) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection(&tmp, &_, &other._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator- (const Graph& other) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_difference(&tmp, &_, &other._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator~ () MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_complementer(&tmp, &_, (igraph_bool_t)NoSelfLoops) );
+	}
+	Graph& Graph::operator^= (const Graph& other) MAY_THROW_EXCEPTION {
+		return (*this = *this ^ other);
+	}
+	Graph& Graph::operator|= (const Graph& other) MAY_THROW_EXCEPTION {
+		return (*this = *this | other);
+	}
+	Graph& Graph::operator&= (const Graph& other) MAY_THROW_EXCEPTION {
+		return (*this = *this & other);
+	}
+	Graph& Graph::operator-= (const Graph& other) MAY_THROW_EXCEPTION {
+		return (*this = *this - other);
+	}
+
+}// end of igraph namespace
 
 #endif

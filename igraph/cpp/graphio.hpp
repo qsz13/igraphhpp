@@ -110,8 +110,8 @@ namespace igraph {
 		friend class Graph;
 	};
 	
-	MEMORY_MANAGER_INTERFACE_EX(GraphReader);
-	MEMORY_MANAGER_INTERFACE_EX(GraphWriter);
+	MEMORY_MANAGER_INTERFACE_EX_NO_COPYING(GraphReader);
+	MEMORY_MANAGER_INTERFACE_EX_NO_COPYING(GraphWriter);
 }
 
 #endif

@@ -98,7 +98,7 @@ namespace igraph {
 	RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T> ) view(typename ReferenceVector<T>::pointer* array, const long count) throw() {
 		igraph_vector_ptr_t _;
 		igraph_vector_ptr_view(&_, array, count);
-		return ::std::move(ReferenceVector<T>(_, ::tempobj::OwnershipTransferNoOwnership));
+		return FORCE_STD_MOVE_WITH_TEMPLATE(ReferenceVector<T>)(ReferenceVector<T>(_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
 	template<typename T>

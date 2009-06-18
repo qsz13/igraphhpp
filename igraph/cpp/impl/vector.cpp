@@ -36,7 +36,7 @@ namespace igraph {
 #undef TYPE
 #undef FUNC
 #undef BASE
-
+	
 #define BASE long
 #define FUNC(x) igraph_vector_long_##x
 #define TYPE FUNC(t)
@@ -53,7 +53,7 @@ namespace igraph {
 #undef FUNC
 #undef BASE
 	
-#define BASE igraph_bool_t
+#define BASE Boolean
 #define FUNC(x) igraph_vector_bool_##x
 #define TYPE FUNC(t)
 #include <igraph/cpp/impl/vector.4.cpp>

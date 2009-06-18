@@ -499,7 +499,7 @@ namespace gsl {
 		XXINTRNL_RANDIST_DECLARE_GET__METHOD_WITH_TYPE(size_t, discrete, g);
 		XXINTRNL_RANDIST_DECLARE_PDF__METHOD_WITH_TYPE(size_t, discrete, g);
 	};
-	MEMORY_MANAGER_INTERFACE_EX(GeneralDiscreteDistribution);
+	MEMORY_MANAGER_INTERFACE_EX_NO_COPYING(GeneralDiscreteDistribution);
 	MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(GeneralDiscreteDistribution);
 	IMPLEMENT_MOVE_METHOD(GeneralDiscreteDistribution) {
 		g = ::std::move(other.g);

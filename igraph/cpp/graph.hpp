@@ -76,9 +76,9 @@ namespace igraph {
 		
 		Directedness is_directed() const throw() { return igraph_is_directed(&_) ? Directed : Undirected; }
 		
-		Real degree(Vertex i, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION;
+		Integer degree(Vertex i, NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
 		RETRIEVE_TEMPORARY_CLASS(Vector) degree(const VertexSelector& vids, NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
-		RETRIEVE_TEMPORARY_CLASS(Vector) degree(NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(Vector) degree(NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 #pragma mark Adding and Deleting Vertices and Edges
@@ -154,6 +154,8 @@ namespace igraph {
 		static RETRIEVE_TEMPORARY_CLASS(Graph) grg_game(const Integer size, const Real radius, const PeriodicLattice periodic, Vector& x_coords, Vector& y_coords) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game(const Integer size, const Integer m, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game(const Integer size, const Vector& outseq, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game_simple(const Integer size, const Integer m) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer m) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) watts_strogatz_game(const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) watts_strogatz_game_simple(const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) watts_strogatz_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;

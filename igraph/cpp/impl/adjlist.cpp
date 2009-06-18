@@ -41,11 +41,11 @@ namespace igraph {
 	RETRIEVE_TEMPORARY_CLASS(AdjacencyList) AdjacencyList::complementer(const Graph& g, NeighboringMode mode, SelfLoops loop) MAY_THROW_EXCEPTION {
 		igraph_adjlist_t _;
 		TRY(igraph_adjlist_init_complementer(&g._, &_, (igraph_neimode_t)mode, loop));
-		return ::std::move(AdjacencyList(&_, ::tempobj::OwnershipTransferMove));
+		return FORCE_STD_MOVE(AdjacencyList)(AdjacencyList(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	RETRIEVE_TEMPORARY_CLASS(Vector) AdjacencyList::operator[](const Vertex v) const throw() {
-		return ::std::move(Vector(igraph_adjlist_get(&_, v), ::tempobj::OwnershipTransferKeepOriginal));
+		return FORCE_STD_MOVE(Vector)(Vector(igraph_adjlist_get(&_, v), ::tempobj::OwnershipTransferKeepOriginal));
 	}
 	
 	AdjacencyList& AdjacencyList::sort() throw() {

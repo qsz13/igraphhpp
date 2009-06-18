@@ -121,6 +121,65 @@ namespace igraph {
 		return *this;
 	}
 
+
+#pragma mark -
+#pragma mark Graph Operation
+
+#define XXINTRNL_FORWARD_GRAPH_CREATION(temp, statement) \
+	igraph_t temp; \
+	TRY(statement); \
+	return ::std::move(Graph(&temp, ::tempobj::OwnershipTransferMove)); \
+
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::disjoint_union(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union(&tmp, &g1._, &g2._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::disjoint_union(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union_many(&tmp, &gg._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::merge(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union(&tmp, &g1._, &g2._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::merge(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union_many(&tmp, &gg._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::intersection(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection(&tmp, &g1._, &g2._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::intersection(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection_many(&tmp, &gg._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::difference(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_difference(&tmp, &g1._, &g2._) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::complementer(const Graph& g1, SelfLoops loops) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_complementer(&tmp, &g1._, (igraph_bool_t)loops) );
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::compose(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_compose(&tmp, &g1._, &g2._) );
+	}
+
+	Graph& Graph::operator|=(const Graph& other) {
+		*this = Graph::merge(*this,other);
+		return *this;
+	}
+	Graph& Graph::operator^=(const Graph& other) {
+		*this = Graph::disjoint_union(*this,other);
+		return *this;
+	}
+	Graph& Graph::operator&=(const Graph& other) {
+		*this = Graph::intersection(*this,other);
+		return *this;
+	}
+	Graph& Graph::operator-=(const Graph& other) {
+		*this = Graph::difference(*this,other);
+		return *this;
+	}
+
+	IMMEDIATE_OPERATOR_IMPLEMENTATION(Graph, |);
+	IMMEDIATE_OPERATOR_IMPLEMENTATION(Graph, ^);
+	IMMEDIATE_OPERATOR_IMPLEMENTATION(Graph, &);
+	IMMEDIATE_OPERATOR_IMPLEMENTATION(Graph, -);
+
 #pragma mark -
 #pragma mark Deterministic Graph Generators
 

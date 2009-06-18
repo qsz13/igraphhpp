@@ -3,6 +3,8 @@
 
 Items in <font color="red">red</font> are more urgent ones that should be done first.
 
+Remove the section if you have done that part. Once everything is completed, this page shall disappear :).
+
 = 4 About igraph graphs, the basic interface =
 == 4.2 The basic interface ==
 === 4.2.1 Graph Constructors and Destructors ===
@@ -62,13 +64,10 @@ All unimplemented.
  * `igraph_cited_type_game`
  * `igraph_citing_cited_type_game` _requires_ <font color="red">Matrix</font>
 
-Besides wrapping the original ones, we also need to create the corresponding ones that give simple graphs. See issue 1. They should include<font color="red">
- * Barabási-Albert model
+Besides wrapping the original ones, we also need to create the corresponding ones that give simple graphs. See issue 1. The undone parts are<font color="red">
  * Rewire (preserve degree distribution)
  * Erdős–Rényi model.
 </font>
- * ~~Random rewire (done) ~~
- * ~~Watts-Strogatz model (done)~~
 
 = 9 Graph, Vertex and Edge Attributes =
 All unimplemented.
@@ -94,11 +93,6 @@ All unimplemented.
 
 == 10.8 Spanning Tree ==
 All unimplemented.
-
-<s>
-== 10.9 Transitivity or Clustering Coefficient ==
-<font color="red">All unimplemented.</font> (Done, 09/06/18)
-</s>
 
 == 10.11 Spectral properties ==
  * <font color="red">` igraph_laplacian`</font> _requires_ <font color="red">Matrix</font>
@@ -141,11 +135,6 @@ All unimplemented.
 
 = 17 Detecting Community Structure =
 All unimplemented.
-
-<s>
-= 18 Graph Operators =
-All unimplemented. See issue 2. (Done, 09/06/18)
-</s>
 
 = 19 Using ARPACK for igraph graphs =
 All unimplemented.

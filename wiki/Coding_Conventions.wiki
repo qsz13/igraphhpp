@@ -12,6 +12,8 @@ _Revise these?_
    * `igraph_vector_null` → `igraph::Vector.null`
    * `igraph_degree` → `igraph::Graph.degree`
    * `igraph_vs_as_vector` → `igraph::VertexSelector.as_vector` 
+ * If no ambiguity is introduced between the name and the actual function, then function may be overloaded, e.g.
+   * degree() return degree of all nodes, while degree(6) return degree of node 6.
  * Use the named constructor idiom unless default constructor really express its default meaning, e.g.
    *  Use `igraph::Vector::seq(Integer, Integer)` instead of `igraph::Vector::Vector(Integer, Integer)`. An uninformed seeing the statement `Vector(5., 12.)` may think you are creating a vector with 2 elements.
 

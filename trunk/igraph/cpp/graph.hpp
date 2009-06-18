@@ -76,7 +76,9 @@ namespace igraph {
 		
 		Directedness is_directed() const throw() { return igraph_is_directed(&_) ? Directed : Undirected; }
 		
+		Real degree(Vertex i, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION;
 		RETRIEVE_TEMPORARY_CLASS(Vector) degree(const VertexSelector& vids, NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(Vector) degree(NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 #pragma mark Adding and Deleting Vertices and Edges
@@ -96,24 +98,6 @@ namespace igraph {
 		Graph& disconnect(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION { return delete_edge(from, to); }
 		__attribute__((deprecated,warning("Graph::disconnect is deprecated. Use Graph::delete_edge instead.")))
 		Graph& disconnect(const Edge eid) { return delete_edge(eid); }
-
-#pragma mark -
-#pragma mark Graph Operation
-
-		static RETRIEVE_TEMPORARY_CLASS(Graph) disjoint_union(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
-		static RETRIEVE_TEMPORARY_CLASS(Graph) disjoint_union(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
-		static RETRIEVE_TEMPORARY_CLASS(Graph) merge(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
-		static RETRIEVE_TEMPORARY_CLASS(Graph) merge(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
-		static RETRIEVE_TEMPORARY_CLASS(Graph) intersection(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
-		static RETRIEVE_TEMPORARY_CLASS(Graph) intersection(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
-		static RETRIEVE_TEMPORARY_CLASS(Graph) difference(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
-		static RETRIEVE_TEMPORARY_CLASS(Graph) complementer(const Graph& g1, SelfLoops loops=NoSelfLoops) MAY_THROW_EXCEPTION;
-		static RETRIEVE_TEMPORARY_CLASS(Graph) compose(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
-
-		Graph& operator|=(const Graph& other);
-		Graph& operator^=(const Graph& other);
-		Graph& operator&=(const Graph& other);
-		Graph& operator-=(const Graph& other);
 
 #pragma mark -
 #pragma mark Deterministic Graph Generators
@@ -199,9 +183,18 @@ namespace igraph {
 		RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Graph>) decompose(Connectedness connectedness = WeaklyConnected, long max_component_number = -1, long min_size_of_components = -1);
 		// TODO: igraph_biconnected_components
 		RETRIEVE_TEMPORARY_CLASS(VertexVector) articulation_points() const MAY_THROW_EXCEPTION;
-		
+
 #pragma mark -
-#pragma mark Directedness conversion
+#pragma mark 10.9 Transitivity or Clustering Coefficient
+
+	Real transitivity() const MAY_THROW_EXCEPTION;
+	Real transitivity_local(Vertex i) const MAY_THROW_EXCEPTION;
+	RETRIEVE_TEMPORARY_CLASS(Vector) transitivity_local(const VertexSelector& vids) const MAY_THROW_EXCEPTION;
+	RETRIEVE_TEMPORARY_CLASS(Vector) transitivity_local() const MAY_THROW_EXCEPTION;
+	Real transitivity_avglocal() const MAY_THROW_EXCEPTION;
+
+#pragma mark -
+#pragma mark 10.10 Directedness conversion
 		enum ToDirectedMode {
 			ToDirectedMode_Arbitrary = IGRAPH_TO_DIRECTED_ARBITRARY,
 			ToDirectedMode_Mutual = IGRAPH_TO_DIRECTED_MUTUAL,
@@ -264,7 +257,29 @@ namespace igraph {
 		
 		static RETRIEVE_TEMPORARY_CLASS(Graph) read(const char* filename, GraphFormat format = GraphFormat_auto);
 		
-		
+#pragma mark -
+#pragma mark 18. Graph Operators
+
+		static RETRIEVE_TEMPORARY_CLASS(Graph) disjoint_union(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) disjoint_union(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) merge(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) merge(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) intersection(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) intersection(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) difference(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) complementer(const Graph& x, SelfLoops loops=NoSelfLoops) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) compose(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
+
+		RETRIEVE_TEMPORARY_CLASS(Graph) operator^ (const Graph& other) MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(Graph) operator| (const Graph& other) MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(Graph) operator& (const Graph& other) MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(Graph) operator- (const Graph& other) MAY_THROW_EXCEPTION;
+		RETRIEVE_TEMPORARY_CLASS(Graph) operator~ () MAY_THROW_EXCEPTION;
+		Graph& operator^= (const Graph& other) MAY_THROW_EXCEPTION;
+		Graph& operator|= (const Graph& other) MAY_THROW_EXCEPTION;
+		Graph& operator&= (const Graph& other) MAY_THROW_EXCEPTION;
+		Graph& operator-= (const Graph& other) MAY_THROW_EXCEPTION;
+
 		friend class VertexSelector;
 		friend class EdgeSelector;
 		friend class VertexIterator;

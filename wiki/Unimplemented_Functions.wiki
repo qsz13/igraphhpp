@@ -95,8 +95,10 @@ All unimplemented.
 == 10.8 Spanning Tree ==
 All unimplemented.
 
+<s>
 == 10.9 Transitivity or Clustering Coefficient ==
-<font color="red">All unimplemented.</font>
+<font color="red">All unimplemented.</font> (Done, 09/06/18)
+</s>
 
 == 10.11 Spectral properties ==
  * <font color="red">` igraph_laplacian`</font> _requires_ <font color="red">Matrix</font>
@@ -140,8 +142,10 @@ All unimplemented.
 = 17 Detecting Community Structure =
 All unimplemented.
 
+<s>
 = 18 Graph Operators =
-All unimplemented. See issue 2.
+All unimplemented. See issue 2. (Done, 09/06/18)
+</s>
 
 = 19 Using ARPACK for igraph graphs =
 All unimplemented.

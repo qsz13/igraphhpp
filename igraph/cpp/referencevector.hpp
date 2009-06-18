@@ -159,8 +159,10 @@ namespace igraph {
 		/// Move a C pointer array into a ReferenceVector.
 		ReferenceVector(pointer* ptr_array, const long count) MAY_THROW_EXCEPTION;
 		
-		/// var_arg method to construct the ReferenceVector
-		ReferenceVector(const long count, ...) MAY_THROW_EXCEPTION;
+#if XXINTRNL_CXX0X
+		/// Copy elements from an initializer list to ReferenceVector (C++0x only.)
+		ReferenceVector(::std::initializer_list<const_reference> elements) MAY_THROW_EXCEPTION;
+#endif
 			
 		/// Wrap a C pointer array as a ReferenceVector.
 		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) view(pointer* array, const long count) throw();
@@ -190,7 +192,7 @@ namespace igraph {
 		ReferenceVector<T>& clear() throw();
 		ReferenceVector<T>& reserve(const long new_size) MAY_THROW_EXCEPTION;
 		ReferenceVector<T>& resize(const long new_size) MAY_THROW_EXCEPTION;
-		ReferenceVector<T>& push_back(const_reference obj, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) MAY_THROW_EXCEPTION { return push_back(&obj, transfer); }
+		ReferenceVector<T>& push_back(const_reference obj) MAY_THROW_EXCEPTION { return push_back(new T(obj)); }
 		ReferenceVector<T>& push_back(pointer e, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
 		ReferenceVector<T>& insert(const long pos, const_reference obj, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferCopy) MAY_THROW_EXCEPTION { return insert(pos, &obj, transfer); }
 		ReferenceVector<T>& insert(const long pos, pointer e, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
@@ -200,7 +202,6 @@ namespace igraph {
 		ReferenceVector<T>& sort(int(*compar)(const_reference, const_reference));
 		
 		// STL support.
-				
 		iterator begin() throw() { return iterator::convert(_.stor_begin); }
 		iterator end() throw() { return iterator::convert(_.end); }
 		const_iterator begin() const throw() { return const_iterator::convert(_.stor_begin); }

@@ -48,7 +48,6 @@ All unimplemented.
 == 7.2 Games: Randomized Graph Generators ==
  * `igraph_nonlinear_barabasi_game`
  * <font color="red">`igraph_erdos_renyi_game`</font>
- * <font color="red">`igraph_watts_strogatz_game `</font>
  * `igraph_degree_sequence_game`
  * `igraph_forest_fire_game`
  * <font color="red">`igraph_rewire`</font>
@@ -66,10 +65,10 @@ All unimplemented.
 Besides wrapping the original ones, we also need to create the corresponding ones that give simple graphs. See issue 1. They should include<font color="red">
  * Barabási-Albert model
  * Rewire (preserve degree distribution)
- * Watts-Strogatz model
  * Erdős–Rényi model.
 </font>
  * ~~Random rewire (done) ~~
+ * ~~Watts-Strogatz model (done)~~
 
 = 9 Graph, Vertex and Edge Attributes =
 All unimplemented.

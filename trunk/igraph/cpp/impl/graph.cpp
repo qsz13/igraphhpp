@@ -90,7 +90,7 @@ namespace igraph {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 1));
 		TRY(igraph_degree(&_, &res, igraph_vss_1(i), (igraph_neimode_t)neimode, countLoops));
-		Real resdeg = res[0]
+		Integer resdeg = VECTOR(res)[0];
 		return resdeg;
 	}
 	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::degree(const VertexSelector& vids, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
@@ -413,7 +413,7 @@ namespace igraph {
 	}
 	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::transitivity_local(const VertexSelector& vids) const MAY_THROW_EXCEPTION {
 		Vector res ((long)vids.size(*this));
-		TRY(igraph_transitivity_local_undirected(&_, &res._, ));
+		TRY(igraph_transitivity_local_undirected(&_, &res._, vids._));
 		return res;
 	}
 	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::transitivity_local() const MAY_THROW_EXCEPTION {

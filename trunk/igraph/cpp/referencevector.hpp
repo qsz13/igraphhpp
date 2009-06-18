@@ -217,6 +217,7 @@ namespace igraph {
 		bool operator==(const ReferenceVector<T>& other) const throw();
 		bool operator!=(const ReferenceVector<T>& other) const throw();
 		
+		friend class Graph;
 	};
 	
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, ReferenceVector, <T>);

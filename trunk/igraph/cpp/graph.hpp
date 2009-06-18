@@ -98,8 +98,26 @@ namespace igraph {
 		Graph& disconnect(const Edge eid) { return delete_edge(eid); }
 
 #pragma mark -
+#pragma mark Graph Operation
+
+		static RETRIEVE_TEMPORARY_CLASS(Graph) disjoint_union(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) disjoint_union(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) merge(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) merge(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) intersection(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) intersection(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) difference(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) complementer(const Graph& g1, SelfLoops loops=NoSelfLoops) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) compose(const Graph& g1, const Graph& g2) MAY_THROW_EXCEPTION;
+
+		Graph& operator|=(const Graph& other);
+		Graph& operator^=(const Graph& other);
+		Graph& operator&=(const Graph& other);
+		Graph& operator-=(const Graph& other);
+
+#pragma mark -
 #pragma mark Deterministic Graph Generators
-		
+
 		enum StarMode {
 			StarMode_Out = IGRAPH_STAR_OUT,
 			StarMode_In = IGRAPH_STAR_IN,

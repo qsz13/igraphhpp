@@ -132,13 +132,16 @@ namespace tempobj {
 #define RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(...) __VA_ARGS__
 #else
 /// \internal
+#include <boost/type_traits.hpp>
+#include <boost/static_assert.hpp>
+
 namespace tempobj {
 	struct XXINTRNL_GetTmpClsImpl_A {char x[256];};
 	template <typename U> XXINTRNL_GetTmpClsImpl_A XXINTRNL_GetTmpClsImpl_B (const typename U::Temporary* p);
 	template <typename U> char                     XXINTRNL_GetTmpClsImpl_B (...);
-
-	template <typename T, int> struct XXINTRNL_GetTmpClsImpl         { typedef          T            v; };
-	template <typename T>      struct XXINTRNL_GetTmpClsImpl<T, 256> { typedef typename T::Temporary v; };
+	
+	template <typename T, int> struct XXINTRNL_GetTmpClsImpl         { typedef typename T::Temporary v; };
+	template <typename T>      struct XXINTRNL_GetTmpClsImpl<T, 1>   { typedef          T            v; };
 	
 	template <typename T>
 	struct temporary_class {
@@ -151,19 +154,21 @@ namespace tempobj {
 #define XXINTRNL_RRP2MT(xx_typnm, ...) const_cast<xx_typnm __VA_ARGS__::Temporary&>
 #define RETRIEVE_TEMPORARY_CLASS(...) __VA_ARGS__::Temporary
 #define RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(...) typename __VA_ARGS__::Temporary
+#define FORCE_STD_MOVE(...) ::std::move
+#define FORCE_STD_MOVE_WITH_TEMPLATE(...) ::std::move
+#include <typeinfo>
 namespace std {
 	
 	template <typename T>
 	struct add_rvalue_reference {
 		typedef typename ::tempobj::temporary_class<T>::type& type;
 	};
-	
+
 	template <typename T>
 	static inline typename add_rvalue_reference<T>::type move(const T& a) {
 		return (typename add_rvalue_reference<T>::type)(a);
 	};
 }
-#include <typeinfo>
 /// \internal
 #define XXINTRNL_TMPOBJ_INTERFACE class Temporary; friend class Temporary
 #define XXINTRNL_MEMORY_MANAGER_INTERFACE_EX(cls, ...)                          \
@@ -172,6 +177,14 @@ public:                                                                         
 	Temporary(const cls __VA_ARGS__& other) : cls(other) {}                     \
 	Temporary(const Temporary& other) : cls(other) {}                           \
 }
+#define XXINTRNL_MEMORY_MANAGER_INTERFACE_EX_NO_COPYING(cls, ...)               \
+class cls __VA_ARGS__::Temporary : public cls __VA_ARGS__ {                     \
+public:                                                                         \
+	Temporary(const Temporary& other) : cls(other) {}                           \
+}
+
+#define FORCE_STD_MOVE(...) *(const __VA_ARGS__::Temporary*)&
+#define FORCE_STD_MOVE_WITH_TEMPLATE(...) *(const typename __VA_ARGS__::Temporary*)&
 #endif
 
 /// Group a comma-separated list. Using this avoids the extra parenthesis.
@@ -214,7 +227,7 @@ public:                                                                         
 #if XXINTRNL_CXX0X
 #define XXINTRNL_DISABLE_COPYING = delete
 #else
-#define XXINTRNL_DISABLE_COPYING __attribute__((error("This class cannot be copied. Please use ::std::move for assignment.")))
+#define XXINTRNL_DISABLE_COPYING __attribute__((deprecated,error("This class cannot be copied. Please use ::std::move for assignment.")))
 #endif
 
 #define XXINTRNL_MEMORY_MANAGER_INTERFACE_NO_COPYING(xx_typnm, cls, ...)        \
@@ -299,11 +312,11 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (rhs_type other, XXINTRNL_P
 attrib XXINTRNL_RVALTYPE(xx_typnm, cls) operator op (const cls& xx_self, rhs_type other) { \
 	XXINTRNL_RVALTYPE(xx_typnm, cls) self = xx_self;                            \
 	self op##= other;                                                           \
-	return ::std::move(self);                                                   \
+	return FORCE_STD_MOVE(xx_typnm cls)(self);                                  \
 }                                                                               \
 attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (XXINTRNL_PARAMTYPE(xx_typnm, cls) xx_self, rhs_type other) { \
 	XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self) op##= other;                        \
-	return ::std::move(XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self));                \
+	return FORCE_STD_MOVE(xx_typnm cls)(XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self)); \
 }
 
 /// \internal
@@ -311,11 +324,11 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (XXINTRNL_PARAMTYPE(xx_typn
 attrib XXINTRNL_RVALTYPE(xx_typnm, cls) operator op (lhs_type other, const cls& xx_self) { \
 	XXINTRNL_RVALTYPE(xx_typnm, cls) self = xx_self;                  \
 	self op##= other;                                                           \
-	return ::std::move(self);                                                   \
+	return FORCE_STD_MOVE(xx_typnm cls)(self);                                  \
 }                                                                               \
 attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_PARAMTYPE(xx_typnm, cls) xx_self) { \
 	XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self) op##= other;                        \
-	return ::std::move(XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self));                \
+	return FORCE_STD_MOVE(xx_typnm cls)(XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self)); \
 }
 
 //------------------------------------------------------------------------------
@@ -350,10 +363,13 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  
  */
 #define MEMORY_MANAGER_INTERFACE_EX(...) XXINTRNL_MEMORY_MANAGER_INTERFACE_EX(__VA_ARGS__)
+#define MEMORY_MANAGER_INTERFACE_EX_NO_COPYING(...) XXINTRNL_MEMORY_MANAGER_INTERFACE_EX_NO_COPYING(__VA_ARGS__)
 #if XXINTRNL_CXX0X
 #define MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(...) 
+#define MEMORY_MANAGER_INTERFACE_EX_NO_COPYING_WITH_TEMPLATE(...) 
 #else
 #define MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(templ_decl, ...) templ_decl MEMORY_MANAGER_INTERFACE_EX(__VA_ARGS__)
+#define MEMORY_MANAGER_INTERFACE_EX_NO_COPYING_WITH_TEMPLATE(templ_decl, ...) templ_decl MEMORY_MANAGER_INTERFACE_EX_NO_COPYING(__VA_ARGS__)
 #endif
 
 /**
@@ -362,7 +378,7 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  Copying is explicitly deleted (in C++0x) or produce an error (compile-time error in GCC and run-time error in others).
  
  */
-#define MEMORY_MANAGER_INTERFACE_WITH_TEMPLATE_NO_COPYING(cls, ...) XXINTRNL_MEMORY_MANAGER_INTERFACE_NO_COPYING(typename, cls, __VA_ARGS__)
+#define MEMORY_MANAGER_INTERFACE_NO_COPYING_WITH_TEMPLATE(cls, ...) XXINTRNL_MEMORY_MANAGER_INTERFACE_NO_COPYING(typename, cls, __VA_ARGS__)
 #define MEMORY_MANAGER_INTERFACE_NO_COPYING(cls, ...)               XXINTRNL_MEMORY_MANAGER_INTERFACE_NO_COPYING(        , cls, ##__VA_ARGS__) 
 
 /**
@@ -572,10 +588,11 @@ namespace tempobj {
 #define XXINTRNL_WRAPPER_CONSTRUCTOR_IMPLEMENTATION(cls, orig_type, copy_func, ...) \
 cls __VA_ARGS__::cls(orig_type const* pOrig, const ::tempobj::OwnershipTransfer transfer) : COMMON_INIT_WITH(transfer) { \
 	if (pOrig != NULL) { \
-		XXINTRNL_DEBUG_CALL_INITIALIZER(cls, ## __VA_ARGS__); \
-		if (transfer == ::tempobj::OwnershipTransferCopy) \
+		if (transfer != ::tempobj::OwnershipTransferNoOwnership) \
+			XXINTRNL_DEBUG_CALL_INITIALIZER(cls, ## __VA_ARGS__); \
+		if (transfer == ::tempobj::OwnershipTransferCopy) { \
 			copy_func(&_, pOrig); \
-		else \
+		} else \
 			_ = ::std::move(*pOrig); \
 	} else \
 		mm_dont_dealloc = true; \

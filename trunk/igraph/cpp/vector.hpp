@@ -178,13 +178,13 @@ namespace igraph {
 		const_reference back() const throw() { return *(_.end-1); }
 		
 		/// Print content of the Vector.
-		void print(std::FILE* f = stdout) const throw() {
+		void print(const char* separator = " ", std::FILE* f = stdout) const throw() {
 			bool is_first = true;
 			for (const_iterator cit = begin(); cit != end(); ++ cit) {
 				if (is_first)
 					is_first = false;
 				else
-					::std::fprintf(f, " ");
+					::std::fprintf(f, separator);
 				XXINTRNL_fprintf(f, *cit);
 			}
 			::std::fprintf(f, "\n");
@@ -198,6 +198,8 @@ namespace igraph {
 		BasicVector<T>& remove_first_matching(const T e) throw();
 		BasicVector<T>& remove_all_matching(const T e) throw();
 		BasicVector<T>& remove_first_matching_assume_sorted(const T e) throw();
+		
+		::tempobj::temporary_class<BasicVector<Real> >::type distribution() const MAY_THROW_EXCEPTION;
 		
 		friend class VertexSelector;
 		friend class VertexIterator;

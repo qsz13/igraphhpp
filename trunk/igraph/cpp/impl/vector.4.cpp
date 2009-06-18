@@ -27,18 +27,18 @@ template<> IMPLEMENT_MOVE_METHOD(BasicVector, <BASE>) { _ = ::std::move(other._)
 template<> IMPLEMENT_DEALLOC_METHOD(BasicVector, <BASE>) { FUNC(destroy)(&_); }
 
 template<> BasicVector<BASE>::BasicVector(BASE* const array, const long count) MAY_THROW_EXCEPTION {
-	XXINTRNL_DEBUG_CALL_INITIALIZER(BasicVector);
+	XXINTRNL_DEBUG_CALL_INITIALIZER(BasicVector, <BASE>);
 	TRY(FUNC(init_copy)(&_, array, count));
 }
 
 template<> BasicVector<BASE>::BasicVector(const long count) MAY_THROW_EXCEPTION {
-	XXINTRNL_DEBUG_CALL_INITIALIZER(BasicVector);
+	XXINTRNL_DEBUG_CALL_INITIALIZER(BasicVector, <BASE>);
 	TRY(FUNC(init)(&_, count));
 }
 
 #if XXINTRNL_CXX0X
 template<> BasicVector<BASE>::BasicVector(::std::initializer_list<BASE> elements) MAY_THROW_EXCEPTION {
-	XXINTRNL_DEBUG_CALL_INITIALIZER(BasicVector);
+	XXINTRNL_DEBUG_CALL_INITIALIZER(BasicVector, <BASE>);
 	TRY(FUNC(init)(&_, elements.size()));
 	BASE* q = VECTOR(_);
 	for (auto p = elements.begin(); p != elements.end(); ++p, ++q)
@@ -47,6 +47,7 @@ template<> BasicVector<BASE>::BasicVector(::std::initializer_list<BASE> elements
 #endif
 
 template<> BasicVector<BASE>::BasicVector(const char* vertices_as_string) MAY_THROW_EXCEPTION {
+	XXINTRNL_DEBUG_CALL_INITIALIZER(BasicVector, <BASE>);
 	TRY(FUNC(init)(&_, 0));
 	const char* end_of_string = ::std::strchr(vertices_as_string, '\0');
 	while (vertices_as_string < end_of_string) {
@@ -59,17 +60,17 @@ template<> BasicVector<BASE>::BasicVector(const char* vertices_as_string) MAY_TH
 template<> RETRIEVE_TEMPORARY_CLASS(BasicVector<BASE>) BasicVector<BASE>::seq(const BASE from, const BASE to) MAY_THROW_EXCEPTION {
 	TYPE _;
 	TRY(FUNC(init_seq)(&_, from, to));
-	return ::std::move(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferMove));
+	return FORCE_STD_MOVE(BasicVector<BASE>)(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferMove));
 }
 
 template<> RETRIEVE_TEMPORARY_CLASS(BasicVector<BASE>) BasicVector<BASE>::zeros(const long count) MAY_THROW_EXCEPTION {
-	return ::std::move(BasicVector<BASE>(count));
+	return FORCE_STD_MOVE(BasicVector<BASE>)(BasicVector<BASE>(count));
 }
 
 template<> RETRIEVE_TEMPORARY_CLASS(BasicVector<BASE>) BasicVector<BASE>::n() MAY_THROW_EXCEPTION {
 	TYPE _;
 	TRY(FUNC(init)(&_, 0));
-	return ::std::move(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferMove));
+	return FORCE_STD_MOVE(BasicVector<BASE>)(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferMove));
 }
 
 #pragma mark -
@@ -92,7 +93,7 @@ template<> BASE BasicVector<BASE>::tail() const throw() { return FUNC(tail)(&_);
 template<> RETRIEVE_TEMPORARY_CLASS(BasicVector<BASE>) BasicVector<BASE>::view(const BASE* const array, const long count) throw() {
 	TYPE _;
 	FUNC(view)(&_, array, count);
-	return ::std::move(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferNoOwnership));
+	return FORCE_STD_MOVE(BasicVector<BASE>)(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferNoOwnership));
 }
 
 #pragma mark -
@@ -215,4 +216,14 @@ template<> BasicVector<BASE>& BasicVector<BASE>::remove_first_matching_assume_so
 	if (binsearch(e, pos))
 		remove(pos);
 	return *this;
+}
+
+template<> ::tempobj::temporary_class<Vector>::type BasicVector<BASE>::distribution() const MAY_THROW_EXCEPTION {
+	assert(min() >= 0);
+	igraph_vector_t res;
+	TRY(igraph_vector_init(&res, static_cast<long>(max()) ));
+	Real delta = 1./size();
+	for (const_iterator cit = begin(); cit != end(); ++ cit)
+		VECTOR(res)[static_cast<long>(*cit)] += delta;
+	return FORCE_STD_MOVE(Vector)(Vector(&res, ::tempobj::OwnershipTransferMove));
 }

@@ -30,13 +30,13 @@ namespace igraph {
 	RETRIEVE_TEMPORARY_CLASS(VertexVector) VertexIterator::as_vector() const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vit_as_vector(&_, &res));
-		return ::std::move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
+		return FORCE_STD_MOVE(VertexVector)(VertexVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 	
 	RETRIEVE_TEMPORARY_CLASS(EdgeVector) EdgeIterator::as_vector() const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_eit_as_vector(&_, &res));
-		return ::std::move(EdgeVector(&res, ::tempobj::OwnershipTransferMove));
+		return FORCE_STD_MOVE(EdgeVector)(EdgeVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 }
 

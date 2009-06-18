@@ -48,10 +48,10 @@ namespace gsl {
 	
 	RETRIEVE_TEMPORARY_CLASS(Random) Random::default_generator() throw() {
 		gsl_rng* _ = gsl_rng_alloc(gsl_rng_default);
-		return ::std::move(Random(&_, ::tempobj::OwnershipTransferMove));
+		return FORCE_STD_MOVE(Random)(Random(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-#define XXINTRNL_CREATE_CONSTRUCTOR(xxname) RETRIEVE_TEMPORARY_CLASS(Random) Random::xxname() throw() { return ::std::move(Random(gsl_rng_##xxname)); }
+#define XXINTRNL_CREATE_CONSTRUCTOR(xxname) RETRIEVE_TEMPORARY_CLASS(Random) Random::xxname() throw() { return FORCE_STD_MOVE(Random)(Random(gsl_rng_##xxname)); }
 	
 	XXINTRNL_CREATE_CONSTRUCTOR(mt19937);
 	XXINTRNL_CREATE_CONSTRUCTOR(ranlxs0);
@@ -103,7 +103,7 @@ namespace gsl {
 			case 256: type = gsl_rng_random256_##vers; break; \
 			default: break; \
 		} \
-		return ::std::move(Random(type)); \
+		return FORCE_STD_MOVE(Random)(Random(type)); \
 	}
 	
 	XXINTRNL_CREATE_UNIX_CONSTRUCTOR(bsd);

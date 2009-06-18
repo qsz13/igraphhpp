@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <tempobj.hpp>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 
 struct gsl_rng_type;
 
@@ -88,6 +89,39 @@ namespace gsl {
 		static RETRIEVE_TEMPORARY_CLASS(Random) default_generator() throw();
 		static RETRIEVE_TEMPORARY_CLASS(Random) rand() throw();
 
+#pragma mark -
+#pragma mark Shuffling and Sampling
+				
+		template <typename T>
+		void shuffle(T* arr, const size_t count) const throw() {
+			for (size_t i = count - 1; i > 0; --i) {
+				size_t j = uniform_int(i+1);
+				if (i != j)
+					::std::swap(arr[i], arr[j]);
+			}
+		}
+		
+		template <typename T>
+		T* choose(T* store, const size_t how_many, T* source, const size_t count) const {
+			for (size_t i = 0, j = 0; i < count && j < how_many; i++)
+				if (uniform_int(count-i) < how_many-j)
+					store[j++] = source[i];
+			return store;
+		}
+		
+		template <typename T>
+		T* choose(const size_t how_many, T* source, const size_t count) const { return choose(new T[how_many], how_many, source, count); }
+		
+		template <typename T>
+		T* sample(T* store, const size_t how_many, T* source, const size_t count) const {
+			for (size_t j = 0; j < how_many; ++ j)
+				store[j] = source[uniform_int(count)];
+			return store;
+		}
+		
+		template <typename T>
+		T* sample(const size_t how_many, T* source, const size_t count) const { return sample(new T[how_many], how_many, source, count); }
+				
 		template <typename T>
 		friend class IRandomDistribution;
 	};
@@ -98,8 +132,8 @@ namespace gsl {
 	IMPLEMENT_MOVE_METHOD(Random) {}
 	IMPLEMENT_DEALLOC_METHOD(Random) {}
 	
-	RETRIEVE_TEMPORARY_CLASS(Random) Random::default_generator() throw() { return ::std::move(Random(NULL)); }
-	RETRIEVE_TEMPORARY_CLASS(Random) Random::rand() throw() { return ::std::move(Random(NULL)); }
+	RETRIEVE_TEMPORARY_CLASS(Random) Random::default_generator() throw() { return FORCE_STD_MOVE(Random)(Random(NULL)); }
+	RETRIEVE_TEMPORARY_CLASS(Random) Random::rand() throw() { return FORCE_STD_MOVE(Random)(Random(NULL)); }
 }
 
 #endif

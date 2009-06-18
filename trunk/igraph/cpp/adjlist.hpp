@@ -43,7 +43,7 @@ namespace igraph {
 		
 		friend class Graph;
 	};
-	MEMORY_MANAGER_INTERFACE_EX(AdjacencyList);
+	MEMORY_MANAGER_INTERFACE_EX_NO_COPYING(AdjacencyList);
 }
 
 #endif

@@ -140,19 +140,17 @@ namespace gsl {
 		void shuffle(T* arr, const size_t count) const throw() { gsl_ran_shuffle(_, arr, count, sizeof(T)); }
 		
 		template <typename T>
-		T* choose(const size_t how_many, T* source, const size_t count) const {
-			T* dest = new T[how_many];
-			gsl_ran_choose(_, dest, how_many, source, count);
-			return dest;
-		}
+		T* choose(T* store, const size_t how_many, T* source, const size_t count) const { gsl_ran_choose(_, store, how_many, source, count, sizeof(T)); return store; }
 		
 		template <typename T>
-		T* sample(const size_t how_many, T* source, const size_t count) const {
-			T* dest = new T[how_many];
-			gsl_ran_sample(_, dest, how_many, source, count);
-			return dest;
-		}
+		T* choose(const size_t how_many, T* source, const size_t count) const { return choose(new T[how_many], how_many, source, count); }
+
+		template <typename T>
+		T* sample(T* store, const size_t how_many, T* source, const size_t count) const { gsl_ran_sample(_, store, how_many, source, count, sizeof(T)); return store; }
 		
+		template <typename T>
+		T* sample(const size_t how_many, T* source, const size_t count) const { return sample(new T[how_many], how_many, source, count); }
+				
 		template <typename T>
 		friend class IRandomDistribution;
 	};

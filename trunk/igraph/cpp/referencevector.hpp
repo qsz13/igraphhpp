@@ -172,7 +172,7 @@ namespace igraph {
 		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) adopt(igraph_vector_ptr_t& raw) {
 			for (void** it = raw.stor_begin; it != raw.end; ++it)
 				*it = new T(reinterpret_cast<OriginalType const*>(*it), ::tempobj::OwnershipTransferMove);
-			return ::std::move(ReferenceVector<T>(&raw, ::tempobj::OwnershipTransferNoOwnership));
+			return FORCE_STD_MOVE_WITH_TEMPLATE(ReferenceVector<T>)(ReferenceVector<T>(&raw, ::tempobj::OwnershipTransferNoOwnership));
 		}
 
 		 

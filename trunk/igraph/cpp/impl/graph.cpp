@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <igraph/cpp/graph.hpp>
 #include <igraph/cpp/adjlist.hpp>
-#include <gsl/cpp/rng.hpp>
+#include <gsl/cpp/rng_minimal.hpp>
 #include <stdexcept>
 
 namespace igraph {

@@ -173,7 +173,6 @@ namespace igraph {
 		
 		Graph& rewire_edges(const Real prob) MAY_THROW_EXCEPTION;
 		/// Randomly rewire edges and produce a simple graph.
-		Graph& rewire_edges_simple(const Real prob) MAY_THROW_EXCEPTION;
 		Graph& rewire_edges_simple(const Real prob, const ::gsl::Random& rangen) MAY_THROW_EXCEPTION;
 				
 #pragma mark -

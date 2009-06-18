@@ -72,7 +72,7 @@ namespace igraph {
 	MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(GraphReader);
 	
 	IMPLEMENT_MOVE_METHOD(GraphReader) {
-		fptr = ::std::move(fptr);
+		fptr = ::std::move(other.fptr);
 	}
 	IMPLEMENT_DEALLOC_METHOD(GraphReader) {
 		::std::fclose(fptr);
@@ -219,14 +219,14 @@ namespace igraph {
 	
 	IMPLEMENT_MOVE_METHOD(GraphWriter) {
 		_ = ::std::move(other._);
-		fptr = ::std::move(fptr);
+		fptr = ::std::move(other.fptr);
 	}
 	IMPLEMENT_DEALLOC_METHOD(GraphWriter) {
 		::std::fclose(fptr);
 	}
 	
 	GraphWriter::GraphWriter(const igraph_t* graph, const char* filename)
-		: _(graph), fptr(std::fopen(filename, "w")), COMMON_INIT_WITH(::tempobj::OwnershipTransferMove) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphWriter); }
+		: _(graph), fptr(::std::fopen(filename, "w")), COMMON_INIT_WITH(::tempobj::OwnershipTransferMove) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphWriter); }
 	GraphWriter::GraphWriter(const igraph_t* graph, std::FILE* filestream) throw()
 		: _(graph), fptr(filestream), COMMON_INIT_WITH(::tempobj::OwnershipTransferNoOwnership) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphWriter); }
 

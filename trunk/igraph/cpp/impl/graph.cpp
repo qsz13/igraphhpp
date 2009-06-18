@@ -292,12 +292,25 @@ namespace igraph {
 		TRY(igraph_barabasi_game(&_, size, 0, &outseq._, outpref, directed));
 		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::watts_strogatz_game(const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_watts_strogatz_game(&_, dimensions, size, K, p));
+		return ::std::move(Graph(&_, ::tempobj::OwnershipTransferMove));
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::watts_strogatz_game_simple(const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
+		return watts_strogatz_game_simple(::gsl::Random::default_generator(), size, K, p, dimensions);
+	}
+	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::watts_strogatz_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
+		Graph base = dimensions == 1 ? Graph::ring(size) : Graph::lattice(Vector((long)dimensions).fill(size));
+		return ::std::move(base.connect_neighborhood(K).rewire_edges_simple(rangen, p));
+	}
 	
 	Graph& Graph::rewire_edges(const Real prob) MAY_THROW_EXCEPTION {
 		TRY(igraph_rewire_edges(&_, prob));
 		return *this;
 	}
-	Graph& Graph::rewire_edges_simple(const Real prob, const ::gsl::Random& rangen) MAY_THROW_EXCEPTION {
+	Graph& Graph::rewire_edges_simple(const Real prob) MAY_THROW_EXCEPTION { return rewire_edges_simple(::gsl::Random::default_generator(), prob); }
+	Graph& Graph::rewire_edges_simple(const ::gsl::Random& rangen, const Real prob) MAY_THROW_EXCEPTION {
 		// Will this create some sort of bias?
 		for (long eid = ecount()-1; eid >= 0; -- eid) {
 			if (rangen.uniform() < prob) {

@@ -170,10 +170,14 @@ namespace igraph {
 		static RETRIEVE_TEMPORARY_CLASS(Graph) grg_game(const Integer size, const Real radius, const PeriodicLattice periodic, Vector& x_coords, Vector& y_coords) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game(const Integer size, const Integer m, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
 		static RETRIEVE_TEMPORARY_CLASS(Graph) barabasi_game(const Integer size, const Vector& outseq, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) watts_strogatz_game(const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) watts_strogatz_game_simple(const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
+		static RETRIEVE_TEMPORARY_CLASS(Graph) watts_strogatz_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
 		
 		Graph& rewire_edges(const Real prob) MAY_THROW_EXCEPTION;
 		/// Randomly rewire edges and produce a simple graph.
-		Graph& rewire_edges_simple(const Real prob, const ::gsl::Random& rangen) MAY_THROW_EXCEPTION;
+		Graph& rewire_edges_simple(const Real prob) MAY_THROW_EXCEPTION;
+		Graph& rewire_edges_simple(const ::gsl::Random& rangen, const Real prob) MAY_THROW_EXCEPTION;
 				
 #pragma mark -
 #pragma mark Basic Properties

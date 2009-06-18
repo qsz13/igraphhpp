@@ -247,9 +247,10 @@ namespace igraph {
 		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
+	/*
 	// we assume how_many is small.
 	static inline void XXINTRNL_random_choose(const ::gsl::Random& rangen, unsigned long* store, unsigned long how_many, double* discrete_distrib, unsigned long count, double total) {
-		// because the distribution changes everytime we pick a number, it is unwise for us to cook the PDF into CDF.
+		// because the distribution changes everytime we pick a number, it is unwise for us to cook the PDF into inverse CDF.
 		for (unsigned long i = 0; i < how_many; ++ i) {
 			double current_level = rangen.uniform() * total;
 			for (long x = count-1; x >= 0; -- x) {
@@ -269,46 +270,43 @@ namespace igraph {
 			discrete_distrib[store[i]] = -discrete_distrib[store[i]];
 		}
 	}
+	*/
 	
 	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::barabasi_game_simple(const Integer size, const Integer m) MAY_THROW_EXCEPTION { return barabasi_game_simple(::gsl::Random::default_generator(), size, m); }
 	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::barabasi_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer m) MAY_THROW_EXCEPTION {
 		if (size <= m+1)
 			return Graph::full(size);
 		else {
-			Graph g = Graph::full(m+1);
-			g.add_vertices(size - (m+1));
-			
 			unsigned long M = static_cast<unsigned long>(m), Size = static_cast<unsigned long>(size);
-			unsigned long* vertices_to_connect = (M <= 32) ? reinterpret_cast<unsigned long*>(alloca(M * sizeof(unsigned long))) : new unsigned long[M];
-			double* current_degrees = (Size <= 496) ? reinterpret_cast<double*>(alloca(Size * sizeof(double))) : new double[Size];
-			for (unsigned long i = 0; i < Size; ++ i)
-				current_degrees[i] = m;
-			double total_degree = m*(m+1);
-			
-			Vector edges_to_add( (Size - (M+1))*M*2 );
-			unsigned long k = 0;
-				 
-			for (unsigned long i = M+1; i < Size; ++ i) {
-				XXINTRNL_random_choose(rangen, vertices_to_connect, M, current_degrees, i, total_degree);
+			Vertex* citations = new Vertex[M*(M+1) + (Size-(M+1))*M*2];
+			Vertex* citation_store = citations;
+			for (unsigned long i = 0; i <= M; ++ i)
 				for (unsigned long j = 0; j < M; ++ j) {
-					edges_to_add[k++] = i;
-					edges_to_add[k++] = vertices_to_connect[j];
-					current_degrees[vertices_to_connect[j]] += 1;
+					*citation_store = i;
+					++citation_store;
 				}
-				total_degree += m;
-				/*
-				for (unsigned long j = 0; j < i; ++ j)
-					printf("%lg ", current_degrees[j]);
-				printf("[%lg]\n", total_degree);
-				 */
+													 
+			for (unsigned long i = M+1; i < Size; ++ i) {
+				
+				// randomly pick M _non_repeating_ members from the possible citations.
+				for (unsigned long j = 0; j < M; ++ j) {
+				choose_again:
+					Vertex candidate_citation = citations[rangen.uniform_int(citation_store-citations)];
+					for (unsigned long l = 0; l < j; ++ l)
+						if (citation_store[l] == candidate_citation)
+							goto choose_again;
+					citation_store[j*2]   = i;
+					citation_store[j*2+1] = candidate_citation;
+				}
+				
+				citation_store += 2*M;
 			}
 			
-			if (M > 32) delete[] vertices_to_connect;
-			if (Size > 496) delete[] current_degrees;
+			RETRIEVE_TEMPORARY_CLASS(Graph) g = FORCE_STD_MOVE(Graph)(Graph::full(m+1).add_vertices(size - (m+1)).add_edges(VertexVector::view(citations+M*(M+1), (Size-(M+1))*M*2)));
 			
-			g.add_edges(edges_to_add);
+			delete[] citations;
 			
-			return FORCE_STD_MOVE(Graph)(g);
+			return g;
 		}
 	}
 

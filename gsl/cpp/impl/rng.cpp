@@ -48,7 +48,6 @@ namespace gsl {
 	
 	RETRIEVE_TEMPORARY_CLASS(Random) Random::default_generator() throw() {
 		gsl_rng* _ = gsl_rng_alloc(gsl_rng_default);
-		gsl_rng_set(_, gsl_rng_default_seed);
 		return ::std::move(Random(&_, ::tempobj::OwnershipTransferMove));
 	}
 	

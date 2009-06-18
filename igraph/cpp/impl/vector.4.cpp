@@ -221,7 +221,7 @@ template<> BasicVector<BASE>& BasicVector<BASE>::remove_first_matching_assume_so
 template<> ::tempobj::temporary_class<Vector>::type BasicVector<BASE>::distribution() const MAY_THROW_EXCEPTION {
 	assert(min() >= 0);
 	igraph_vector_t res;
-	TRY(igraph_vector_init(&res, static_cast<long>(max()) ));
+	TRY(igraph_vector_init(&res, static_cast<long>(max())+1 ));
 	Real delta = 1./size();
 	for (const_iterator cit = begin(); cit != end(); ++ cit)
 		VECTOR(res)[static_cast<long>(*cit)] += delta;

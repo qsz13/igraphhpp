@@ -83,27 +83,16 @@ namespace igraph {
 			VECTOR(_)[i] = new T(array[i]);
 	}
 	
+#if XXINTRNL_CXX0X
 	template<typename T>
-	ReferenceVector<T>::ReferenceVector(const long count, ...) MAY_THROW_EXCEPTION : manage_children_by_new_and_delete(false) {
+	ReferenceVector<T>::ReferenceVector(::std::initializer_list<const_reference> elements) MAY_THROW_EXCEPTION : manage_children_by_new_and_delete(true) {
 		XXINTRNL_DEBUG_CALL_INITIALIZER(ReferenceVector, <T>);
-#if __GNUC__ >= 3
-		void* arr[count];
-#else
-		void** arr = new void*[count];
-#endif
-		std::va_list va;
-		va_start(va, count);
-		for (long i = 0; i < count; ++ i)
-			arr[i] = va_arg(va, pointer);
-		va_end(va);
-		
-		TRY(igraph_vector_ptr_init_copy(&_, arr, count));
-		
-#if !(__GNUC__ >= 3)
-		// FIXME: May cause memory leak when an exception is thrown.
-		delete[] arr;
-#endif
+		TRY(igraph_vector_ptr_init(&_, elements.size()));
+		long i = 0;
+		for (auto cit = elements.begin(); cit != elements.end(); ++cit, ++i)
+			VECTOR(_)[i] = new T(*cit);
 	}
+#endif
 	
 	template<typename T>
 	RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T> ) view(typename ReferenceVector<T>::pointer* array, const long count) throw() {

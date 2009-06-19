@@ -24,16 +24,20 @@ _Revise these?_
    * `std::vector<Integer> stl_vector = std::vector<Integer> (igraph_vector.begin(), igraph_vector.end());`
    * `Vector igraph_vector = Vector (stl_vector.begin(), stl_vector.end());`
  * Always keep in mind that the igraph Integer is typedef-ed to be a double, not an int.
+ * Wrapper types must put the original type as the first member, and must not have virtual functions. This ensures conversions like these will succeed in most platforms:
+   * {{{ Graph g = ...; igraph_is_connected( (igraph_t*)&g, ... ); }}}
+ But such coding style should not be used.
 
 = Language features =
- * Avoid use of GCC C extensions, TR1 libraries or C++0x features, as these are not available in every compilers. If you really need these, you must provide an alternative that gives the same result when these feature are absent. You can test for each of these with:
+ * Avoid unnecessary use of GCC C extensions, TR1 libraries or C++0x features, as these are not available in every compilers. If you really need these, you must justify that the use is beneficial to the user by increased readiness or performance. Always provide an alternative that gives the same result when these feature are absent. You can test for each of these special configurations with:
    * GCC: `#if __GNUC__`
-   * C++0x: `#if __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus > 199711L`
+   * C++0x: `#if XXINTRNL_CXX0X`
  * Avoid the use of non-standard library, such as boost libraries. If the functionality of some library is required, all source code should be added them in this project.
+   * Avoid using boost features (e.g. `foreach`). Some people may not bother to download and configure boost.
  * Some of these features, however, have been dealt with, so you may freely use them. They are:
-   * `__attribute__`
+   * `__attribute__` (revert to nothing is GCC is not used.)
    * `std::move`
- * Avoid using boost features (e.g. `foreach`). Some people may not bother to download and configure boost.
+   * `gsl::Random` (revert to `rand()` if GSL is not included.)
  * All internal macro should be prefixed by `XXINTRNL_` so normal people won't see it. They should be used only in the file that defines it. `#undef` them after using if possible.
    * *FIXME*: `XXINTRNL_WRAPPER_CONSTRUCTOR_***` currently breaks this rule.
  * Unless you need `realloc()`, always allocate memory with `new[]`/`delete[]` or `alloca()`.
@@ -70,3 +74,20 @@ public:
 };
 }}}
  Outside of the class you'd refer to the enum by File::Type and the values by File::Binary and File::ASCII.)
+
+= Compiler support =
+ * The following compilers should be supported:
+   * Primary:
+     * `g++-4.4` (4.4.0 20090327) (Lau's machine)
+     * `g++-4.2` (4.2.1) (Kenny's machine)
+     * `g++-4.1` (4.1.2 20071124) (MOSIX)
+   * Secondary:
+     * `llvm-g++-4.2`
+     * Microsoft Visual C++ 2008
+     * Microsoft Visual C++ 2005 (Barn)
+
+= Documentation syntax =
+ * Doxygen syntax should be used.
+
+= License =
+ * All new code are licensed in GPLv3.

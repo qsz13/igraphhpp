@@ -161,7 +161,7 @@ namespace igraph {
 		
 #if XXINTRNL_CXX0X
 		/// Copy elements from an initializer list to ReferenceVector (C++0x only.)
-		ReferenceVector(::std::initializer_list<const_reference> elements) MAY_THROW_EXCEPTION;
+		ReferenceVector(::std::initializer_list<value_type> elements) MAY_THROW_EXCEPTION;
 #endif
 			
 		/// Wrap a C pointer array as a ReferenceVector.

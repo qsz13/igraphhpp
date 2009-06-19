@@ -85,7 +85,7 @@ namespace igraph {
 	
 #if XXINTRNL_CXX0X
 	template<typename T>
-	ReferenceVector<T>::ReferenceVector(::std::initializer_list<const_reference> elements) MAY_THROW_EXCEPTION : manage_children_by_new_and_delete(true) {
+	ReferenceVector<T>::ReferenceVector(::std::initializer_list<value_type> elements) MAY_THROW_EXCEPTION : manage_children_by_new_and_delete(true) {
 		XXINTRNL_DEBUG_CALL_INITIALIZER(ReferenceVector, <T>);
 		TRY(igraph_vector_ptr_init(&_, elements.size()));
 		long i = 0;

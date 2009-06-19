@@ -57,20 +57,20 @@ template<> BasicVector<BASE>::BasicVector(const char* vertices_as_string) MAY_TH
 	}
 }
 
-template<> RETRIEVE_TEMPORARY_CLASS(BasicVector<BASE>) BasicVector<BASE>::seq(const BASE from, const BASE to) MAY_THROW_EXCEPTION {
+template<> ::tempobj::force_temporary_class<BasicVector<BASE> >::type BasicVector<BASE>::seq(const BASE from, const BASE to) MAY_THROW_EXCEPTION {
 	TYPE _;
 	TRY(FUNC(init_seq)(&_, from, to));
-	return FORCE_STD_MOVE(BasicVector<BASE>)(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferMove));
+	return ::tempobj::force_move(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferMove));
 }
 
-template<> RETRIEVE_TEMPORARY_CLASS(BasicVector<BASE>) BasicVector<BASE>::zeros(const long count) MAY_THROW_EXCEPTION {
-	return FORCE_STD_MOVE(BasicVector<BASE>)(BasicVector<BASE>(count));
+template<> ::tempobj::force_temporary_class<BasicVector<BASE> >::type BasicVector<BASE>::zeros(const long count) MAY_THROW_EXCEPTION {
+	return ::tempobj::force_move(BasicVector<BASE>(count));
 }
 
-template<> RETRIEVE_TEMPORARY_CLASS(BasicVector<BASE>) BasicVector<BASE>::n() MAY_THROW_EXCEPTION {
+template<> ::tempobj::force_temporary_class<BasicVector<BASE> >::type BasicVector<BASE>::n() MAY_THROW_EXCEPTION {
 	TYPE _;
 	TRY(FUNC(init)(&_, 0));
-	return FORCE_STD_MOVE(BasicVector<BASE>)(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferMove));
+	return ::tempobj::force_move(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferMove));
 }
 
 #pragma mark -
@@ -93,7 +93,7 @@ template<> BASE BasicVector<BASE>::tail() const throw() { return FUNC(tail)(&_);
 template<> RETRIEVE_TEMPORARY_CLASS(BasicVector<BASE>) BasicVector<BASE>::view(const BASE* const array, const long count) throw() {
 	TYPE _;
 	FUNC(view)(&_, array, count);
-	return FORCE_STD_MOVE(BasicVector<BASE>)(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferNoOwnership));
+	return ::tempobj::force_move(BasicVector<BASE>(&_, ::tempobj::OwnershipTransferNoOwnership));
 }
 
 #pragma mark -
@@ -225,5 +225,5 @@ template<> ::tempobj::temporary_class<Vector>::type BasicVector<BASE>::distribut
 	Real delta = 1./size();
 	for (const_iterator cit = begin(); cit != end(); ++ cit)
 		VECTOR(res)[static_cast<long>(*cit)] += delta;
-	return FORCE_STD_MOVE(Vector)(Vector(&res, ::tempobj::OwnershipTransferMove));
+	return ::tempobj::force_move(Vector(&res, ::tempobj::OwnershipTransferMove));
 }

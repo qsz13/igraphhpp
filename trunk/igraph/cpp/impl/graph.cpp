@@ -56,8 +56,8 @@ namespace igraph {
 		TRY(igraph_empty(&_, size, directedness));
 	}
 
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::empty(Integer size, Directedness directedness) MAY_THROW_EXCEPTION {
-		return FORCE_STD_MOVE(Graph)(Graph(size, directedness));
+	::tempobj::force_temporary_class<Graph>::type Graph::empty(Integer size, Directedness directedness) MAY_THROW_EXCEPTION {
+		return ::tempobj::force_move(Graph(size, directedness));
 	}
 
 #pragma mark -
@@ -72,18 +72,18 @@ namespace igraph {
 		return e;
 	}
 
-	RETRIEVE_TEMPORARY_CLASS(VertexVector) Graph::neighbors(Vertex vid, NeighboringMode neimode) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<VertexVector>::type Graph::neighbors(Vertex vid, NeighboringMode neimode) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 0));
 		TRY(igraph_neighbors(&_, &res, vid, (igraph_neimode_t)neimode));
-		return FORCE_STD_MOVE(VertexVector)(VertexVector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 
-	RETRIEVE_TEMPORARY_CLASS(EdgeVector) Graph::adjacent(Vertex vid, NeighboringMode neimode) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<EdgeVector>::type Graph::adjacent(Vertex vid, NeighboringMode neimode) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 0));
 		TRY(igraph_adjacent(&_, &res, vid, (igraph_neimode_t)neimode));
-		return FORCE_STD_MOVE(EdgeVector)(EdgeVector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(EdgeVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 
 	Integer Graph::degree(Vertex i, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
@@ -93,13 +93,13 @@ namespace igraph {
 		Integer resdeg = VECTOR(res)[0];
 		return resdeg;
 	}
-	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::degree(const VertexSelector& vids, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Vector>::type Graph::degree(const VertexSelector& vids, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 0));
 		TRY(igraph_degree(&_, &res, vids._, (igraph_neimode_t)neimode, countLoops));
-		return FORCE_STD_MOVE(Vector)(Vector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Vector(&res, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::degree(NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Vector>::type Graph::degree(NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
 		return degree(VertexSelector::all(), neimode, countLoops);
 	}
 
@@ -137,84 +137,84 @@ namespace igraph {
 #pragma mark -
 #pragma mark Deterministic Graph Generators
 
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::create(const VertexVector& edges, const Integer min_size, const Directedness directedness) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::create(const VertexVector& edges, const Integer min_size, const Directedness directedness) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_create(&_, &edges._, min_size, directedness));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	// TODO: igraph_adjacency when Matrix is implemented.
 	// TODO: igraph_weighted_adjacency when Matrix is implemented.
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::adjlist(const AdjacencyList& lst, const Directedness directedness, const ToUndirectedMode duplicate_edges) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::adjlist(const AdjacencyList& lst, const Directedness directedness, const ToUndirectedMode duplicate_edges) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_adjlist(&_, &lst._, directedness, duplicate_edges == ToUndirectedMode_Each));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::star(const Integer n, const StarMode mode, const Vertex center) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::star(const Integer n, const StarMode mode, const Vertex center) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_star(&_, n, (igraph_star_mode_t)mode, center));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::lattice(const Vector& dimensions, const PeriodicLattice periodic, const Integer step, const Directedness directedness, const MutualConnections mutual) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::lattice(const Vector& dimensions, const PeriodicLattice periodic, const Integer step, const Directedness directedness, const MutualConnections mutual) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_lattice(&_, &dimensions._, step, directedness, mutual, periodic));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::lattice_2d(const Integer width, const Integer length, const PeriodicLattice periodic, const Integer step, const Directedness directedness, const MutualConnections mutual) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::lattice_2d(const Integer width, const Integer length, const PeriodicLattice periodic, const Integer step, const Directedness directedness, const MutualConnections mutual) MAY_THROW_EXCEPTION {
 		Integer raw_dimensions[2] = {width, length};
 		return lattice(Vector::view(raw_dimensions, 2), periodic, step, directedness, mutual);
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::lattice_3d(const Integer width, const Integer length, const Integer height, const PeriodicLattice periodic, const Integer step, const Directedness directedness, const MutualConnections mutual) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::lattice_3d(const Integer width, const Integer length, const Integer height, const PeriodicLattice periodic, const Integer step, const Directedness directedness, const MutualConnections mutual) MAY_THROW_EXCEPTION {
 		Integer raw_dimensions[3] = {width, length, height};
 		return lattice(Vector::view(raw_dimensions, 3), periodic, step, directedness, mutual);
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::ring(const Integer size, const Directedness directedness, const MutualConnections mutual, const PeriodicLattice periodic) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::ring(const Integer size, const Directedness directedness, const MutualConnections mutual, const PeriodicLattice periodic) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_ring(&_, size, directedness, mutual, periodic));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::tree(const Integer n, const Integer children, const TreeMode type) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::tree(const Integer n, const Integer children, const TreeMode type) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_tree(&_, n, children, (igraph_tree_mode_t)type));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::full(const Integer n, const Directedness directedness, const SelfLoops loops) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::full(const Integer n, const Directedness directedness, const SelfLoops loops) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_full(&_, n, directedness, loops));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::complete(const Integer n, const Directedness directedness, const SelfLoops loops) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::complete(const Integer n, const Directedness directedness, const SelfLoops loops) MAY_THROW_EXCEPTION {
 		return full(n, directedness, loops);
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::full_citation(const Integer n, const Directedness directedness) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::full_citation(const Integer n, const Directedness directedness) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_full_citation(&_, n, directedness));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::famous(const char* name) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::famous(const char* name) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_famous(&_, name));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::lcf_vector(const Integer n, const Vector& shifts, const Integer repeats) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::lcf_vector(const Integer n, const Vector& shifts, const Integer repeats) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_lcf_vector(&_, n, &shifts._, repeats));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::atlas(const int number) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::atlas(const int number) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_atlas(&_, number));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::de_bruijn(const Integer m, const Integer n) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::de_bruijn(const Integer m, const Integer n) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_de_bruijn(&_, m, n));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::kautz(const Integer m, const Integer n) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::kautz(const Integer m, const Integer n) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_kautz(&_, m, n));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	// TODO: igraph_extended_chordal_ring when Matrix is implemented.
 
@@ -226,25 +226,25 @@ namespace igraph {
 #pragma mark -
 #pragma mark Games: Randomized Graph Generators
 
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::grg_game(const Integer size, const Real radius, const PeriodicLattice periodic) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::grg_game(const Integer size, const Real radius, const PeriodicLattice periodic) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_grg_game(&_, size, radius, periodic, NULL, NULL));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::grg_game(const Integer size, const Real radius, const PeriodicLattice periodic, Vector& x_coords, Vector& y_coords) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::grg_game(const Integer size, const Real radius, const PeriodicLattice periodic, Vector& x_coords, Vector& y_coords) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_grg_game(&_, size, radius, periodic, &x_coords._, &y_coords._));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::barabasi_game(const Integer size, const Integer m, const Directedness directed, const BarabasiOutPref outpref) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::barabasi_game(const Integer size, const Integer m, const Directedness directed, const BarabasiOutPref outpref) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_barabasi_game(&_, size, m, NULL, outpref, directed));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::barabasi_game(const Integer size, const Vector& outseq, const Directedness directed, const BarabasiOutPref outpref) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::barabasi_game(const Integer size, const Vector& outseq, const Directedness directed, const BarabasiOutPref outpref) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_barabasi_game(&_, size, 0, &outseq._, outpref, directed));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	/*
@@ -272,8 +272,8 @@ namespace igraph {
 	}
 	*/
 	
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::barabasi_game_simple(const Integer size, const Integer m) MAY_THROW_EXCEPTION { return barabasi_game_simple(::gsl::Random::default_generator(), size, m); }
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::barabasi_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer m) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::barabasi_game_simple(const Integer size, const Integer m) MAY_THROW_EXCEPTION { return barabasi_game_simple(::gsl::Random::default_generator(), size, m); }
+	::tempobj::force_temporary_class<Graph>::type Graph::barabasi_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer m) MAY_THROW_EXCEPTION {
 		if (size <= m+1)
 			return Graph::full(size);
 		else {
@@ -302,7 +302,7 @@ namespace igraph {
 				citation_store += 2*M;
 			}
 			
-			RETRIEVE_TEMPORARY_CLASS(Graph) g = FORCE_STD_MOVE(Graph)(Graph::full(m+1).add_vertices(size - (m+1)).add_edges(VertexVector::view(citations+M*(M+1), (Size-(M+1))*M*2)));
+			::tempobj::force_temporary_class<Graph>::type g = ::tempobj::force_move(Graph::full(m+1).add_vertices(size - (m+1)).add_edges(VertexVector::view(citations+M*(M+1), (Size-(M+1))*M*2)));
 			
 			delete[] citations;
 			
@@ -310,17 +310,17 @@ namespace igraph {
 		}
 	}
 
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::watts_strogatz_game(const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::watts_strogatz_game(const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_watts_strogatz_game(&_, dimensions, size, K, p));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::watts_strogatz_game_simple(const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::watts_strogatz_game_simple(const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
 		return watts_strogatz_game_simple(::gsl::Random::default_generator(), size, K, p, dimensions);
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::watts_strogatz_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::watts_strogatz_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
 			Graph::Temporary base = dimensions == 1 ? Graph::ring(size) : Graph::lattice(Vector((long)dimensions).fill(size));
-		return FORCE_STD_MOVE(Graph)(base.connect_neighborhood(K).rewire_edges_simple(rangen, p));
+		return ::tempobj::force_move(base.connect_neighborhood(K).rewire_edges_simple(rangen, p));
 	}
 	
 	Graph& Graph::rewire_edges(const Real prob) MAY_THROW_EXCEPTION {
@@ -354,24 +354,24 @@ namespace igraph {
 #pragma mark -
 #pragma mark Graph Components
 	
-	RETRIEVE_TEMPORARY_CLASS(VertexVector) Graph::subcomponent(const Vertex representative, const NeighboringMode mode) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<VertexVector>::type Graph::subcomponent(const Vertex representative, const NeighboringMode mode) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 0));
 		TRY(igraph_subcomponent(&_, &res, representative, (igraph_neimode_t)mode));
-		return FORCE_STD_MOVE(VertexVector)(VertexVector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::subgraph(const VertexSelector& vs) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::subgraph(const VertexSelector& vs) const MAY_THROW_EXCEPTION {
 		igraph_t res;
 		TRY(igraph_subgraph(&_, &res, vs._));
-		return FORCE_STD_MOVE(Graph)(Graph(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&res, ::tempobj::OwnershipTransferMove));
 	}
 	void Graph::cluster(Vector& cluster_id_each_vertex_belongs_to, Vector& size_of_each_cluster, Connectedness connectedness) const MAY_THROW_EXCEPTION {
 		igraph_vector_t membership, csize;
 		TRY(igraph_vector_init(&membership, 0));
 		TRY(igraph_vector_init(&csize, 0));
 		TRY(igraph_clusters(&_, &membership, &csize, NULL, (igraph_connectedness_t)connectedness));
-		cluster_id_each_vertex_belongs_to = FORCE_STD_MOVE(Vector)(Vector(&membership, ::tempobj::OwnershipTransferMove));
-		size_of_each_cluster = FORCE_STD_MOVE(Vector)(Vector(&csize, ::tempobj::OwnershipTransferMove));
+		cluster_id_each_vertex_belongs_to = ::tempobj::force_move(Vector(&membership, ::tempobj::OwnershipTransferMove));
+		size_of_each_cluster = ::tempobj::force_move(Vector(&csize, ::tempobj::OwnershipTransferMove));
 	}
 	Integer Graph::cluster_count(const Connectedness connectedness) const MAY_THROW_EXCEPTION {
 		Integer res;
@@ -383,17 +383,17 @@ namespace igraph {
 		TRY(igraph_is_connected(&_, &res, (igraph_connectedness_t)connectedness));
 		return res;
 	}
-	RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Graph>) Graph::decompose(Connectedness connectedness, long max_component_number, long min_size_of_components) {
+	::tempobj::force_temporary_class<ReferenceVector<Graph> >::type Graph::decompose(Connectedness connectedness, long max_component_number, long min_size_of_components) {
 		igraph_vector_ptr_t res;
 		TRY(igraph_vector_ptr_init(&res, 0));
 		TRY(igraph_decompose(&_, &res, (igraph_connectedness_t)connectedness, max_component_number, min_size_of_components));
 		return ReferenceVector<Graph>::adopt<igraph_t>(res);
 	}
-	RETRIEVE_TEMPORARY_CLASS(VertexVector) Graph::articulation_points() const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<VertexVector>::type Graph::articulation_points() const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 0));
 		TRY(igraph_articulation_points(&_, &res));
-		return FORCE_STD_MOVE(VertexVector)(VertexVector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 
 #pragma mark -
@@ -409,12 +409,12 @@ namespace igraph {
 		TRY(igraph_transitivity_local_undirected(&_, &res._, igraph_vss_1(i)));
 		return res[0];
 	}
-	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::transitivity_local(const VertexSelector& vids) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Vector>::type Graph::transitivity_local(const VertexSelector& vids) const MAY_THROW_EXCEPTION {
 		Vector res ((long)vids.size(*this));
 		TRY(igraph_transitivity_local_undirected(&_, &res._, vids._));
 		return res;
 	}
-	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::transitivity_local() const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Vector>::type Graph::transitivity_local() const MAY_THROW_EXCEPTION {
 		Vector res (this->size());
 		TRY(igraph_transitivity_local_undirected(&_, &res._, igraph_vss_all()));
 		return ::std::move(res);
@@ -443,23 +443,23 @@ namespace igraph {
 		TRY(igraph_is_simple(&_, &res));
 		return res;
 	}
-	RETRIEVE_TEMPORARY_CLASS(BoolVector) Graph::is_loop(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<BoolVector>::type Graph::is_loop(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
 		igraph_vector_bool_t res;
 		TRY(igraph_vector_bool_init(&res, 0));
 		TRY(igraph_is_loop(&_, &res, es._));
-		return FORCE_STD_MOVE(BoolVector)(BoolVector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(BoolVector(&res, ::tempobj::OwnershipTransferMove));
 	}
-	RETRIEVE_TEMPORARY_CLASS(BoolVector) Graph::is_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<BoolVector>::type Graph::is_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
 		igraph_vector_bool_t res;
 		TRY(igraph_vector_bool_init(&res, 0));
 		TRY(igraph_is_multiple(&_, &res, es._));
-		return FORCE_STD_MOVE(BoolVector)(BoolVector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(BoolVector(&res, ::tempobj::OwnershipTransferMove));
 	}	
-	RETRIEVE_TEMPORARY_CLASS(Vector) Graph::count_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Vector>::type Graph::count_multiple(const EdgeSelector& es) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 0));
 		TRY(igraph_count_multiple(&_, &res, es._));
-		return FORCE_STD_MOVE(Vector)(Vector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Vector(&res, ::tempobj::OwnershipTransferMove));
 	}
 	
 	Graph& Graph::simplify() MAY_THROW_EXCEPTION {
@@ -479,25 +479,25 @@ namespace igraph {
 #pragma mark -
 #pragma mark Cliques
 	
-	RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Vector>) Graph::cliques(const Integer min_size, const Integer max_size) const {
+	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::cliques(const Integer min_size, const Integer max_size) const {
 		igraph_vector_ptr_t res;
 		TRY(igraph_vector_ptr_init(&res, 0));
 		TRY(igraph_cliques(&_, &res, min_size, max_size));
 		return ReferenceVector<Vector>::adopt<igraph_vector_t>(res);
 	}
 	
-	RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Vector>) Graph::cliques(const Integer max_size) const {
+	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::cliques(const Integer max_size) const {
 		return cliques(0, max_size);
 	}
 	
-	RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Vector>) Graph::largest_cliques() const {
+	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::largest_cliques() const {
 		igraph_vector_ptr_t res;
 		TRY(igraph_vector_ptr_init(&res, 0));
 		TRY(igraph_largest_cliques(&_, &res));
 		return ReferenceVector<Vector>::adopt<igraph_vector_t>(res);
 	}
 	
-	RETRIEVE_TEMPORARY_CLASS(ReferenceVector<Vector>) Graph::maximal_cliques() const {
+	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::maximal_cliques() const {
 		igraph_vector_ptr_t res;
 		TRY(igraph_vector_ptr_init(&res, 0));
 		TRY(igraph_maximal_cliques(&_, &res));
@@ -513,11 +513,11 @@ namespace igraph {
 #pragma mark -
 #pragma mark Reading and Writing Graphs from and to Files (GraphWriter)
 
-	RETRIEVE_TEMPORARY_CLASS(GraphWriter) Graph::writer(const char* filename) const {
-		return FORCE_STD_MOVE(GraphWriter)(GraphWriter(&_, filename));
+	::tempobj::force_temporary_class<GraphWriter>::type Graph::writer(const char* filename) const {
+		return ::tempobj::force_move(GraphWriter(&_, filename));
 	}
-	RETRIEVE_TEMPORARY_CLASS(GraphWriter) Graph::writer(std::FILE* filestream) const throw() {
-		return FORCE_STD_MOVE(GraphWriter)(GraphWriter(&_, filestream));
+	::tempobj::force_temporary_class<GraphWriter>::type Graph::writer(std::FILE* filestream) const throw() {
+		return ::tempobj::force_move(GraphWriter(&_, filestream));
 	}
 
 	bool Graph::write(const char* filename, GraphFormat format) const {
@@ -558,31 +558,31 @@ namespace igraph {
 		return false;
 	}
 
-	RETRIEVE_TEMPORARY_CLASS(GraphReader) Graph::reader(const char* filename) { return FORCE_STD_MOVE(GraphReader)(GraphReader(filename)); }
-	RETRIEVE_TEMPORARY_CLASS(GraphReader) Graph::reader(std::FILE* filestream) throw() { return FORCE_STD_MOVE(GraphReader)(GraphReader(filestream)); }
+	::tempobj::force_temporary_class<GraphReader>::type Graph::reader(const char* filename) { return ::tempobj::force_move(GraphReader(filename)); }
+	::tempobj::force_temporary_class<GraphReader>::type Graph::reader(std::FILE* filestream) throw() { return ::tempobj::force_move(GraphReader(filestream)); }
 
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::read(const char* filename, GraphFormat format) {
+	::tempobj::force_temporary_class<Graph>::type Graph::read(const char* filename, GraphFormat format) {
 		if (format == GraphFormat_auto)
 			format = identify_file_format(filename, false);
 		if (format != GraphFormat_auto) {
 			GraphReader reader = GraphReader(filename);
 			switch (format) {
 				case GraphFormat_adjlist:
-					return FORCE_STD_MOVE(Graph)(reader.adjlist());
+					return ::tempobj::force_move(reader.adjlist());
 //				case GraphFormat_dimacs:
 				case GraphFormat_dot:
 					break;
 				case GraphFormat_edgelist:
-					return FORCE_STD_MOVE(Graph)(reader.edgelist());
+					return ::tempobj::force_move(reader.edgelist());
 				case GraphFormat_gml:
-					return FORCE_STD_MOVE(Graph)(reader.gml());
+					return ::tempobj::force_move(reader.gml());
 				case GraphFormat_graphdb:
-					return FORCE_STD_MOVE(Graph)(reader.graphdb());
+					return ::tempobj::force_move(reader.graphdb());
 				case GraphFormat_lgl:
-					return FORCE_STD_MOVE(Graph)(reader.lgl());
+					return ::tempobj::force_move(reader.lgl());
 //				case GraphFormat_ncol:
 				case GraphFormat_pajek:
-					return FORCE_STD_MOVE(Graph)(reader.pajek());
+					return ::tempobj::force_move(reader.pajek());
 				default:
 					break;
 			}
@@ -596,49 +596,49 @@ namespace igraph {
 #define XXINTRNL_FORWARD_GRAPH_CREATION(temp, statement) \
 	igraph_t temp; \
 	TRY(statement); \
-	return FORCE_STD_MOVE(Graph)(Graph(&temp, ::tempobj::OwnershipTransferMove)); \
+	return ::tempobj::force_move(Graph(&temp, ::tempobj::OwnershipTransferMove)); \
 
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::disjoint_union(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::disjoint_union(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union(&tmp, &x._, &y._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::disjoint_union(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::disjoint_union(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union_many(&tmp, &gg._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::merge(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::merge(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union(&tmp, &x._, &y._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::merge(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::merge(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union_many(&tmp, &gg._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::intersection(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::intersection(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection(&tmp, &x._, &y._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::intersection(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::intersection(const ReferenceVector<Graph>& gg) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection_many(&tmp, &gg._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::difference(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::difference(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_difference(&tmp, &x._, &y._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::complementer(const Graph& x, SelfLoops loops) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::complementer(const Graph& x, SelfLoops loops) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_complementer(&tmp, &x._, (igraph_bool_t)loops) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::compose(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::compose(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_compose(&tmp, &x._, &y._) );
 	}
 
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator^ (const Graph& other) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::operator^ (const Graph& other) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union(&tmp, &_, &other._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator| (const Graph& other) MAY_THROW_EXCEPTION  {
+	::tempobj::force_temporary_class<Graph>::type Graph::operator| (const Graph& other) MAY_THROW_EXCEPTION  {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union(&tmp, &_, &other._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator& (const Graph& other) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::operator& (const Graph& other) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection(&tmp, &_, &other._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator- (const Graph& other) MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::operator- (const Graph& other) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_difference(&tmp, &_, &other._) );
 	}
-	RETRIEVE_TEMPORARY_CLASS(Graph) Graph::operator~ () MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::operator~ () MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_complementer(&tmp, &_, (igraph_bool_t)NoSelfLoops) );
 	}
 	Graph& Graph::operator^= (const Graph& other) MAY_THROW_EXCEPTION {

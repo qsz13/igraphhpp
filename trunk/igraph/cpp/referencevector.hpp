@@ -169,12 +169,7 @@ namespace igraph {
 		
 		/// Move an igraph_vector_ptr_t into a ReferenceVector, and also convert its content into the corresponding C++ types.
 		template <typename OriginalType>
-		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) adopt(igraph_vector_ptr_t& raw) {
-			for (void** it = raw.stor_begin; it != raw.end; ++it)
-				*it = new T(reinterpret_cast<OriginalType const*>(*it), ::tempobj::OwnershipTransferMove);
-			return FORCE_STD_MOVE_WITH_TEMPLATE(ReferenceVector<T>)(ReferenceVector<T>(&raw, ::tempobj::OwnershipTransferNoOwnership));
-		}
-
+		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) adopt(igraph_vector_ptr_t& raw);
 		 
 		ReferenceVector<T>& null() throw();
 		
@@ -223,4 +218,7 @@ namespace igraph {
 	
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, ReferenceVector, <T>);
 }
+
+#include <igraph/cpp/impl/referencevector.cpp>
+
 #endif

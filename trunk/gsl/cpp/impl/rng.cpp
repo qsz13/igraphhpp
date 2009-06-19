@@ -46,12 +46,12 @@ namespace gsl {
 #pragma mark -
 #pragma mark Random number generator algorithms
 	
-	RETRIEVE_TEMPORARY_CLASS(Random) Random::default_generator() throw() {
+	::tempobj::force_temporary_class<Random>::type Random::default_generator() throw() {
 		gsl_rng* _ = gsl_rng_alloc(gsl_rng_default);
-		return FORCE_STD_MOVE(Random)(Random(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Random(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-#define XXINTRNL_CREATE_CONSTRUCTOR(xxname) RETRIEVE_TEMPORARY_CLASS(Random) Random::xxname() throw() { return FORCE_STD_MOVE(Random)(Random(gsl_rng_##xxname)); }
+#define XXINTRNL_CREATE_CONSTRUCTOR(xxname) ::tempobj::force_temporary_class<Random>::type Random::xxname() throw() { return ::tempobj::force_move(Random(gsl_rng_##xxname)); }
 	
 	XXINTRNL_CREATE_CONSTRUCTOR(mt19937);
 	XXINTRNL_CREATE_CONSTRUCTOR(ranlxs0);
@@ -93,7 +93,7 @@ namespace gsl {
 	XXINTRNL_CREATE_CONSTRUCTOR(coveyou);
 	
 #define XXINTRNL_CREATE_UNIX_CONSTRUCTOR(vers) \
-	RETRIEVE_TEMPORARY_CLASS(Random) Random::random_##vers(const unsigned bitlength) throw() { \
+	::tempobj::force_temporary_class<Random>::type Random::random_##vers(const unsigned bitlength) throw() { \
 		const gsl_rng_type* type = gsl_rng_random_##vers; \
 		switch (bitlength) { \
 			case 8: type = gsl_rng_random8_##vers; break; \
@@ -103,7 +103,7 @@ namespace gsl {
 			case 256: type = gsl_rng_random256_##vers; break; \
 			default: break; \
 		} \
-		return FORCE_STD_MOVE(Random)(Random(type)); \
+		return ::tempobj::force_move(Random(type)); \
 	}
 	
 	XXINTRNL_CREATE_UNIX_CONSTRUCTOR(bsd);

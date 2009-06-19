@@ -40,42 +40,42 @@ namespace igraph {
 		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(EdgeSelector, igraph_es_t);
 		
 		/// Return an EdgeSelector of all edges.
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) all(EdgeOrderType ordering = OrderByID) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type all(EdgeOrderType ordering = OrderByID) MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector of the neighbors of a vertex.
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) adj(const Vertex which, const NeighboringMode mode = OutNeighbors) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type adj(const Vertex which, const NeighboringMode mode = OutNeighbors) MAY_THROW_EXCEPTION;
 				
 		/// Return an EdgeSelector of nothing.
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) none() MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type none() MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector a single edge.
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) single(const Edge which) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type single(const Edge which) MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector with edges identified as content of the vector.
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) vector(const EdgeVector& vec, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type vector(const EdgeVector& vec, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove) MAY_THROW_EXCEPTION;
 				
 		/// Return an EdgeSelector with edges inside the specified range.
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) seq(const Edge fromID, const Edge toID) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type seq(const Edge fromID, const Edge toID) MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector between two vertex sets
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) fromto(const VertexSelector& from, const VertexSelector& to) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type fromto(const VertexSelector& from, const VertexSelector& to) MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector of the single edge between the vertices.
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) fromto(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type fromto(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector defined by the endpoints
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) pairs(const VertexVector& vec, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type pairs(const VertexVector& vec, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		
 		/// ?
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) multipairs(const VertexVector& vec, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type multipairs(const VertexVector& vec, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		
 		/// Return an EdgeSelector on a path of vertices.
-		static RETRIEVE_TEMPORARY_CLASS(EdgeSelector) path(const VertexVector& vec, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<EdgeSelector>::type path(const VertexVector& vec, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		
 		int type() const throw() { return igraph_es_type(&_); }
 		bool is_all() throw() { return igraph_es_is_all(&_); }
 		
-		RETRIEVE_TEMPORARY_CLASS(EdgeVector) as_vector(const Graph& g) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<EdgeVector>::type as_vector(const Graph& g) const MAY_THROW_EXCEPTION;
 		Integer size(const Graph& g) const MAY_THROW_EXCEPTION;
 		
 		friend class Graph;

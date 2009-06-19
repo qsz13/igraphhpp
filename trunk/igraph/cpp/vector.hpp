@@ -42,7 +42,7 @@ namespace igraph {
 	
 	XXINTRNL_PREPARE_UNDERLYING_TYPES(BasicVector, vector);	
 	/**
-	 \class Vector
+	 \class BasicVector
 	 \brief Wrapper for igraph vectors
 	 
 	 This template class is a wrapper of the igraph vectors type.
@@ -79,17 +79,18 @@ namespace igraph {
 		BasicVector(const char* stringized_elements) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector sequentially between two values inclusively.
-		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(BasicVector<T>) seq(const T from, const T to) MAY_THROW_EXCEPTION;
+		typedef typename ::tempobj::force_temporary_class< BasicVector<T> >::type TemporaryVector;
+		static TemporaryVector seq(const T from, const T to) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector with "count" elements filled with zero.
 		__attribute__((deprecated,warning("BasicVector<T>::zeros is deprecated. Use the constructor BasicVector(x) (for x > 0) or BasicVector<T>::n (for x = 0) instead.")))
-		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(BasicVector<T>) zeros(const long count = 0) MAY_THROW_EXCEPTION;
+		static typename ::tempobj::force_temporary_class<BasicVector<T> >::type zeros(const long count = 0) MAY_THROW_EXCEPTION;
 		
 		/// Create a vector with "count" elements filled with zero.
-		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(BasicVector<T>) n() MAY_THROW_EXCEPTION;
+		static typename ::tempobj::force_temporary_class<BasicVector<T> >::type n() MAY_THROW_EXCEPTION;
 		
 		/// Wrap a C array as a Vector. 
-		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(BasicVector<T>) view(const T* const array, const long count) throw();
+		static typename ::tempobj::force_temporary_class<BasicVector<T> >::type view(const T* const array, const long count) throw();
 		
 		BasicVector<T>& null() throw();
 		BasicVector<T>& fill(const T e) throw();
@@ -200,6 +201,7 @@ namespace igraph {
 		BasicVector<T>& remove_first_matching_assume_sorted(const T e) throw();
 		
 		::tempobj::temporary_class<BasicVector<Real> >::type distribution() const MAY_THROW_EXCEPTION;
+		 
 		
 		friend class VertexSelector;
 		friend class VertexIterator;
@@ -208,6 +210,7 @@ namespace igraph {
 		friend class Graph;
 		friend class GraphWriter;
 		friend class GraphReader;
+		 
 	};
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicVector, <T>);
 	
@@ -216,5 +219,7 @@ namespace igraph {
 	typedef Vector VertexVector;
 	typedef Vector EdgeVector;
 }
+
+#include <igraph/cpp/impl/vector.cpp>
 										   
 #endif

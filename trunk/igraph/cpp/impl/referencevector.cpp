@@ -95,10 +95,10 @@ namespace igraph {
 #endif
 	
 	template<typename T>
-	RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T> ) view(typename ReferenceVector<T>::pointer* array, const long count) throw() {
+	typename ::tempobj::force_temporary_class<ReferenceVector<T> >::type view(typename ReferenceVector<T>::pointer* array, const long count) throw() {
 		igraph_vector_ptr_t _;
 		igraph_vector_ptr_view(&_, array, count);
-		return FORCE_STD_MOVE_WITH_TEMPLATE(ReferenceVector<T>)(ReferenceVector<T>(_, ::tempobj::OwnershipTransferNoOwnership));
+		return ::tempobj::force_move(ReferenceVector<T>(_, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
 	template<typename T>
@@ -178,6 +178,14 @@ namespace igraph {
 		for (T* const* cit = _.stor_begin; cit != _.end; ++ cit)
 			fptr(*cit, context);
 		return *this;
+	}
+	
+	template<typename T>
+	template<typename OriginalType>
+	RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) ReferenceVector<T>::adopt(igraph_vector_ptr_t& raw) {
+		for (void** it = raw.stor_begin; it != raw.end; ++it)
+			*it = new T(reinterpret_cast<OriginalType const*>(*it), ::tempobj::OwnershipTransferMove);
+			return ::tempobj::force_move(ReferenceVector<T>(&raw, ::tempobj::OwnershipTransferNoOwnership));
 	}
 	
 	template<typename T>

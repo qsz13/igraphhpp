@@ -35,8 +35,8 @@ namespace igraph {
 		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(AdjacencyList, igraph_adjlist_t);
 		
 		AdjacencyList(const Graph& g, NeighboringMode mode = OutNeighbors) MAY_THROW_EXCEPTION;
-		static RETRIEVE_TEMPORARY_CLASS(AdjacencyList) complementer(const Graph& g, NeighboringMode mode = OutNeighbors, SelfLoops loop = NoSelfLoops) MAY_THROW_EXCEPTION;
-		RETRIEVE_TEMPORARY_CLASS(Vector) operator[] (const Vertex v) const throw();
+		static ::tempobj::temporary_class<AdjacencyList>::type complementer(const Graph& g, NeighboringMode mode = OutNeighbors, SelfLoops loop = NoSelfLoops) MAY_THROW_EXCEPTION;
+		::tempobj::temporary_class<Vector>::type operator[] (const Vertex v) const throw();
 		Integer size() const throw();
 		AdjacencyList& sort() throw();
 		AdjacencyList& simplify() MAY_THROW_EXCEPTION;

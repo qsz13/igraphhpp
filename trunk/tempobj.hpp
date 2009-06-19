@@ -105,12 +105,14 @@ namespace tempobj {
 }
 #define XXINTRNL_PRINTF ::tempobj::debug_printf
 #else
+/// \internal Print debug messages for memory management to stdout.
 #define XXINTRNL_PRINTF(...)
 #endif
 
 #if __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus > 199711L
 #define XXINTRNL_CXX0X 1
 #else
+/// \internal Whether C++0x is enabled.
 #define XXINTRNL_CXX0X 0
 #endif
 
@@ -127,26 +129,63 @@ namespace tempobj {
 	struct temporary_class {
 		typedef T type;
 	};
+	template <typename T>
+	struct force_temporary_class {
+		typedef T type;
+	};
+	template <typename T>
+	static inline typename remove_reference<T>::type&& force_move(T&& a) {
+		return ::std::move(a);
+	}
+	
 }
 #define RETRIEVE_TEMPORARY_CLASS(...) __VA_ARGS__
 #define RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(...) __VA_ARGS__
 #else
-/// \internal
 #include <boost/type_traits.hpp>
 #include <boost/static_assert.hpp>
 
 namespace tempobj {
+	/// \internal Support structures to determine if a class has the ::Temporary subclass.
 	struct XXINTRNL_GetTmpClsImpl_A {char x[256];};
+	/// \internal Support functions to determine if a class has the ::Temporary subclass.
 	template <typename U> XXINTRNL_GetTmpClsImpl_A XXINTRNL_GetTmpClsImpl_B (const typename U::Temporary* p);
+	/// \internal Support functions to determine if a class has the ::Temporary subclass.
 	template <typename U> char                     XXINTRNL_GetTmpClsImpl_B (...);
 	
+	/// \internal Support types to determine if a class has the ::Temporary subclass.
 	template <typename T, int> struct XXINTRNL_GetTmpClsImpl         { typedef typename T::Temporary v; };
+	/// \internal Support types to determine if a class has the ::Temporary subclass.
 	template <typename T>      struct XXINTRNL_GetTmpClsImpl<T, 1>   { typedef          T            v; };
 	
 	template <typename T>
+	/** Returns the class that intends to hold a temporary instance.
+	 
+	 Use this class whether you want to return a temporary instance, in combination with a std::move.
+	 */
 	struct temporary_class {
 		typedef typename XXINTRNL_GetTmpClsImpl<T,sizeof(XXINTRNL_GetTmpClsImpl_B<T>(0))>::v type;
 	};
+	
+	template <typename T>
+	/** Force return the class that intends to hold a temporary instance.
+	 
+	 Use this class whether you want to return a temporary instance and know that class adopts the memory
+	 management interface defined in this file, in combination with a tempobj::force_move.
+	 */
+	struct force_temporary_class {
+		typedef typename T::Temporary type;
+	};
+	
+	template <typename T>
+	/** Force std::move.
+	 
+	 Use this function whether you want to return a temporary instance and know that class adopts the memory
+	 management interface defined in this file. The effect is same as std::move but more deterministic.
+	 */
+	static inline typename T::Temporary& force_move(const T& a) {
+		return reinterpret_cast<typename T::Temporary&>(const_cast<T&>(a));
+	}
 }
 #define XXINTRNL_PARAMTYPE(xx_typnm, ...) const xx_typnm __VA_ARGS__::Temporary&
 #define XXINTRNL_MOVETYPE(xx_typnm, ...) xx_typnm __VA_ARGS__::Temporary&
@@ -154,19 +193,54 @@ namespace tempobj {
 #define XXINTRNL_RRP2MT(xx_typnm, ...) const_cast<xx_typnm __VA_ARGS__::Temporary&>
 #define RETRIEVE_TEMPORARY_CLASS(...) __VA_ARGS__::Temporary
 #define RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(...) typename __VA_ARGS__::Temporary
-#define FORCE_STD_MOVE(...) ::std::move
-#define FORCE_STD_MOVE_WITH_TEMPLATE(...) ::std::move
-#include <typeinfo>
+#define FORCE_STD_MOVE(cls, ...) (::std::move((__VA_ARGS__)))
+#define FORCE_STD_MOVE_WITH_TEMPLATE(cls, ...) (::std::move((__VA_ARGS__)))
 namespace std {
 	
 	template <typename T>
+	/** Return the rvalue reference for the class.
+	 
+	 In C++03, the reference of the temporary class will be returned instead.
+	 */
 	struct add_rvalue_reference {
 		typedef typename ::tempobj::temporary_class<T>::type& type;
 	};
 
 	template <typename T>
+	/** \fn static inline typename add_rvalue_reference<T>::type move(const T& a)
+	 \brief Move an object to another memory location.
+	 
+	 This method indicates an ownership transfer.
+	 
+	 In our usage, copying here means a "deep copy". A completely new instance
+	 will be created that can be adopted by an owner separated from the old one.
+	 Copying ensures memory safety (no one will touch this except you), but it is
+	 typically very slow.
+	 
+	 When a large number of temporary objects is needed (e.g. in coding a+b+c+d+e),
+	 copying is a complete waste of resource. In this case, a different strategy
+	 -- moving, or "shallow copy" -- is needed. In moving, the original owner
+	 declares it no longer will manipulate the instance further. Therefore the
+	 instance can be transferred to the new owner unchanged. 
+	 
+	 To declare a move instead of a copy, you must wrap the instance with this
+	 ::std::move function, e.g.
+	 
+	 \code
+	 Vector v = w;              // Copying.
+	 w[0] = 42;                 // OK. v and w are owners of two different memory block.
+	 Vector t = ::std::move(w); // Moving.
+	 // w[0] = 14;              // Error. w is no longer a valid owner.
+	 \endcode
+	 
+	 \bug Sometimes, in C++03, ::std::move cannot successfully convert the class
+			 into its temporary subclass. If you are sure that the class uses the
+			 memory management interface defined in this file, you should use the
+			 FORCE_STD_MOVE macro instead. Plus, the macro is faster to process than
+			 a bunch of templates :)
+	 */
 	static inline typename add_rvalue_reference<T>::type move(const T& a) {
-		return (typename add_rvalue_reference<T>::type)(a);
+		return reinterpret_cast<typename add_rvalue_reference<T>::type>(const_cast<T&>(a));
 	};
 }
 /// \internal
@@ -183,8 +257,8 @@ public:                                                                         
 	Temporary(const Temporary& other) : cls(other) {}                           \
 }
 
-#define FORCE_STD_MOVE(...) *(const __VA_ARGS__::Temporary*)&
-#define FORCE_STD_MOVE_WITH_TEMPLATE(...) *(const typename __VA_ARGS__::Temporary*)&
+#define FORCE_STD_MOVE(cls, ...) (*reinterpret_cast<const cls::Temporary*>(&(__VA_ARGS__)))
+#define FORCE_STD_MOVE_WITH_TEMPLATE(cls, ...) (*reinterpret_cast<const typename cls::Temporary*>(&(__VA_ARGS__)))
 #endif
 
 /// Group a comma-separated list. Using this avoids the extra parenthesis.
@@ -312,11 +386,11 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (rhs_type other, XXINTRNL_P
 attrib XXINTRNL_RVALTYPE(xx_typnm, cls) operator op (const cls& xx_self, rhs_type other) { \
 	XXINTRNL_RVALTYPE(xx_typnm, cls) self = xx_self;                            \
 	self op##= other;                                                           \
-	return FORCE_STD_MOVE(xx_typnm cls)(self);                                  \
+	return FORCE_STD_MOVE(xx_typnm cls, self);                                  \
 }                                                                               \
 attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (XXINTRNL_PARAMTYPE(xx_typnm, cls) xx_self, rhs_type other) { \
 	XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self) op##= other;                        \
-	return FORCE_STD_MOVE(xx_typnm cls)(XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self)); \
+	return FORCE_STD_MOVE(xx_typnm cls, XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self)); \
 }
 
 /// \internal
@@ -324,11 +398,11 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (XXINTRNL_PARAMTYPE(xx_typn
 attrib XXINTRNL_RVALTYPE(xx_typnm, cls) operator op (lhs_type other, const cls& xx_self) { \
 	XXINTRNL_RVALTYPE(xx_typnm, cls) self = xx_self;                  \
 	self op##= other;                                                           \
-	return FORCE_STD_MOVE(xx_typnm cls)(self);                                  \
+	return FORCE_STD_MOVE(xx_typnm cls, self);                                  \
 }                                                                               \
 attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_PARAMTYPE(xx_typnm, cls) xx_self) { \
 	XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self) op##= other;                        \
-	return FORCE_STD_MOVE(xx_typnm cls)(XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self)); \
+	return FORCE_STD_MOVE(xx_typnm cls, XXINTRNL_RRP2MT(xx_typnm, cls)(xx_self)); \
 }
 
 //------------------------------------------------------------------------------
@@ -388,8 +462,8 @@ attrib XXINTRNL_PARAMTYPE(xx_typnm, cls) operator op (lhs_type other, XXINTRNL_P
  
  Example:
  \code
- MEMORY_MANAGER_IMPLEMENTATION_ATTR_WITH_TEMPLATE(
-	GROUP(template<typename K, typename V>), , HashTable, <K,V>
+ MEMORY_MANAGER_IMPLEMENTATION_WITH_TEMPLATE(
+	GROUP(template<typename K, typename V>), HashTable, <K,V>
  );
  \endcode 
  

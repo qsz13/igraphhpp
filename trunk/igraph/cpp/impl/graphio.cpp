@@ -105,7 +105,7 @@ namespace igraph {
 			igraph_vector_destroy(&resvec);
 		}
 		
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	::tempobj::temporary_class<Graph>::type GraphReader::adjlist(const Directedness directedness, const EdgeMultiplicity multiplicity, const char* line_separator) MAY_THROW_EXCEPTION {
@@ -175,7 +175,7 @@ namespace igraph {
 			igraph_vector_destroy(adjlist.adjs + i);
 		::std::free(adjlist.adjs);
 		
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	// TODO: ncol, after StringVector is implemented.
@@ -183,7 +183,7 @@ namespace igraph {
 	::tempobj::temporary_class<Graph>::type GraphReader::lgl(const lglNames names, const lglWeights weights) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_lgl(&_, fptr, names, weights));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	// TODO: dimacs, after StringVector is implemented.
@@ -191,25 +191,25 @@ namespace igraph {
 	::tempobj::temporary_class<Graph>::type GraphReader::graphml(const int index) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_graphml(&_, fptr, index));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	::tempobj::temporary_class<Graph>::type GraphReader::gml() MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_gml(&_, fptr));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	::tempobj::temporary_class<Graph>::type GraphReader::pajek() MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_pajek(&_, fptr));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	::tempobj::temporary_class<Graph>::type GraphReader::graphdb(const Directedness directedness) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_read_graph_graphdb(&_, fptr, directedness));
-		return FORCE_STD_MOVE(Graph)(Graph(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
 #pragma mark -

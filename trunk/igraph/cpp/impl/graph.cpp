@@ -86,7 +86,7 @@ namespace igraph {
 		return ::tempobj::force_move(EdgeVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 
-	Integer Graph::degree(Vertex i, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
+	Integer Graph::degree_of(Vertex i, NeighboringMode neimode, SelfLoops countLoops) const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vector_init(&res, 1));
 		TRY(igraph_degree(&_, &res, igraph_vss_1(i), (igraph_neimode_t)neimode, countLoops));
@@ -404,7 +404,7 @@ namespace igraph {
 		TRY(igraph_transitivity_undirected(&_, &res));
 		return res;
 	}
-	Real Graph::transitivity_local(Vertex i) const MAY_THROW_EXCEPTION {
+	Real Graph::transitivity_of(Vertex i) const MAY_THROW_EXCEPTION {
 		Vector res (1);
 		TRY(igraph_transitivity_local_undirected(&_, &res._, igraph_vss_1(i)));
 		return res[0];

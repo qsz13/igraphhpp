@@ -76,7 +76,9 @@ namespace igraph {
 		
 		Directedness is_directed() const throw() { return igraph_is_directed(&_) ? Directed : Undirected; }
 		
-		Integer degree(Vertex i, NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
+		Integer degree_of(Vertex i, NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
+		__attribute__((deprecated,warning("Graph::degree(Vertex) is deprecated. Use Graph::degree_of(Vertex) instead.")))
+		Integer degree(Vertex i, NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION { return degree_of(i, neimode, countLoops); }
 		::tempobj::force_temporary_class<Vector>::type degree(const VertexSelector& vids, NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Vector>::type degree(NeighboringMode neimode = OutNeighbors, SelfLoops countLoops = ContainSelfLoops) const MAY_THROW_EXCEPTION;
 		
@@ -190,7 +192,9 @@ namespace igraph {
 #pragma mark 10.9 Transitivity or Clustering Coefficient
 
 	Real transitivity() const MAY_THROW_EXCEPTION;
-	Real transitivity_local(Vertex i) const MAY_THROW_EXCEPTION;
+		Real transitivity_of(Vertex i) const MAY_THROW_EXCEPTION;
+		__attribute__((deprecated,warning("Graph::transitivity_local(Vertex) is deprecated. Use Graph::transitivity_of instead.")))
+		Real transitivity_local(Vertex i) const MAY_THROW_EXCEPTION { return transitivity_of(i); }
 	::tempobj::force_temporary_class<Vector>::type transitivity_local(const VertexSelector& vids) const MAY_THROW_EXCEPTION;
 	::tempobj::force_temporary_class<Vector>::type transitivity_local() const MAY_THROW_EXCEPTION;
 	Real transitivity_avglocal() const MAY_THROW_EXCEPTION;

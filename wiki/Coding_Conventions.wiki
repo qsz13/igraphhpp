@@ -12,8 +12,9 @@ _Revise these?_
    * `igraph_vector_null` → `igraph::Vector.null`
    * `igraph_degree` → `igraph::Graph.degree`
    * `igraph_vs_as_vector` → `igraph::VertexSelector.as_vector` 
- * If no ambiguity is introduced between the name and the actual function, then function may be overloaded, e.g.
-   * degree() return degree of all nodes, while degree(6) return degree of node 6.
+ * If the functions serve similar purpose _and_ return the same type, then they may share the same name, e.g.
+   * degree() return degree of all nodes, while degree(VertexSelector::single(6)) return degree of node 6 as a Vector.
+   * But degree_of(6) returns the degree of node 6 as an Integer, so it should take a different name.
  * Use the named constructor idiom unless default constructor really express its default meaning, e.g.
    *  Use `igraph::Vector::seq(Integer, Integer)` instead of `igraph::Vector::Vector(Integer, Integer)`. An uninformed seeing the statement `Vector(5., 12.)` may think you are creating a vector with 2 elements.
 

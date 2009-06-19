@@ -319,7 +319,7 @@ namespace igraph {
 		return watts_strogatz_game_simple(::gsl::Random::default_generator(), size, K, p, dimensions);
 	}
 	::tempobj::force_temporary_class<Graph>::type Graph::watts_strogatz_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
-			Graph::Temporary base = dimensions == 1 ? Graph::ring(size) : Graph::lattice(Vector((long)dimensions).fill(size));
+		::tempobj::force_temporary_class<Graph>::type base = dimensions == 1 ? Graph::ring(size) : Graph::lattice(Vector((long)dimensions).fill(size));
 		return ::tempobj::force_move(base.connect_neighborhood(K).rewire_edges_simple(rangen, p));
 	}
 	

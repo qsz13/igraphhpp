@@ -124,6 +124,7 @@ namespace tempobj {
 #define XXINTRNL_RRP2MT(xx_typnm, ...)						/// \internal // = CAST_FOR_MMMOVE
 #define XXINTRNL_TMPOBJ_INTERFACE				/// \internal
 #define XXINTRNL_MEMORY_MANAGER_INTERFACE_EX(...) /// \internal
+#define XXINTRNL_MEMORY_MANAGER_INTERFACE_EX_NO_COPYING(...) /// \internal
 namespace tempobj {
 	template <typename T>
 	struct temporary_class {
@@ -134,13 +135,14 @@ namespace tempobj {
 		typedef T type;
 	};
 	template <typename T>
-	static inline typename remove_reference<T>::type&& force_move(T&& a) {
+	static inline typename ::std::remove_reference<T>::type&& force_move(T&& a) {
 		return ::std::move(a);
-	}
-	
+	}	
 }
 #define RETRIEVE_TEMPORARY_CLASS(...) __VA_ARGS__
 #define RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(...) __VA_ARGS__
+#define FORCE_STD_MOVE(cls, ...) (::std::move((__VA_ARGS__)))
+#define FORCE_STD_MOVE_WITH_TEMPLATE(cls, ...) (::std::move((__VA_ARGS__)))
 #else
 #include <boost/type_traits.hpp>
 #include <boost/static_assert.hpp>
@@ -193,8 +195,6 @@ namespace tempobj {
 #define XXINTRNL_RRP2MT(xx_typnm, ...) const_cast<xx_typnm __VA_ARGS__::Temporary&>
 #define RETRIEVE_TEMPORARY_CLASS(...) __VA_ARGS__::Temporary
 #define RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(...) typename __VA_ARGS__::Temporary
-#define FORCE_STD_MOVE(cls, ...) (::std::move((__VA_ARGS__)))
-#define FORCE_STD_MOVE_WITH_TEMPLATE(cls, ...) (::std::move((__VA_ARGS__)))
 namespace std {
 	
 	template <typename T>

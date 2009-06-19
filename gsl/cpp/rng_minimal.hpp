@@ -86,8 +86,8 @@ namespace gsl {
 		
 #pragma mark -
 #pragma mark Random number generator algorithms
-		static RETRIEVE_TEMPORARY_CLASS(Random) default_generator() throw();
-		static RETRIEVE_TEMPORARY_CLASS(Random) rand() throw();
+		static ::tempobj::force_temporary_class<Random>::type default_generator() throw();
+		static ::tempobj::force_temporary_class<Random>::type rand() throw();
 
 #pragma mark -
 #pragma mark Shuffling and Sampling
@@ -132,8 +132,8 @@ namespace gsl {
 	IMPLEMENT_MOVE_METHOD(Random) {}
 	IMPLEMENT_DEALLOC_METHOD(Random) {}
 	
-	RETRIEVE_TEMPORARY_CLASS(Random) Random::default_generator() throw() { return FORCE_STD_MOVE(Random)(Random(NULL)); }
-	RETRIEVE_TEMPORARY_CLASS(Random) Random::rand() throw() { return FORCE_STD_MOVE(Random)(Random(NULL)); }
+	::tempobj::force_temporary_class<Random>::type Random::default_generator() throw() { return ::tempobj::force_move(Random(NULL)); }
+	::tempobj::force_temporary_class<Random>::type Random::rand() throw() { return ::tempobj::force_move(Random(NULL)); }
 }
 
 #endif

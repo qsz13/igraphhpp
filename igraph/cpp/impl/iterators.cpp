@@ -27,16 +27,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/edgeiterator.hpp>
 
 namespace igraph {
-	RETRIEVE_TEMPORARY_CLASS(VertexVector) VertexIterator::as_vector() const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<VertexVector>::type VertexIterator::as_vector() const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_vit_as_vector(&_, &res));
-		return FORCE_STD_MOVE(VertexVector)(VertexVector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(VertexVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 	
-	RETRIEVE_TEMPORARY_CLASS(EdgeVector) EdgeIterator::as_vector() const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<EdgeVector>::type EdgeIterator::as_vector() const MAY_THROW_EXCEPTION {
 		igraph_vector_t res;
 		TRY(igraph_eit_as_vector(&_, &res));
-		return FORCE_STD_MOVE(EdgeVector)(EdgeVector(&res, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(EdgeVector(&res, ::tempobj::OwnershipTransferMove));
 	}
 }
 

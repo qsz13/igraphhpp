@@ -19,9 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#include <stdexcept>
+#include <igraph/cpp/vector.hpp>
 #include <igraph/cpp/adjlist.hpp>
 #include <igraph/cpp/graph.hpp>
-#include <stdexcept>
 
 namespace igraph {
 	MEMORY_MANAGER_IMPLEMENTATION_NO_COPYING(AdjacencyList);
@@ -38,14 +39,14 @@ namespace igraph {
 		TRY(igraph_adjlist_init(&g._, &_, (igraph_neimode_t)mode));
 	}
 	
-	RETRIEVE_TEMPORARY_CLASS(AdjacencyList) AdjacencyList::complementer(const Graph& g, NeighboringMode mode, SelfLoops loop) MAY_THROW_EXCEPTION {
+	::tempobj::temporary_class<AdjacencyList>::type AdjacencyList::complementer(const Graph& g, NeighboringMode mode, SelfLoops loop) MAY_THROW_EXCEPTION {
 		igraph_adjlist_t _;
 		TRY(igraph_adjlist_init_complementer(&g._, &_, (igraph_neimode_t)mode, loop));
-		return FORCE_STD_MOVE(AdjacencyList)(AdjacencyList(&_, ::tempobj::OwnershipTransferMove));
+		return ::tempobj::force_move(AdjacencyList(&_, ::tempobj::OwnershipTransferMove));
 	}
 	
-	RETRIEVE_TEMPORARY_CLASS(Vector) AdjacencyList::operator[](const Vertex v) const throw() {
-		return FORCE_STD_MOVE(Vector)(Vector(igraph_adjlist_get(&_, v), ::tempobj::OwnershipTransferKeepOriginal));
+	::tempobj::temporary_class<Vector>::type AdjacencyList::operator[](const Vertex v) const throw() {
+		return ::tempobj::force_move(Vector(igraph_adjlist_get(&_, v), ::tempobj::OwnershipTransferKeepOriginal));
 	}
 	
 	AdjacencyList& AdjacencyList::sort() throw() {

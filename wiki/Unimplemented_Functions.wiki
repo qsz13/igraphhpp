@@ -5,6 +5,8 @@ Items in <font color="red">red</font> are more urgent ones that should be done f
 
 Remove the section if you have done that part. Once everything is completed, this page shall disappear :).
 
+Please mark down those items by <font color="green">your name</font> if they are under development that take more than one day to avoid duplicating effort.
+
 = 4 About igraph graphs, the basic interface =
 == 4.2 The basic interface ==
 === 4.2.1 Graph Constructors and Destructors ===

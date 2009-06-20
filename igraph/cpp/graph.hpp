@@ -161,6 +161,11 @@ namespace igraph {
 		static ::tempobj::force_temporary_class<Graph>::type watts_strogatz_game(const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type watts_strogatz_game_simple(const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type watts_strogatz_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type erdos_renyi_game(Integer size, Real prob, Directedness directedness = Undirected, SelfLoops self_loops = NoSelfLoops) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type erdos_renyi_game_simple(const ::gsl::Random& rangen, Integer size, Real prob, Directedness directedness = Undirected, SelfLoops self_loops = NoSelfLoops) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type erdos_renyi_game_simple(Integer size, Real prob, Directedness directedness = Undirected, SelfLoops self_loops = NoSelfLoops) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type erdos_renyi_Gnm_game(Integer size, Integer edges, Directedness directedness = Undirected, SelfLoops self_loops = NoSelfLoops) MAY_THROW_EXCEPTION;
+		// TODO: erdos_renyi_Gnm_game_simple
 		
 		Graph& rewire_edges(const Real prob) MAY_THROW_EXCEPTION;
 		/// Randomly rewire edges and produce a simple graph.

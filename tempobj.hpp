@@ -144,9 +144,6 @@ namespace tempobj {
 #define FORCE_STD_MOVE(cls, ...) (::std::move((__VA_ARGS__)))
 #define FORCE_STD_MOVE_WITH_TEMPLATE(cls, ...) (::std::move((__VA_ARGS__)))
 #else
-#include <boost/type_traits.hpp>
-#include <boost/static_assert.hpp>
-
 namespace tempobj {
 	/// \internal Support structures to determine if a class has the ::Temporary subclass.
 	struct XXINTRNL_GetTmpClsImpl_A {char x[256];};

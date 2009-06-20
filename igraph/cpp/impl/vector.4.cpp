@@ -135,8 +135,8 @@ IMMEDIATE_OPERATOR_IMPLEMENTATION(BasicVector<BASE>, /);
 #pragma mark -
 #pragma mark Finding minimum and maximum
 
-template<> BASE BasicVector<BASE>::min() const throw() { return FUNC(min)(&_); }
-template<> BASE BasicVector<BASE>::max() const throw() { return FUNC(max)(&_); }
+template<> Real BasicVector<BASE>::min() const throw() { return FUNC(min)(&_); }
+template<> Real BasicVector<BASE>::max() const throw() { return FUNC(max)(&_); }
 template<> long BasicVector<BASE>::which_min() const throw() { return FUNC(which_min)(&_); }
 template<> long BasicVector<BASE>::which_max() const throw() { return FUNC(which_max)(&_); }
 template<> void BasicVector<BASE>::minmax(BASE& minStore, BASE& maxStore) const MAY_THROW_EXCEPTION { TRY(FUNC(minmax)(&_, &minStore, &maxStore)); }
@@ -149,8 +149,8 @@ template<> bool BasicVector<BASE>::empty() const throw() { return FUNC(empty)(&_
 template<> long BasicVector<BASE>::size() const throw() { return FUNC(size)(&_); }
 template<> bool BasicVector<BASE>::isnull() const throw() { return FUNC(isnull)(&_); }
 
-template<> BASE BasicVector<BASE>::sum() const throw() { return FUNC(sum)(&_); }
-template<> BASE BasicVector<BASE>::prod() const throw() { return FUNC(prod)(&_); }
+template<> Real BasicVector<BASE>::sum() const throw() { return FUNC(sum)(&_); }
+template<> Real BasicVector<BASE>::prod() const throw() { return FUNC(prod)(&_); }
 template<> bool BasicVector<BASE>::isininterval(BASE low, BASE high) const throw() { return FUNC(isininterval)(&_, low, high); }
 template<> bool BasicVector<BASE>::any_smaller(BASE upper_limit) const throw() { return FUNC(any_smaller)(&_, upper_limit); }
 template<> bool BasicVector<BASE>::operator== (const BasicVector<BASE>& other) const throw() { return FUNC(is_equal)(&_, &other._); }

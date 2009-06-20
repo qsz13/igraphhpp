@@ -17,9 +17,6 @@ All unimplemented
 
 = 6 Data structure library =
 
-== 6.3 Matrices ==
-<font color="red">All unimplemented.</font> <font color="green">(_to be implemented by_ Kenny.)</font>
-
 == 6.4 Sparse matrices ==
 All unimplemented.
 

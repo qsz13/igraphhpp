@@ -65,8 +65,11 @@ namespace igraph {
 	}
 	
 	template<typename T>
-	ReferenceVector<T>::ReferenceVector(const long count) MAY_THROW_EXCEPTION : manage_children_by_new_and_delete(false) {
+	ReferenceVector<T>::ReferenceVector(const long count) MAY_THROW_EXCEPTION : manage_children_by_new_and_delete(true) {
+		XXINTRNL_DEBUG_CALL_INITIALIZER(ReferenceVector, <T>);
 		TRY(igraph_vector_ptr_init(&_, count));
+		for (T** it = reinterpret_cast<T**>(_.stor_begin); it != reinterpret_cast<T**>(_.end); ++ it)
+			*it = new T;
 	}
 	
 	template<typename T>
@@ -95,10 +98,17 @@ namespace igraph {
 #endif
 	
 	template<typename T>
-	typename ::tempobj::force_temporary_class<ReferenceVector<T> >::type view(typename ReferenceVector<T>::pointer* array, const long count) throw() {
+	RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) ReferenceVector<T>::view(typename ReferenceVector<T>::pointer* array, const long count) throw() {
 		igraph_vector_ptr_t _;
 		igraph_vector_ptr_view(&_, array, count);
 		return ::tempobj::force_move(ReferenceVector<T>(_, ::tempobj::OwnershipTransferNoOwnership));
+	}
+	
+	template<typename T>
+	RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) ReferenceVector<T>::nullptrs(const long count) MAY_THROW_EXCEPTION {
+		igraph_vector_ptr_t _;
+		TRY(igraph_vector_ptr_init(&_, count));
+		return ::tempobj::force_move(ReferenceVector<T>(_, ::tempobj::OwnershipTransferMove));
 	}
 	
 	template<typename T>

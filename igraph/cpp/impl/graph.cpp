@@ -340,7 +340,7 @@ namespace igraph {
 #if __MSVC__
 #define XXINTRNL_LOG1P(p) (::std::log(1.0 + (p)))	// there is no log1p in windows. fake with log(1+p).
 #else
-#define XXINTRNL_LOG1P(p) (::std::log1p(p))
+#define XXINTRNL_LOG1P(p) (::log1p(p))
 #endif
 	// Ref: https://networkx.lanl.gov/trac/browser/networkx/trunk/networkx/generators/random_graphs.py (fast_gnp_random_graph)
 	::tempobj::force_temporary_class<Graph>::type Graph::erdos_renyi_game_simple(const ::gsl::Random& rangen, Integer size, Real prob, Directedness directedness, SelfLoops self_loops) MAY_THROW_EXCEPTION {

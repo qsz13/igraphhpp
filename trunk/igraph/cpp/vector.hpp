@@ -123,8 +123,8 @@ namespace igraph {
 		BasicVector<T>& operator*= (const BasicVector<T>& k) MAY_THROW_EXCEPTION;
 		BasicVector<T>& operator/= (const BasicVector<T>& k) MAY_THROW_EXCEPTION;
 		
-		T min() const throw();
-		T max() const throw();
+		Real min() const throw();
+		Real max() const throw();
 		long which_min() const throw();
 		long which_max() const throw();
 		void minmax(T& minStore, T& maxStore) const MAY_THROW_EXCEPTION;
@@ -133,8 +133,8 @@ namespace igraph {
 		bool empty() const throw();
 		long size() const throw();
 		
-		T sum() const throw();
-		T prod() const throw();
+		Real sum() const throw();
+		Real prod() const throw();
 		bool isnull() const throw();
 		bool isininterval(T low, T high) const throw();
 		bool any_smaller(T upper_limit) const throw();

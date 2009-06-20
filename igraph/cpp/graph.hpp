@@ -171,6 +171,9 @@ namespace igraph {
 		/// Randomly rewire edges and produce a simple graph.
 		Graph& rewire_edges_simple(const Real prob) MAY_THROW_EXCEPTION;
 		Graph& rewire_edges_simple(const ::gsl::Random& rangen, const Real prob) MAY_THROW_EXCEPTION;
+		
+		// What is this? No probability at all?
+		Graph& rewire(Integer max_trials = 16) MAY_THROW_EXCEPTION;
 				
 #pragma mark -
 #pragma mark Basic Properties

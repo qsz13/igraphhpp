@@ -382,6 +382,11 @@ namespace igraph {
 		}
 		return *this;
 	}
+	
+	Graph& Graph::rewire(Integer max_trials) MAY_THROW_EXCEPTION {
+		TRY(igraph_rewire(&_, max_trials, IGRAPH_REWIRING_SIMPLE));
+		return *this;
+	}
 
 #pragma mark -
 #pragma mark Basic Properties

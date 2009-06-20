@@ -671,7 +671,7 @@ cls __VA_ARGS__::cls(orig_type const* pOrig, const ::tempobj::OwnershipTransfer 
 
 /// \internal
 #define XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(constr_name, orig_type) \
-constr_name(orig_type const* pOrig = NULL, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove)
+explicit constr_name(orig_type const* pOrig = NULL, const ::tempobj::OwnershipTransfer transfer = ::tempobj::OwnershipTransferMove)
 
 
 #endif

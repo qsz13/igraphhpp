@@ -171,11 +171,14 @@ namespace igraph {
 		template <typename OriginalType>
 		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) adopt(igraph_vector_ptr_t& raw);
 		 
+		/// Allocate a ReferenceVector of null pointers. Attempt to access any elements directly will result in segfault.
+		static RETRIEVE_TEMPORARY_CLASS_WITH_TEMPLATE(ReferenceVector<T>) nullptrs(const long count) MAY_THROW_EXCEPTION;
+		
 		ReferenceVector<T>& null() throw();
 		
 		pointer* ptr() throw() { return VECTOR(_); }
-		const_reference operator[](const long index) const throw() { return **reinterpret_cast<const const_pointer*>(VECTOR(_)[index]); }
-		reference operator[](const long index) throw() { return **reinterpret_cast<pointer*>(VECTOR(_)[index]); }
+		const_reference operator[](const long index) const throw() { return *reinterpret_cast<const_pointer>(VECTOR(_)[index]); }
+		reference operator[](const long index) throw() { return *reinterpret_cast<pointer>(VECTOR(_)[index]); }
 		
 		pointer e(const long index) const throw();
 		/// Note: DO NOT supply OwnershipTransferKeepOriginal in the last argument.

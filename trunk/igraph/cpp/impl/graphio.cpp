@@ -227,8 +227,7 @@ namespace igraph {
 	
 	GraphWriter::GraphWriter(const igraph_t* graph, const char* filename)
 		: _(graph), fptr(::std::fopen(filename, "w")), COMMON_INIT_WITH(::tempobj::OwnershipTransferMove) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphWriter); }
-	GraphWriter::GraphWriter(const igraph_t* graph, std::FILE* filestream) throw()
-		: _(graph), fptr(filestream), COMMON_INIT_WITH(::tempobj::OwnershipTransferNoOwnership) { XXINTRNL_DEBUG_CALL_INITIALIZER(GraphWriter); }
+	GraphWriter::GraphWriter(const igraph_t* graph, std::FILE* filestream) throw() : _(graph), fptr(filestream), COMMON_INIT_WITH(::tempobj::OwnershipTransferNoOwnership) { }
 
 	void GraphWriter::edgelist(const char* separator, const char* line_separator) MAY_THROW_EXCEPTION {
 		if (separator == NULL && line_separator == NULL) {

@@ -186,7 +186,7 @@ namespace igraph {
 				if (is_first)
 					is_first = false;
 				else
-					::std::fprintf(f, separator);
+					::std::fprintf(f, "%s", separator);
 				XXINTRNL_fprintf(f, *cit);
 			}
 			::std::fprintf(f, "\n");

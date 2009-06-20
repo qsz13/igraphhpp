@@ -19,6 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+#ifndef IGRAPH_ADJLIST_CPP
+#define IGRAPH_ADJLIST_CPP
+
 #include <stdexcept>
 #include <igraph/cpp/vector.hpp>
 #include <igraph/cpp/adjlist.hpp>
@@ -63,3 +66,5 @@ namespace igraph {
 		return igraph_adjlist_size(&_);
 	}
 }
+
+#endif

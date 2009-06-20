@@ -18,7 +18,7 @@ All unimplemented
 = 6 Data structure library =
 
 == 6.3 Matrices ==
-<font color="red">All unimplemented.</font> <font color="green">[Kenny.]</font>
+<font color="red">All unimplemented.</font> <font color="green">(_to be implemented by_ Kenny.)</font>
 
 == 6.4 Sparse matrices ==
 All unimplemented.
@@ -53,7 +53,6 @@ All unimplemented.
  * `igraph_nonlinear_barabasi_game`
  * `igraph_degree_sequence_game`
  * `igraph_forest_fire_game`
- * <font color="red">`igraph_rewire`</font> <font color="green">[Kenny.]</font>
  * `igraph_growing_random_game`
  * `igraph_callaway_traits_game` _requires_ <font color="red">Matrix</font>
  * `igraph_establishment_game` _requires_ <font color="red">Matrix</font>
@@ -66,7 +65,7 @@ All unimplemented.
  * `igraph_citing_cited_type_game` _requires_ <font color="red">Matrix</font>
 
 Besides wrapping the original ones, we also need to create the corresponding ones that give simple graphs. See issue 1. The undone parts are<font color="red">
- * Rewire (preserve degree distribution) <font color="green">[Kenny.]</font>
+ * Rewire (preserve degree distribution) <font color="green">(_to be implemented by_ Kenny.)</font>
 </font>
 
 = 9 Graph, Vertex and Edge Attributes =

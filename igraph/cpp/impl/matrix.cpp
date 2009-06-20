@@ -1,6 +1,6 @@
 /*
 
-vector.cpp ... Wrapper implementation of igraph vector.
+matrix.cpp ... Wrapper implementation of igraph matrix.
 
 Copyright (C) 2009  KennyTM~
 

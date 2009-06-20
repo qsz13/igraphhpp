@@ -29,35 +29,40 @@ using namespace igraph;
 int main () {    
 	Graph F = Graph::full(5);
 	Graph G = Graph::full(4);
-	Graph H = Graph::full(3);
-	//ReferenceVector<Graph> glist(3l);
+	Graph H = Graph::star(5);
+	Graph J = Graph::full(3);
 
-	printf("\nGraph operation fucntion test\n----------------\n");
-	Graph::disjoint_union(F,H).write("test1.txt",GraphFormat_adjlist);
-	//Graph::disjoint_union(glist).write("test2.txt",GraphFormat_adjlist);
-	Graph::merge(F,H).write("test3.txt",GraphFormat_adjlist);
-	//Graph::merge(glist).write("test4.txt",GraphFormat_adjlist);
-	Graph::intersection(F,H).write("test5.txt",GraphFormat_adjlist);
-	//Graph::intersection(glist).write("test6.txt",GraphFormat_adjlist);
-	Graph::difference(F,H).write("test7.txt",GraphFormat_adjlist);
-	Graph::complementer(F).write("test8.txt",GraphFormat_adjlist);
-	Graph::compose(F,H).write("test9.txt",GraphFormat_adjlist);
+	printf("\n\nGraph operation fucntion test\n----------------\n");	
+	Graph::disjoint_union(F,H).writer(stdout).adjlist();  printf("\n---\n");
+	Graph::merge(F,H).writer(stdout).adjlist();  printf("\n---\n");
+	Graph::intersection(F,H).writer(stdout).adjlist();  printf("\n---\n");
+	Graph::difference(F,H).writer(stdout).adjlist();  printf("\n---\n");
+	Graph::complementer(F).writer(stdout).adjlist();  printf("\n---\n");
+	Graph::compose(F,H).writer(stdout).adjlist();  printf("\n---\n");
 
-	printf("\nGraph operator test\n----------------\n");
-	(F ^ H).write("test11.txt",GraphFormat_adjlist);
-	(F | H).write("test12.txt",GraphFormat_adjlist);
-	(F & H).write("test13.txt",GraphFormat_adjlist);
-	(F - H).write("test14.txt",GraphFormat_adjlist);
+	printf("\n\nGraph operator test\n----------------\n");
+	(F ^ H).writer(stdout).adjlist();  printf("\n---\n");
+	(F | H).writer(stdout).adjlist();  printf("\n---\n");
+	(F & H).writer(stdout).adjlist();  printf("\n---\n");
+	(F - H).writer(stdout).adjlist();  printf("\n---\n");
+	(~H).writer(stdout).adjlist();  printf("\n---\n");
 
-	printf("\nGraph operators combination test\n----------------\n");
-	Graph t1 = F - G;
-	t1.write("test21.txt",GraphFormat_adjlist);
+	printf("\n\nGraph operators combination test\n----------------\n");
+	Graph t1 = (~H) - J;
+	t1.writer(stdout).adjlist();  printf("\n---\n");
 	Graph t2 = (F - G) | H;
-	t2.write("test22.txt",GraphFormat_adjlist);
-	Graph t3 = (F - G) ^ (H & F);
-	t3.write("test23.txt",GraphFormat_adjlist);
+	t2.writer(stdout).adjlist();  printf("\n---\n");
+	Graph t3 = (F - G) ^ (J & F);
+	t3.writer(stdout).adjlist();  printf("\n---\n");
 
-	printf("\nTest end\n----------------\n");
-	
+	printf("\n\ngraph operation many\n----------------\n");
+
+	ReferenceVector<Graph> glist = (F ^ G ^ H ^ J).decompose();
+	Graph::disjoint_union(glist).writer(stdout).adjlist();  printf("\n---\n");
+	Graph::merge(glist).writer(stdout).adjlist();  printf("\n---\n");
+	Graph::intersection(glist).writer(stdout).adjlist();  printf("\n---\n");
+
+	printf("\n\nTest end\n----------------\n");
+
 	return 0;
 }

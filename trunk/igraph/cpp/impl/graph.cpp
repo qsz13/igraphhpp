@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/adjlist.hpp>
 #include <gsl/cpp/rng_minimal.hpp>
 #include <stdexcept>
+#include <cmath>
 
 namespace igraph {
 
@@ -278,15 +279,15 @@ namespace igraph {
 			return Graph::full(size);
 		else {
 			unsigned long M = static_cast<unsigned long>(m), Size = static_cast<unsigned long>(size);
-			Vertex* citations = new Vertex[M*(M+1) + (Size-(M+1))*M*2];
+			Vertex* citations = new Vertex[2*M*Size];
 			Vertex* citation_store = citations;
-			for (unsigned long i = 0; i <= M; ++ i)
-				for (unsigned long j = 0; j < M; ++ j) {
-					*citation_store = i;
-					++citation_store;
+			for (unsigned long i = 0; i <= 2*M; ++ i)
+				for (unsigned long j = i+1; j <= 2*M; ++ j) {
+					*citation_store++ = i;
+					*citation_store++ = j;
 				}
 													 
-			for (unsigned long i = M+1; i < Size; ++ i) {
+			for (unsigned long i = 2*M+1; i < Size; ++ i) {
 				
 				// randomly pick M _non_repeating_ members from the possible citations.
 				for (unsigned long j = 0; j < M; ++ j) {
@@ -302,7 +303,7 @@ namespace igraph {
 				citation_store += 2*M;
 			}
 			
-			::tempobj::force_temporary_class<Graph>::type g = ::tempobj::force_move(Graph::full(m+1).add_vertices(size - (m+1)).add_edges(VertexVector::view(citations+M*(M+1), (Size-(M+1))*M*2)));
+			::tempobj::force_temporary_class<Graph>::type g = Graph::create(VertexVector::view(citations, 2*M*Size));
 			
 			delete[] citations;
 			
@@ -322,6 +323,46 @@ namespace igraph {
 		::tempobj::force_temporary_class<Graph>::type base = dimensions == 1 ? Graph::ring(size) : Graph::lattice(Vector((long)dimensions).fill(size));
 		return ::tempobj::force_move(base.connect_neighborhood(K).rewire_edges_simple(rangen, p));
 	}
+	
+	::tempobj::force_temporary_class<Graph>::type Graph::erdos_renyi_game(Integer size, Real prob, Directedness directedness, SelfLoops self_loops) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_erdos_renyi_game(&_, IGRAPH_ERDOS_RENYI_GNP, size, prob, directedness, self_loops));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::erdos_renyi_Gnm_game(Integer size, Integer edges, Directedness directedness, SelfLoops self_loops) MAY_THROW_EXCEPTION {
+		igraph_t _;
+		TRY(igraph_erdos_renyi_game(&_, IGRAPH_ERDOS_RENYI_GNM, size, edges, directedness, self_loops));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::erdos_renyi_game_simple(Integer size, Real prob, Directedness directedness, SelfLoops self_loops) MAY_THROW_EXCEPTION {
+		return erdos_renyi_game_simple(::gsl::Random::default_generator(), size, prob, directedness, self_loops);
+	}
+#if __MSVC__
+#define XXINTRNL_LOG1P(p) (::std::log(1.0 + (p)))	// there is no log1p in windows. fake with log(1+p).
+#else
+#define XXINTRNL_LOG1P(p) (::std::log1p(p))
+#endif
+	// Ref: https://networkx.lanl.gov/trac/browser/networkx/trunk/networkx/generators/random_graphs.py (fast_gnp_random_graph)
+	::tempobj::force_temporary_class<Graph>::type Graph::erdos_renyi_game_simple(const ::gsl::Random& rangen, Integer size, Real prob, Directedness directedness, SelfLoops self_loops) MAY_THROW_EXCEPTION {
+		VertexVector edges = VertexVector::n();
+		long v = 1, w = -1, n = static_cast<long>(size);
+		double lp = XXINTRNL_LOG1P(-prob);
+		while (v < n) {
+			double lr = XXINTRNL_LOG1P(-rangen.uniform());
+			w += 1 + ::std::floor(lr / lp);
+			while (w >= v && v < n) {
+				w -= v;
+				++ v;
+			}
+			if (v < n) {
+				edges.push_back(w);
+				edges.push_back(v);
+			}
+		}
+		return Graph::create(edges, size);
+	}
+	
+	
 	
 	Graph& Graph::rewire_edges(const Real prob) MAY_THROW_EXCEPTION {
 		TRY(igraph_rewire_edges(&_, prob));

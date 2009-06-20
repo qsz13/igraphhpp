@@ -146,8 +146,8 @@ IMMEDIATE_OPERATOR_IMPLEMENTATION_RHS(BasicMatrix<BASE>, /, BASE);
 IMMEDIATE_OPERATOR_IMPLEMENTATION(BasicMatrix<BASE>, +);
 IMMEDIATE_OPERATOR_IMPLEMENTATION(BasicMatrix<BASE>, -);
 
-template<> BASE BasicMatrix<BASE>::sum() const throw() { return FUNC(sum)(&_); }
-template<> BASE BasicMatrix<BASE>::prod() const throw() { return FUNC(prod)(&_); }
+template<> Real BasicMatrix<BASE>::sum() const throw() { return FUNC(sum)(&_); }
+template<> Real BasicMatrix<BASE>::prod() const throw() { return FUNC(prod)(&_); }
 template<> ::tempobj::force_temporary_class<Vector>::type BasicMatrix<BASE>::rowsum() const MAY_THROW_EXCEPTION {
 	igraph_vector_t res;
 	TRY(igraph_vector_init(&res, 0));
@@ -180,8 +180,8 @@ template<> BasicMatrix<BASE>& BasicMatrix<BASE>::cbind(const BasicMatrix<BASE>& 
 #pragma mark -
 #pragma mark Finding minimum and maximum
 
-template<> BASE BasicMatrix<BASE>::min() const throw() { return FUNC(min)(&_); }
-template<> BASE BasicMatrix<BASE>::max() const throw() { return FUNC(max)(&_); }
+template<> Real BasicMatrix<BASE>::min() const throw() { return FUNC(min)(&_); }
+template<> Real BasicMatrix<BASE>::max() const throw() { return FUNC(max)(&_); }
 template<> ::std::pair<long,long> BasicMatrix<BASE>::which_min() const throw() {
 	long i, j;
 	TRY(FUNC(which_min)(&_, &i, &j));

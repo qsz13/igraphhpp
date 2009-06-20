@@ -111,8 +111,8 @@ namespace igraph {
 		BasicMatrix<T>& mul_elements(const BasicMatrix<T>& k) MAY_THROW_EXCEPTION;
 		BasicMatrix<T>& div_elements(const BasicMatrix<T>& k) MAY_THROW_EXCEPTION;
 		
-		T sum() const throw();
-		T prod() const throw();
+		Real sum() const throw();
+		Real prod() const throw();
 		::tempobj::force_temporary_class<Vector>::type rowsum() const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Vector>::type colsum() const MAY_THROW_EXCEPTION;
 		BasicMatrix<T>& transpose() MAY_THROW_EXCEPTION;
@@ -120,8 +120,8 @@ namespace igraph {
 		BasicMatrix<T>& rbind(const BasicMatrix<T>& from) MAY_THROW_EXCEPTION;
 		BasicMatrix<T>& cbind(const BasicMatrix<T>& from) MAY_THROW_EXCEPTION;
 		
-		T min() const throw();
-		T max() const throw();
+		Real min() const throw();
+		Real max() const throw();
 		::std::pair<long,long> which_min() const throw();
 		::std::pair<long,long> which_max() const throw();
 		void minmax(T& minStore, T& maxStore) const MAY_THROW_EXCEPTION;

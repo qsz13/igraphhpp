@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <igraph/cpp/vector.hpp>
 #include <igraph/cpp/referencevector.hpp>
+#include <igraph/cpp/matrix.hpp>
 
 #include <igraph/cpp/graph.hpp>
 #include <igraph/cpp/graphio.hpp>

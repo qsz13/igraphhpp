@@ -142,7 +142,7 @@ if __name__ == "__main__":
         s += "<tr><td>" + fn + "</td>";
         for code in row:
             if(code>0):
-                s += "<td class='fail'>FAIL</td>"
+                s += "<td class='fail'>" + str(code) + "</td>"
             else:
                 s += "<td class='pass'>PASS</td>"
         s += "</tr>"

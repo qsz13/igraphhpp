@@ -46,13 +46,13 @@ template<> BasicVector<BASE>::BasicVector(::std::initializer_list<BASE> elements
 }
 #endif
 
-template<> BasicVector<BASE>::BasicVector(const char* stringized_elements) MAY_THROW_EXCEPTION {
+template<> BasicVector<BASE>::BasicVector(const char* vertices_as_string) MAY_THROW_EXCEPTION {
 	XXINTRNL_DEBUG_CALL_INITIALIZER(BasicVector, <BASE>);
 	TRY(FUNC(init)(&_, 0));
-	const char* end_of_string = ::std::strchr(stringized_elements, '\0');
-	while (stringized_elements < end_of_string) {
+	const char* end_of_string = ::std::strchr(vertices_as_string, '\0');
+	while (vertices_as_string < end_of_string) {
 		BASE res;
-		if (XXINTRNL_sscanf(stringized_elements, res))
+		if (XXINTRNL_sscanf(vertices_as_string, res))
 			TRY(FUNC(push_back)(&_, res));
 	}
 }

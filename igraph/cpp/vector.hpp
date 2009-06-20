@@ -32,14 +32,13 @@
 #include <igraph/igraph.h>
 #include <igraph/cpp/common.hpp>
 #include <igraph/cpp/exception.hpp>
+#include <cstdarg>
 #include <cstdio>
 #if XXINTRNL_CXX0X
 #include <initializer_list>
 #endif
 
 namespace igraph {
-	template <typename T>
-	class BasicMatrix;
 	
 	XXINTRNL_PREPARE_UNDERLYING_TYPES(BasicVector, vector);	
 	/**
@@ -211,8 +210,6 @@ namespace igraph {
 		friend class Graph;
 		friend class GraphWriter;
 		friend class GraphReader;
-		template<typename U>
-		friend class BasicMatrix;
 		 
 	};
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicVector, <T>);

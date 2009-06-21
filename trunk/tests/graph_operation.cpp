@@ -55,9 +55,15 @@ int main () {
 	Graph t3 = (F - G) ^ (J & F);
 	t3.writer(stdout).adjlist();  printf("\n---\n");
 
-	printf("\n\ngraph operation many\n----------------\n");
-
+	printf("\n\ngraph operation : decompose\n----------------\n");
 	ReferenceVector<Graph> glist = (F ^ G ^ H ^ J).decompose();
+	for(long i=0; i<glist.size(); ++i) {
+		glist[i].writer(stdout).adjlist();  printf("\n---\n");
+	}
+
+	printf("\n\ngraph operation many\n----------------\n");
+	glist.push_back(F);
+	glist.push_back(G);
 	Graph::disjoint_union(glist).writer(stdout).adjlist();  printf("\n---\n");
 	Graph::merge(glist).writer(stdout).adjlist();  printf("\n---\n");
 	Graph::intersection(glist).writer(stdout).adjlist();  printf("\n---\n");

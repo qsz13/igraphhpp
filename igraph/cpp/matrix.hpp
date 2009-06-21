@@ -79,8 +79,8 @@ namespace igraph {
 		BasicMatrix<T>& fill(const T e) throw();
 		
 		T* ptr() throw() { return &(MATRIX(_, 0, 0)); }
-		const T* operator[](long i) const throw() __attribute__((warning("m[i][j] is not a recommended way to access matrix elements. Use m(i, j) instead."))) { return &(MATRIX(_, i, 0)); }
-		T* operator[](long i) throw() __attribute__((warning("m[i][j] is not a recommended way to access matrix elements. Use m(i, j) instead."))) { return &(MATRIX(_, i, 0)); }
+		const T& operator[](::std::pair<long,long> c) const throw() { return MATRIX(_, c.first, c.second); }
+		T& operator[](::std::pair<long,long> c) throw() { return MATRIX(_, c.first, c.second); }
 		const T& operator()(long i, long j) const throw() { return MATRIX(_, i, j); }
 		T& operator()(long i, long j) throw() { return MATRIX(_, i, j); }
 		

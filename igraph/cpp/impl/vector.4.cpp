@@ -227,3 +227,15 @@ template<> ::tempobj::temporary_class<Vector>::type BasicVector<BASE>::distribut
 		VECTOR(res)[static_cast<long>(*cit)] += delta;
 	return ::tempobj::force_move(Vector(&res, ::tempobj::OwnershipTransferMove));
 }
+
+template<> BasicVector<BASE>& BasicVector<BASE>::move_section(long from_begin, long from_end, long to_begin) MAY_THROW_EXCEPTION {
+	TRY(FUNC(move_interval2)(&_, from_begin, from_end, to_begin));
+	return *this;
+}
+
+template<> ::tempobj::force_temporary_class<BasicVector<BASE> >::type BasicVector<BASE>::intersect_sorted(const BasicVector<BASE>& other, ElementUniqueness uniqueness) const MAY_THROW_EXCEPTION {
+	TYPE res;
+	TRY(FUNC(init)(&res, 0));
+	TRY(FUNC(intersect_sorted)(&_, &other._, &res, uniqueness));
+	return ::tempobj::force_move(BasicVector<BASE>(&res, ::tempobj::OwnershipTransferMove));
+}

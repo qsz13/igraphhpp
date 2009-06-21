@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import time
 
-CXX0X = "-std=gnu++0x"
 igraph_test_relative_path = "tests/"
 outfn = "tmp.exe"
 last_status_fn = "svn_update_last_status.txt"
@@ -34,8 +33,7 @@ iofiles = " -o %s %s 2>>  " + compiler_message_fn
 
 
 compiler_command = {
-"g++-4.4_gnu++0x" : " g++-4.4 " + CXX0X + options + links + iofiles,
-"g++-4.3_gnu++0x" : " g++-4.3 " + CXX0X + options + links + iofiles,
+"g++-4.4_gnu++0x" : " g++-4.4 -std=gnu++0x" + options + links + iofiles,
 "g++-4.4" : " g++-4.4 " + options + links + iofiles,
 "g++-4.3" : " g++-4.3 " + options + links + iofiles,
 "g++-4.2" : " g++-4.2 " + options + links + iofiles,
@@ -56,7 +54,7 @@ td.pass {background-color: lightgreen; text-align:center;}
 <h1 style="text-align: center;">igraphhpp regression test</h1>
 
 Generated at %(time)s, %(revision)s  Tested on ubuntu 9.04 i386<br/>
-Compiler message <a href="%(compiler_message_fn)s">here<a>. green means pass, red means fail<br/>
+Compiler message <a href="%(compiler_message_fn)s">here<a>. Documentation <a href="html/index.html">here</a>. Green means pass. Red means fail<br/>
 <br/>
 <div><table cellspacing="1" cellpadding="5" border="0" style="">
   %(header)s
@@ -80,11 +78,13 @@ def listdir(root, path=""):
     return files
 
 
-def test(igraph_path,infn,commands):
+def test(igraph_path,igraph_test_path,infn,commands):
     compile_result = []
     for title,base_cmd in commands.iteritems():
-        cmd = base_cmd % (igraph_path,outfn,infn);
-        os.system("echo '\n\n\n***\n"+cmd+"' >> "+compiler_message_fn);
+        cmd = base_cmd % (igraph_path,outfn,igraph_test_path+infn);
+        os.system("echo '\n\n\n***  (" + title + "," + infn + ")  start at "
+        + time.strftime("%a, %d %b %Y %H:%M:%S (local time,HK)", time.localtime())
+        + "\n"+cmd+"' >> "+compiler_message_fn);
         return_code = os.system(cmd)
         compile_result += [return_code]
         print infn, title, return_code
@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     starting_time = time.strftime("%a, %d %b %Y %H:%M:%S (local time,HK)", time.localtime())
 
-    os.system("echo 'igraphhpp regression test' > "+compiler_message_fn);
+    os.system("echo 'regression test for igraphhpp. The following are the compiled result in the (compiler,file) pair' > "+compiler_message_fn);
     header = "<tr><td></td>"
     for title,base_cmd in compiler_command.iteritems():
         header += "<td>" + title + "</td>";
@@ -135,14 +135,14 @@ if __name__ == "__main__":
     
     results = {}
     for infn in filelists:
-        results[infn] = test(igraph_path,igraph_test_path+infn,compiler_command)
+        results[infn] = test(igraph_path,igraph_test_path,infn,compiler_command)
 
     s = ""
     for fn,row in results.iteritems():
         s += "<tr><td>" + fn + "</td>";
         for code in row:
             if(code>0):
-                s += "<td class='fail'>FAIL</td>"
+                s += "<td class='fail' title='"+str(code)+"'>FAIL</td>"
             else:
                 s += "<td class='pass'>PASS</td>"
         s += "</tr>"
@@ -153,6 +153,8 @@ if __name__ == "__main__":
     "compiler_message_fn" : compiler_message_fn,
     "header" : header, "result" : s}
     )
+    
+    os.system("doxygen")
     
     #TODO: create better output
     #TODO: check the correctness of the running result

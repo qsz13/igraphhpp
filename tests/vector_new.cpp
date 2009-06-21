@@ -75,8 +75,10 @@ int main () {
 	
 	v.null();
 	assert(v == Vector(" 0., 0., 0., 0., 0., 0., 0., 0."));
-	v.fill(12.);
-	assert(v == Vector(" 12., 12., 12., 12., 12., 12., 12., 12."));
+	assert(v.isnull());
+	v.fill(-12.);
+	assert(v == Vector(" -12., -12., -12., -12., -12., -12., -12., -12."));
+	assert(!v.isnull());
 	
 	Vector x = Vector::seq(4, 10);
 	assert(x == Vector(" 4., 5., 6., 7., 8., 9., 10."));
@@ -155,6 +157,80 @@ int main () {
 	std::sort(r.begin(), r.end());
 	assert(r == Vector("4 5 7 22"));
 	assert(std::inner_product(sv.begin(), sv.end(), r.begin(), 0) == 4*4+14*5+5*7+7*22);
+	
+	Real d[] = {1., 4., 9., 16., 25., 49.};
+	r = Vector(d, 6);
+	assert(r == Vector("1 4 9 16 25 49"));
+	d[5] = 36;
+	assert(r == Vector("1 4 9 16 25 49"));
+	r[5] = 81;
+	assert(d[5] == 36);
+	r = Vector::view(d, 6);
+	d[4] = 121;
+	assert(r == Vector("1 4 9 16 121 36"));
+	r[3] = 144;
+	assert(d[3] == 144);
+	
+#if XXINTRNL_CXX0X
+	assert(Vector("2 -4 6 12") == Vector({2, -4, 6, 12}));
+#endif
+	
+	assert(Vector("1 1 1 1 1; 2 2 2; 3; 4 4 4 4; 5 5 5").distribution() == Vector("0, 0.3125, 0.1875, 0.0625, 0.25, 0.1875"));
+	
+	{
+		Vector r ("1 4 6 12 11 4");
+		Vector s ("6 -2 5 8 6 4");
+		assert(r.maxdifference(s) == 6);
+		
+		r = Vector("1 4 6 12 11 4 124 4");
+		r.remove_first_matching(4);
+		assert(r == Vector("1 6 12 11 4 124 4"));
+		r.remove_all_matching(4);
+		assert(r == Vector("1 6 12 11 124"));
+		r.sort();
+		assert(r == Vector("1 6 11 12 124"));
+		r.remove_first_matching_assume_sorted(11);
+		assert(r == Vector("1 6 12 124"));
+		r.remove_first_matching(4);
+		assert(r == Vector("1 6 12 124"));
+		r.remove_first_matching_assume_sorted(9);
+		assert(r == Vector("1 6 12 124"));
+	}
+	
+	assert(Vector("1 2 3 4 5 6 7").intersect_sorted(Vector("4 5 7 9 11")) == Vector("4 5 7"));
+	assert(Vector("1 1 1 1 1 6 7 8").intersect_sorted(Vector("1 1 1 6 7 7 7")) == Vector("1 6 7"));
+	assert(Vector("1 1 1 1 1 6 7 8").intersect_sorted(Vector("1 1 1 6 7 7 7"), Vector::NotUnique) == Vector("1 1 1 1, 1 1 1 1; 6 6; 7 7 7 7"));
+
+	{
+		Vector t ("1 8 2 7 3 6 4 5");
+		t.move_interval(2, 4, 0);
+		assert(t == Vector("2 7 2 7 3 6 4 5"));
+		t.move_interval(3, 6, 4);
+		assert(t == Vector("2 7 2 7 7 3 6 5"));
+		assert(t.isininterval(1, 8));
+		assert(!t.isininterval(3, 8));
+		assert(t.isininterval(2, 7));
+		assert(!t.isininterval(1, 5));
+		assert(t.any_smaller(3));
+		assert(!t.any_smaller(2));
+		
+		t -= t / 4;
+		assert(t == "1.5,5.25,1.5,5.25,5.25,2.25,4.5,3.75");
+		t /= Vector("1 2 4 8 -1 -2 -4 -8");
+		assert(t == "1.5,2.625,0.375,0.65625,-5.25,-1.125,-1.125,-0.46875");
+		t += t * 31;
+		assert(t == "48.,84.,12.,21.,-168.,-36.,-36.,-15.");
+		
+		
+		Vector u (12);
+		assert(u.isnull());
+		assert(u.size() == 12);
+		assert(!v.empty());
+		Vector v = Vector::n();
+		assert(v.isnull());
+		assert(v.empty());
+		assert(v.size() == 0);
+	}
 	
 	printf("vector.hpp is correct.\n");
 

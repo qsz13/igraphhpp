@@ -232,4 +232,4 @@ template<> BasicMatrix<BASE>& BasicMatrix<BASE>::resize(long new_nrow, long new_
 template<> BasicMatrix<BASE>& BasicMatrix<BASE>::add_rows(long n) MAY_THROW_EXCEPTION { TRY(FUNC(add_rows)(&_, n)); return *this; }
 template<> BasicMatrix<BASE>& BasicMatrix<BASE>::add_cols(long n) MAY_THROW_EXCEPTION { TRY(FUNC(add_cols)(&_, n)); return *this; }
 template<> BasicMatrix<BASE>& BasicMatrix<BASE>::remove_row(long i) MAY_THROW_EXCEPTION { TRY(FUNC(remove_row)(&_, i)); return *this; }
-template<> BasicMatrix<BASE>& BasicMatrix<BASE>::remove_col(long j) MAY_THROW_EXCEPTION { TRY(FUNC(remove_row)(&_, j)); return *this; }
+template<> BasicMatrix<BASE>& BasicMatrix<BASE>::remove_col(long j) MAY_THROW_EXCEPTION { TRY(FUNC(remove_col)(&_, j)); return *this; }

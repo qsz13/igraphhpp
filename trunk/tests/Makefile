@@ -4,5 +4,16 @@ Options=-std=gnu++0x -Wall -Wno-unknown-pragmas -O2 -ligraph -lgsl -lgslcblas -I
 %.exe:	%.cpp
 	$(Compiler) $(Options) -o $@ $^
 
+%.cov.exe:	%.cpp
+	$(Compiler) $(Options) -fprofile-arcs -ftest-coverage -o $@ $^
+
 all:
 	for i in `ls *.cpp`; do make $${i/%cpp/exe}; done
+
+cover:
+	for i in `ls *.cpp`; do make $${i/%cpp/cov.exe}; done
+
+clean:
+	-rm *.gcov
+	-rm *.gcno
+	-rm *.gcda

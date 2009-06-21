@@ -349,7 +349,7 @@ namespace igraph {
 		double lp = XXINTRNL_LOG1P(-prob);
 		while (v < n) {
 			double lr = XXINTRNL_LOG1P(-rangen.uniform());
-			w += 1 + ::std::floor(lr / lp);
+			w += 1. + ::std::floor(lr / lp);
 			while (w >= v && v < n) {
 				w -= v;
 				++ v;

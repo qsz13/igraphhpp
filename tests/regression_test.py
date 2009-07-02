@@ -22,14 +22,14 @@ import os
 import time
 
 igraph_test_relative_path = "tests/"
-outfn = "tmp.exe"
+compiler_message_path = "compiler_message/"
 last_status_fn = "svn_update_last_status.txt"
 compiler_result_fn = 'compiling_result.html'
-compiler_message_fn = "compiler_message.txt"
+outfn = "tmp.exe"
 
 options = " -Wall -Wno-unknown-pragmas -Wno-attributes -fno-strict-aliasing -O2 "
 links = " -I%s -I/opt/local/include -ligraph -lgsl -lgslcblas -L/opt/local/lib "
-iofiles = " -o %s %s 2>>  " + compiler_message_fn
+iofiles = " -o %s %s 2>> %s "
 
 
 compiler_command = {
@@ -46,15 +46,17 @@ htmlcode = '''<html><head><title>igraphhpp regression test</title>
 <style type="text/css">
 <!--
 body {font-size: 1em; font-family: sans-serif;}
-td.fail {background-color: red; text-align:center;}
-td.pass {background-color: lightgreen; text-align:center;}
+.fail {background-color: red; text-align:center;}
+.pass {background-color: lightgreen; text-align:center;}
+.warn {background-color: rgb(255,233,0); text-align:center;}
 --></style>
 
 <body>
 <h1 style="text-align: center;">igraphhpp regression test</h1>
 
 Generated at %(time)s, %(revision)s  Tested on ubuntu 9.04 i386<br/>
-Compiler message <a href="%(compiler_message_fn)s">here<a>. Documentation <a href="html/index.html">here</a>. Green means pass. Red means fail<br/>
+Documentation <a href="html/index.html">here</a>.
+<font class="fail">FAIL</font>: compiled with some error. <font class="pass">PASS</font>: pass with no warning. <font class="warn">PASS</font>: pass with some warning.<br/>
 <br/>
 <div><table cellspacing="1" cellpadding="5" border="0" style="">
   %(header)s
@@ -78,15 +80,17 @@ def listdir(root, path=""):
     return files
 
 
-def test(igraph_path,igraph_test_path,infn,commands):
+def test(igraph_path,igraph_test_path,name,commands,compiler_message_path):
     compile_result = []
     for title,base_cmd in commands.iteritems():
-        cmd = base_cmd % (igraph_path,outfn,igraph_test_path+infn);
-        os.system("echo '\n\n\n***  (" + title + "," + infn + ")  start at "
+        msgfn = compiler_message_path + title + name + ".txt"
+        infn = igraph_test_path+name
+        cmd = base_cmd % (igraph_path,outfn,infn,msgfn);
+        os.system("echo 'Test cases: (" + title + "," + name + ")  start at "
         + time.strftime("%a, %d %b %Y %H:%M:%S (local time,HK)", time.localtime())
-        + "\n"+cmd+"' >> "+compiler_message_fn);
+        + "\n"+cmd+"' > "+msgfn);
         return_code = os.system(cmd)
-        compile_result += [return_code]
+        compile_result += [[msgfn,return_code]]
         print infn, title, return_code
         if return_code == 0:
             os.remove(outfn)
@@ -99,7 +103,7 @@ if __name__ == "__main__":
     if(len(os.sys.argv)!=3 and len(os.sys.argv)!=4):
         print '''Usage: working_directory igraphhpp_root_directory [force]\n
         if force is used, no svn update and preform regression test directly 
-        e.g. python regression_test.py ./ ../ force        
+        e.g. python regression_test.py ./ ../ force
         '''
         exit(0)
     working_dir = os.sys.argv[1]
@@ -122,7 +126,7 @@ if __name__ == "__main__":
 
     starting_time = time.strftime("%a, %d %b %Y %H:%M:%S (local time,HK)", time.localtime())
 
-    os.system("echo 'regression test for igraphhpp. The following are the compiled result in the (compiler,file) pair' > "+compiler_message_fn);
+    #os.system("echo 'regression test for igraphhpp. The following are the compiled result in the (compiler,file) pair' > "+compiler_message_fn);
     header = "<tr><td></td>"
     for title,base_cmd in compiler_command.iteritems():
         header += "<td>" + title + "</td>";
@@ -135,22 +139,25 @@ if __name__ == "__main__":
     
     results = {}
     for infn in filelists:
-        results[infn] = test(igraph_path,igraph_test_path,infn,compiler_command)
+        results[infn] = test(igraph_path,igraph_test_path,infn,compiler_command,compiler_message_path)
 
     s = ""
     for fn,row in results.iteritems():
         s += "<tr><td>" + fn + "</td>";
-        for code in row:
-            if(code>0):
-                s += "<td class='fail' title='"+str(code)+"'>FAIL</td>"
+        for res in row:
+            if(res[1]>0):
+                s += "<td class='fail' title='"+str(res[1])+"'><a href='" + res[0] + "'>FAIL</a></td>"
             else:
-                s += "<td class='pass'>PASS</td>"
+                has_warning = open(res[0],"r").read().lower().find("warning:") != -1
+                if(has_warning):
+                    s += "<td class='warn'><a href='" + res[0] + "'>PASS</a></td>"
+                else:
+                    s += "<td class='pass'><a href='" + res[0] + "'>PASS</a></td>"
         s += "</tr>"
     
     f = open(compiler_result_fn, 'w')
     f.write(htmlcode % {
     "time" : starting_time, "revision" : new_status.split("\n")[-2],
-    "compiler_message_fn" : compiler_message_fn,
     "header" : header, "result" : s}
     )
     
@@ -158,4 +165,5 @@ if __name__ == "__main__":
     
     #TODO: create better output
     #TODO: check the correctness of the running result
+
 

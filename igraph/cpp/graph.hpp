@@ -122,9 +122,8 @@ namespace igraph {
 		};
 		
 		static ::tempobj::force_temporary_class<Graph>::type create(const VertexVector& edges, const Integer min_size = 0, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
-		// TODO: igraph_adjacency when Matrix is implemented.
-		// TODO: igraph_weighted_adjacency when Matrix is implemented.
-		// TODO: igraph_adjlist when AdjacencyList is implemented.
+		static ::tempobj::force_temporary_class<Graph>::type adjacency(Matrix& adjmatrix, igraph_adjacency_t mode) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type weighted_adjacency(Matrix& adjmatrix, igraph_adjacency_t mode, const char* attr) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type adjlist(const AdjacencyList& lst, const Directedness directedness = Undirected, const ToUndirectedMode duplicate_edges = ToUndirectedMode_Collapse) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type star(const Integer n, const StarMode mode = StarMode_Undirected, const Vertex center = 0) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type lattice(const Vector& dimensions, const PeriodicLattice periodic = PeriodicLattice_Periodic, const Integer step = 1, const Directedness directedness = Undirected, const MutualConnections mutual = MutualConnections_NotMutual) MAY_THROW_EXCEPTION;
@@ -141,7 +140,7 @@ namespace igraph {
 		static ::tempobj::force_temporary_class<Graph>::type atlas(const int number) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type de_bruijn(const Integer m, const Integer n) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type kautz(const Integer m, const Integer n) MAY_THROW_EXCEPTION;
-		// TODO: igraph_extended_chordal_ring when Matrix is implemented.
+		static ::tempobj::force_temporary_class<Graph>::type extended_chordal_ring(Integer nodes, const Matrix& W) MAY_THROW_EXCEPTION;
 		
 		Graph& connect_neighborhood(const Integer order = 1, const NeighboringMode neimode = OutNeighbors) MAY_THROW_EXCEPTION; 
 		
@@ -157,7 +156,8 @@ namespace igraph {
 		static ::tempobj::force_temporary_class<Graph>::type barabasi_game(const Integer size, const Integer m, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type barabasi_game(const Integer size, const Vector& outseq, const Directedness directed = Undirected, const BarabasiOutPref outpref = BarabasiOutPref_InDegreeOnly) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type barabasi_game_simple(const Integer size, const Integer m) MAY_THROW_EXCEPTION;
-		static ::tempobj::force_temporary_class<Graph>::type barabasi_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer m) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type barabasi_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer m) MAY_THROW_EXCEPTION;		
+		static ::tempobj::force_temporary_class<Graph>::type nonlinear_barabasi_game(Integer n, Real power, Integer m, const Vector& outseq, Boolean outpref, Real zeroappeal, Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type watts_strogatz_game(const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type watts_strogatz_game_simple(const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type watts_strogatz_game_simple(const ::gsl::Random& rangen, const Integer size, const Integer K, const Real p, const Integer dimensions = 1) MAY_THROW_EXCEPTION;
@@ -172,8 +172,22 @@ namespace igraph {
 		Graph& rewire_edges_simple(const Real prob) MAY_THROW_EXCEPTION;
 		Graph& rewire_edges_simple(const ::gsl::Random& rangen, const Real prob) MAY_THROW_EXCEPTION;
 		
+		static ::tempobj::force_temporary_class<Graph>::type degree_sequence_game(const Vector& out_deg, const Vector& in_deg, igraph_degseq_t method) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type forest_fire_game(Integer n, Integer nodes, Real fw_prob, Real bw_factor, Integer pambs, Directedness directed) MAY_THROW_EXCEPTION;
+
 		// What is this? No probability at all?
 		Graph& rewire(Integer max_trials = 16) MAY_THROW_EXCEPTION;
+
+		static ::tempobj::force_temporary_class<Graph>::type growing_random_game(Integer n, Integer m, Directedness directed, Boolean citation) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type callaway_traits_game(Integer nodes, Integer types, Integer edges_per_step, Vector& type_dist, Matrix& pref_matrix, Directedness directed) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type establishment_game(Integer nodes, Integer types, Integer k, Vector& type_dist, Matrix& pref_matrix, Directedness directed) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type preference_game(Integer nodes, Integer types, Vector& type_dist, Matrix& pref_matrix, Vector& node_type_vec, Directedness directed, SelfLoops loops) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type asymmetric_preference_game(Integer nodes, Integer types, Matrix& type_dist_matrix, Matrix& pref_matrix, Vector& node_type_in_vec, Vector& node_type_out_vec, SelfLoops loops) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type recent_degree_game(Integer n, Real power, Integer window, Integer m, const Vector& outseq, Boolean outpref, Real zero_appeal, Directedness directed) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type barabasi_aging_game(Integer nodes, Integer m, const Vector& outseq, Boolean outpref, Real pa_exp, Real aging_exp, Integer aging_bin, Real zero_deg_appeal, Real zero_age_appeal, Real deg_coef, Real age_coef, Directedness directed) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type recent_degree_aging_game(Integer nodes, Integer m, const Vector& outseq, Boolean outpref, igraph_real_t pa_exp, igraph_real_t aging_exp, Integer aging_bin, Integer time_window, igraph_real_t zero_appeal, Directedness directed) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type cited_type_game(Integer nodes, const Vector& types, const Vector& pref, Integer edges_per_step, Directedness directed) MAY_THROW_EXCEPTION;
+		static ::tempobj::force_temporary_class<Graph>::type citing_cited_type_game(Integer nodes, const Vector& types, const Matrix& pref, Integer edges_per_step, Directedness directed) MAY_THROW_EXCEPTION;
 				
 #pragma mark -
 #pragma mark Basic Properties

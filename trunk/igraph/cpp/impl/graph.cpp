@@ -138,13 +138,22 @@ namespace igraph {
 #pragma mark -
 #pragma mark Deterministic Graph Generators
 
+#define XXINTRNL_FORWARD_GRAPH_CREATION(temp, statement) \
+	igraph_t temp; \
+	TRY(statement); \
+	return ::tempobj::force_move(Graph(&temp, ::tempobj::OwnershipTransferMove)); \
+
 	::tempobj::force_temporary_class<Graph>::type Graph::create(const VertexVector& edges, const Integer min_size, const Directedness directedness) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_create(&_, &edges._, min_size, directedness));
 		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
-	// TODO: igraph_adjacency when Matrix is implemented.
-	// TODO: igraph_weighted_adjacency when Matrix is implemented.
+	::tempobj::force_temporary_class<Graph>::type Graph::adjacency(Matrix& adjmatrix, igraph_adjacency_t mode) MAY_THROW_EXCEPTION  {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_adjacency(&_, &adjmatrix._, mode) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::weighted_adjacency(Matrix& adjmatrix, igraph_adjacency_t mode, const char* attr) MAY_THROW_EXCEPTION  {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_weighted_adjacency(&_, &adjmatrix._, mode, attr) );
+	}
 	::tempobj::force_temporary_class<Graph>::type Graph::adjlist(const AdjacencyList& lst, const Directedness directedness, const ToUndirectedMode duplicate_edges) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_adjlist(&_, &lst._, directedness, duplicate_edges == ToUndirectedMode_Each));
@@ -216,8 +225,10 @@ namespace igraph {
 		igraph_t _;
 		TRY(igraph_kautz(&_, m, n));
 		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
+	}	
+	::tempobj::force_temporary_class<Graph>::type Graph::extended_chordal_ring(Integer nodes, const Matrix& W) MAY_THROW_EXCEPTION  {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_extended_chordal_ring(&_, nodes,	&W._) );
 	}
-	// TODO: igraph_extended_chordal_ring when Matrix is implemented.
 
 	Graph& Graph::connect_neighborhood(const Integer order, const NeighboringMode neimode) MAY_THROW_EXCEPTION {
 		TRY(igraph_connect_neighborhood(&_, order, (igraph_neimode_t)neimode));
@@ -311,6 +322,10 @@ namespace igraph {
 		}
 	}
 
+	::tempobj::force_temporary_class<Graph>::type Graph::nonlinear_barabasi_game(Integer n, Real power, Integer m, const Vector& outseq, Boolean outpref, Real zeroappeal, Directedness directed) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_nonlinear_barabasi_game(&_, n, power, m, &outseq._, outpref, zeroappeal, directed) );
+	}
+
 	::tempobj::force_temporary_class<Graph>::type Graph::watts_strogatz_game(const Integer size, const Integer K, const Real p, const Integer dimensions) MAY_THROW_EXCEPTION {
 		igraph_t _;
 		TRY(igraph_watts_strogatz_game(&_, dimensions, size, K, p));
@@ -362,8 +377,6 @@ namespace igraph {
 		return Graph::create(edges, size);
 	}
 	
-	
-	
 	Graph& Graph::rewire_edges(const Real prob) MAY_THROW_EXCEPTION {
 		TRY(igraph_rewire_edges(&_, prob));
 		return *this;
@@ -382,10 +395,48 @@ namespace igraph {
 		}
 		return *this;
 	}
-	
+
+	::tempobj::force_temporary_class<Graph>::type Graph::degree_sequence_game(const Vector& out_deg, const Vector& in_deg, igraph_degseq_t method) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_degree_sequence_game(&_, &out_deg._, &in_deg._, method) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::forest_fire_game(Integer n, Integer nodes, Real fw_prob, Real bw_factor, Integer pambs, Directedness directed) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_forest_fire_game(&_, nodes, fw_prob, bw_factor, pambs, directed) );
+	}
+
 	Graph& Graph::rewire(Integer max_trials) MAY_THROW_EXCEPTION {
 		TRY(igraph_rewire(&_, max_trials, IGRAPH_REWIRING_SIMPLE));
 		return *this;
+	}
+
+	::tempobj::force_temporary_class<Graph>::type Graph::growing_random_game(Integer n, Integer m, Directedness directed, Boolean citation) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_growing_random_game(&_, n, m, directed, citation) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::callaway_traits_game(Integer nodes, Integer types, Integer edges_per_step, Vector& type_dist, Matrix& pref_matrix, Directedness directed) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_callaway_traits_game(&_, nodes, types, edges_per_step, &type_dist._, &pref_matrix._, directed) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::establishment_game(Integer nodes, Integer types, Integer k, Vector& type_dist, Matrix& pref_matrix, Directedness directed) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_establishment_game(&_, nodes, types, k, &type_dist._, &pref_matrix._, directed) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::preference_game(Integer nodes, Integer types, Vector& type_dist, Matrix& pref_matrix, Vector& node_type_vec, Directedness directed, SelfLoops loops) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_preference_game(&_, nodes, types, &type_dist._, &pref_matrix._, &node_type_vec._, directed, loops) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::asymmetric_preference_game(Integer nodes, Integer types, Matrix& type_dist_matrix, Matrix& pref_matrix, Vector& node_type_in_vec, Vector& node_type_out_vec, SelfLoops loops) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_asymmetric_preference_game(&_, nodes, types, &type_dist_matrix._, &pref_matrix._, &node_type_in_vec._, &node_type_out_vec._, loops) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::recent_degree_game(Integer n, Real power, Integer window, Integer m, const Vector& outseq, Boolean outpref, Real zero_appeal, Directedness directed) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_recent_degree_game(&_, n, power, window, m, &outseq._, outpref, zero_appeal, directed) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::barabasi_aging_game(Integer nodes, Integer m, const Vector& outseq, Boolean outpref, Real pa_exp, Real aging_exp, Integer aging_bin, Real zero_deg_appeal, Real zero_age_appeal, Real deg_coef, Real age_coef, Directedness directed) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_barabasi_aging_game(&_, nodes, m, &outseq._, outpref, pa_exp, aging_exp, aging_bin, zero_deg_appeal, zero_age_appeal, deg_coef, age_coef, directed) );
+	}	
+	::tempobj::force_temporary_class<Graph>::type Graph::recent_degree_aging_game(Integer nodes, Integer m, const Vector& outseq, Boolean outpref, igraph_real_t pa_exp, igraph_real_t aging_exp, Integer aging_bin, Integer time_window, igraph_real_t zero_appeal, Directedness directed) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_recent_degree_aging_game(&_, nodes, m, &outseq._, outpref, pa_exp, aging_exp, aging_bin, time_window, zero_appeal, directed) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::cited_type_game(Integer nodes, const Vector& types, const Vector& pref, Integer edges_per_step, Directedness directed) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_cited_type_game(&_, nodes, &types._, &pref._, edges_per_step, directed) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::citing_cited_type_game(Integer nodes, const Vector& types, const Matrix& pref, Integer edges_per_step, Directedness directed) MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(_, igraph_citing_cited_type_game(&_, nodes, &types._, &pref._, edges_per_step, directed) );
 	}
 
 #pragma mark -
@@ -638,11 +689,6 @@ namespace igraph {
 
 #pragma mark -
 #pragma mark 18. Graph Operators
-
-#define XXINTRNL_FORWARD_GRAPH_CREATION(temp, statement) \
-	igraph_t temp; \
-	TRY(statement); \
-	return ::tempobj::force_move(Graph(&temp, ::tempobj::OwnershipTransferMove)); \
 
 	::tempobj::force_temporary_class<Graph>::type Graph::disjoint_union(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union(&tmp, &x._, &y._) );

@@ -41,25 +41,6 @@ All unimplemented.
 All unimplemented.
 
 = 7 Graph Generators ==
-== 7.1 Deterministic Graph Generators ==
- * `igraph_adjacency` _requires_ <font color="red">Matrix</font>.
- * `igraph_weighted_adjacency` _requires_ <font color="red">Matrix</font> and Edge attributes.
- * `igraph_extended_chordal_ring` _requires_ <font color="red">Matrix</font>.
-
-== 7.2 Games: Randomized Graph Generators ==
- * `igraph_nonlinear_barabasi_game`
- * `igraph_degree_sequence_game`
- * `igraph_forest_fire_game`
- * `igraph_growing_random_game`
- * `igraph_callaway_traits_game` _requires_ <font color="red">Matrix</font>
- * `igraph_establishment_game` _requires_ <font color="red">Matrix</font>
- * `igraph_preference_game` _requires_ <font color="red">Matrix</font>
- * `igraph_asymmetric_preference_game` _requires_ <font color="red">Matrix</font>
- * `igraph_recent_degree_game`
- * `igraph_barabasi_aging_game`
- * `igraph_recent_degree_aging_game`
- * `igraph_cited_type_game`
- * `igraph_citing_cited_type_game` _requires_ <font color="red">Matrix</font>
 
 Besides wrapping the original ones, we also need to create the corresponding ones that give simple graphs. See issue 1. The undone parts are<font color="red">
  * Rewire (preserve degree distribution) <font color="green">(_to be implemented by_ Kenny.)</font>
@@ -70,47 +51,17 @@ All unimplemented.
 
 = 10 Structural Properties of Graphs ==
 == 10.2 Shortest Path Related Functions ==
-All unimplemented.
-
-== 10.3 Neighborhood of a vertex ==
-All unimplemented.
-
-== 10.4 Graph Components ==
- * `igraph_biconnected_components`
+ * `igraph_get_all_shortest_paths`
 
 == 10.5 Centrality Measures ==
-All unimplemented.
-
-== 10.6 Estimating Centrality Measures ==
-All unimplemented.
-
-== 10.7 Similarity Measures ==
-All unimplemented.
-
-== 10.8 Spanning Tree ==
-All unimplemented.
-
-== 10.11 Spectral properties ==
- * <font color="red">` igraph_laplacian`</font> _requires_ <font color="red">Matrix</font>
-
-== 10.13 K-Cores ==
-All unimplemented.
-
-== 10.14 Topological sorting ==
-All unimplemented.
-
-== 10.15 Line graphs ==
-All unimplemented.
-
-== 10.16 Unfolding a graph into a tree ==
-All unimplemented.
+ * `igraph_pagerank`
+ * `igraph_pagerank_old`
+ * `igraph_eigenvector_centrality`
+ * `igraph_hub_score`
+ * `igraph_authority_score`
 
 == 10.17 Other Operations ==
-All unimplemented.
-
-= 11 Cliques and Independent Vertex Sets =
-== 11.2 Independent Vertex Sets ==
-All unimplemented.
+ * `igraph_avg_nearest_neighbor_degree`
 
 = 12 Graph Isomorphism =
 All unimplemented.

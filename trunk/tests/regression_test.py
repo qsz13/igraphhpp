@@ -21,16 +21,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import time
 
-igraph_test_relative_path = "tests/"
+igraphhpp_test_relative_path = "tests/"
 compiler_message_path = "compiler_message/"
 last_status_fn = "svn_update_last_status.txt"
 compiler_result_fn = 'compiling_result.html'
 outfn = "tmp.exe"
 
 options = " -Wall -Wno-unknown-pragmas -Wno-attributes -fno-strict-aliasing -O2 "
-links = " -I%s -I/opt/local/include -ligraph -lgsl -lgslcblas -L/opt/local/lib "
-iofiles = " -o %s %s 2>> %s "
-
+links = " -I%(igraphhpp_path)s -I/opt/local/include -ligraph -lgsl -lgslcblas -L/opt/local/lib "
+iofiles = " -o %(outfn)s %(infn)s 2>> %(msgfn)s "
 
 compiler_command = {
 "g++-4.4_gnu++0x" : " g++-4.4 -std=gnu++0x" + options + links + iofiles,
@@ -39,6 +38,7 @@ compiler_command = {
 "g++-4.2" : " g++-4.2 " + options + links + iofiles,
 "g++-4.1" : " g++-4.1 " + options + links + iofiles,
 "llvm-g++-4.2" : " llvm-g++ " + options + links + iofiles,
+"msvc2008" : " /home/share/msvc/bin/cl.exe /Tp%(infn)s /I/home/share/msvc/include /I%(igraphhpp_path)s /I/usr/include/ /link /LIBPATH:/home/share/msvc/lib /Fe%(outfn)s  1> %(msgfn)s "
 }
 
 
@@ -80,12 +80,12 @@ def listdir(root, path=""):
     return files
 
 
-def test(igraph_path,igraph_test_path,name,commands,compiler_message_path):
+def test(igraphhpp_path,igraphhpp_test_path,name,commands,compiler_message_path):
     compile_result = []
     for title,base_cmd in commands.iteritems():
         msgfn = compiler_message_path + title + name + ".txt"
-        infn = igraph_test_path+name
-        cmd = base_cmd % (igraph_path,outfn,infn,msgfn);
+        infn = igraphhpp_test_path+name
+        cmd = base_cmd % {"igraphhpp_path":igraphhpp_path, "outfn":outfn, "infn":infn, "msgfn":msgfn};
         os.system("echo 'Test cases: (" + title + "," + name + ")  start at "
         + time.strftime("%a, %d %b %Y %H:%M:%S (local time,HK)", time.localtime())
         + "\n"+cmd+"' > "+msgfn);
@@ -107,8 +107,8 @@ if __name__ == "__main__":
         '''
         exit(0)
     working_dir = os.sys.argv[1]
-    igraph_path = os.path.abspath(os.sys.argv[2])
-    igraph_test_path = igraph_path + "/" + igraph_test_relative_path
+    igraphhpp_path = os.path.abspath(os.sys.argv[2])
+    igraphhpp_test_path = igraphhpp_path + "/" + igraphhpp_test_relative_path
     
     os.chdir(working_dir)
     
@@ -119,7 +119,7 @@ if __name__ == "__main__":
             old_status = open(last_status_fn, "r").read()
         except:
             pass
-        os.system("svn update " + igraph_path + " > "+last_status_fn)
+        os.system("svn update " + igraphhpp_path + " > "+last_status_fn)
         new_status = open(last_status_fn, "r").read()
         if(old_status==new_status):
             exit(0)
@@ -133,13 +133,13 @@ if __name__ == "__main__":
     header += "</tr>"
 
     filelists = []
-    for fn in listdir(igraph_test_path):
+    for fn in listdir(igraphhpp_test_path):
         if os.path.splitext(fn)[1] == ".cpp":
             filelists += [fn]
     
     results = {}
     for infn in filelists:
-        results[infn] = test(igraph_path,igraph_test_path,infn,compiler_command,compiler_message_path)
+        results[infn] = test(igraphhpp_path,igraphhpp_test_path,infn,compiler_command,compiler_message_path)
 
     s = ""
     for fn,row in results.iteritems():

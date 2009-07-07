@@ -853,7 +853,39 @@ namespace igraph {
 		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_independence_number(&_, &res) );
 	}
 
-	
+
+#pragma mark -
+#pragma mark 14. Generating Layouts for Graph Drawing
+
+	::tempobj::force_temporary_class<Matrix>::type Graph::layout_random() const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_MATRIX(res, igraph_layout_random(&_, &res) );
+	}
+	::tempobj::force_temporary_class<Matrix>::type Graph::layout_circle() const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_MATRIX(res, igraph_layout_circle(&_, &res) );
+	}
+	// TODO: igraph_layout_graphopt
+	// TODO: 10.1.4. The DrL layout generator
+	// TODO: igraph_layout_fruchterman_reingold
+	// TODO: igraph_layout_kamada_kawai
+	::tempobj::force_temporary_class<Matrix>::type Graph::layout_reingold_tilford(Vertex root) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_MATRIX(res, igraph_layout_reingold_tilford(&_, &res, root) );
+	}
+	::tempobj::force_temporary_class<Matrix>::type Graph::layout_reingold_tilford_circular(Vertex root) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_MATRIX(res, igraph_layout_reingold_tilford_circular(&_, &res, root) );
+	}
+	// TODO: igraph_layout_grid_fruchterman_reingold
+	// TODO: igraph_layout_lgl
+	::tempobj::force_temporary_class<Matrix>::type Graph::layout_random_3d() const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_MATRIX(res, igraph_layout_random_3d(&_, &res) );
+	}
+	::tempobj::force_temporary_class<Matrix>::type Graph::layout_sphere() const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_MATRIX(res, igraph_layout_sphere(&_, &res) );
+	}
+	// TODO: igraph_layout_fruchterman_reingold_3d
+	// TODO: igraph_layout_kamada_kawai_3d
+	// TODO: igraph_layout_merge_dla
+
+
 #pragma mark -
 #pragma mark 15. Reading and Writing Graphs from and to Files (GraphWriter)
 

@@ -392,6 +392,27 @@ namespace igraph {
 		::tempobj::force_temporary_class<ReferenceVector<Vector> >::type largest_independent_vertex_sets() const;
 		::tempobj::force_temporary_class<ReferenceVector<Vector> >::type maximal_independent_vertex_sets() const;
 		Integer independence_number() const MAY_THROW_EXCEPTION;
+
+
+#pragma mark -
+#pragma mark 14. Generating Layouts for Graph Drawing
+
+	::tempobj::force_temporary_class<Matrix>::type layout_random() const MAY_THROW_EXCEPTION;
+	::tempobj::force_temporary_class<Matrix>::type layout_circle() const MAY_THROW_EXCEPTION;
+	// TODO: igraph_layout_graphopt
+	// TODO: 10.1.4. The DrL layout generator
+	// TODO: igraph_layout_fruchterman_reingold
+	// TODO: igraph_layout_kamada_kawai
+	::tempobj::force_temporary_class<Matrix>::type layout_reingold_tilford(Vertex root) const MAY_THROW_EXCEPTION;
+	::tempobj::force_temporary_class<Matrix>::type layout_reingold_tilford_circular(Vertex root) const MAY_THROW_EXCEPTION;
+	// TODO: igraph_layout_grid_fruchterman_reingold
+	// TODO: igraph_layout_lgl
+	::tempobj::force_temporary_class<Matrix>::type layout_random_3d() const MAY_THROW_EXCEPTION;
+	::tempobj::force_temporary_class<Matrix>::type layout_sphere() const MAY_THROW_EXCEPTION;
+	// TODO: igraph_layout_fruchterman_reingold_3d
+	// TODO: igraph_layout_kamada_kawai_3d
+	// TODO: igraph_layout_merge_dla
+
 		
 #pragma mark -
 #pragma mark 15. Reading and Writing Graphs from and to Files

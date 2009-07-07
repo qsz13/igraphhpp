@@ -38,7 +38,7 @@ compiler_command = {
 "g++-4.2" : " g++-4.2 " + options + links + iofiles,
 "g++-4.1" : " g++-4.1 " + options + links + iofiles,
 "llvm-g++-4.2" : " llvm-g++ " + options + links + iofiles,
-"msvc2008" : " /home/share/msvc/bin/cl.exe /Tp%(infn)s /I/home/share/msvc/include /I%(igraphhpp_path)s /I/usr/include/ /link /LIBPATH:/home/share/msvc/lib /Fe%(outfn)s  1> %(msgfn)s "
+"msvc2008" : " /home/share/msvc/bin/cl.exe /Tp%(infn)s /wd4068 /I/home/share/msvc/include /I%(igraphhpp_path)s /I/usr/include/ /link /LIBPATH:/home/share/msvc/lib /Fe%(outfn)s  1> %(msgfn)s "
 }
 
 

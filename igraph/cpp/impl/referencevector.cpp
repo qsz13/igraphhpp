@@ -138,7 +138,7 @@ namespace igraph {
 	}
 	template<typename T> ReferenceVector<T>& ReferenceVector<T>::reserve(const long new_size) MAY_THROW_EXCEPTION { TRY(igraph_vector_ptr_reserve(&_, new_size)); return *this; }
 	template<typename T> ReferenceVector<T>& ReferenceVector<T>::resize(const long new_size) MAY_THROW_EXCEPTION { 
-		long old_size;
+		long old_size = 0;	// Just to mute GCC.
 		if (manage_children_by_new_and_delete) {
 			old_size = _.end - _.stor_begin;
 			if (new_size < old_size)

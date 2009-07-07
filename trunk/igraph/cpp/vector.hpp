@@ -806,7 +806,7 @@ namespace igraph {
 		friend class BasicMatrix;
 		 
 	};
-	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicVector, <T>);
+	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicVector<T>);
 	
 	/// Real vector
 	typedef BasicVector<Real> Vector;

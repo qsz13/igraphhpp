@@ -1,0 +1,11 @@
+SHELL := /bin/bash
+
+Compiler=/home/share/msvc/bin/cl.exe
+Options=/wd4141 /wd4068 /I/home/share/msvc/include /I../ /I/usr/include/ /link /LIBPATH:/home/share/msvc/lib 
+
+%.exe:	%.cpp
+	$(Compiler) $^ $(Options) /Fe$@
+	
+all:
+	for i in `ls *.cpp`; do make -f Msvc $${i/%cpp/exe}; done
+

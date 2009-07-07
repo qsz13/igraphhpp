@@ -168,7 +168,7 @@ namespace igraph {
 
 		friend class Graph;
 	};
-	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicMatrix, <T>);
+	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicMatrix<T>);
 	
 	typedef BasicMatrix<Real> Matrix;
 }

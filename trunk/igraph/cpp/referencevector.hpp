@@ -219,7 +219,7 @@ namespace igraph {
 		friend class Graph;
 	};
 	
-	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, ReferenceVector, <T>);
+	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, ReferenceVector<T>);
 }
 
 #include <igraph/cpp/impl/referencevector.cpp>

@@ -165,7 +165,7 @@ namespace igraph {
 	}
 	template<typename T> ReferenceVector<T>& ReferenceVector<T>::remove(const long pos) throw() {
 		if (manage_children_by_new_and_delete)
-			delete VECTOR(_)[pos];
+			delete reinterpret_cast<T*>(VECTOR(_)[pos]);
 		igraph_vector_ptr_remove(&_, pos);
 		return *this;
 	}

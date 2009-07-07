@@ -455,11 +455,11 @@ namespace igraph {
 	TRY( statement ); \
 	return ::tempobj::force_move(Vector(&temp, ::tempobj::OwnershipTransferMove));
 
-#define XXINTRNL_TEMP_RETURN_PTRVEC(T, temp, size, statement) \
+#define XXINTRNL_TEMP_RETURN_PTRVEC(CppType, CType, temp, size, statement) \
 	igraph_vector_ptr_t temp; \
 	TRY( igraph_vector_ptr_init(&temp, size) ); \
 	TRY( statement ); \
-	return ::tempobj::force_move(ReferenceVector<T>(&temp, ::tempobj::OwnershipTransferMove));
+	return ReferenceVector<CppType>::adopt<CType>(temp);
 
 #define XXINTRNL_TEMP_RETURN_NATIVE(T, temp, statement) \
 	T temp; \
@@ -490,10 +490,10 @@ namespace igraph {
 		XXINTRNL_TEMP_RETURN_MATRIX(res, igraph_shortest_paths_johnson(&_, &res, from._, &weights._) );
 	}
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::get_shortest_paths(Integer from, const VertexSelector& to, NeighboringMode mode) const MAY_THROW_EXCEPTION {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, res, to.size(*this), igraph_get_shortest_paths(&_, &res, from, to._, (igraph_neimode_t)mode) );
+		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, igraph_vector_t, res, to.size(*this), igraph_get_shortest_paths(&_, &res, from, to._, (igraph_neimode_t)mode) );
 	}
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::get_shortest_paths_dijkstra(Integer from, const VertexSelector& to, Vector& weights, NeighboringMode mode) const MAY_THROW_EXCEPTION {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, res, to.size(*this), igraph_get_shortest_paths_dijkstra(&_, &res, from, to._, &weights._, (igraph_neimode_t)mode) );
+		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, igraph_vector_t, res, to.size(*this), igraph_get_shortest_paths_dijkstra(&_, &res, from, to._, &weights._, (igraph_neimode_t)mode) );
 	}
 	// TODO: implement igraph_get_all_shortest_paths()
 	// TODO: give enum for the unconn Boolean
@@ -531,10 +531,10 @@ namespace igraph {
 		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_neighborhood_size(&_, &res, vs._, order, (igraph_neimode_t)mode) );
 	}
 	::tempobj::force_temporary_class<ReferenceVector<VertexVector> >::type Graph::neighborhood(VertexSelector& vs, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION {
-		XXINTRNL_TEMP_RETURN_PTRVEC(VertexVector, res, 0, igraph_neighborhood(&_, &res, vs._, order, (igraph_neimode_t)mode) );
+		XXINTRNL_TEMP_RETURN_PTRVEC(VertexVector, igraph_vector_t, res, 0, igraph_neighborhood(&_, &res, vs._, order, (igraph_neimode_t)mode) );
 	}
 	::tempobj::force_temporary_class<ReferenceVector<Graph> >::type Graph::neighborhood_graphs(VertexSelector& vs, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Graph, res, 0, igraph_neighborhood_graphs(&_, &res, vs._, order, (igraph_neimode_t)mode) );
+		XXINTRNL_TEMP_RETURN_PTRVEC(Graph, igraph_t, res, 0, igraph_neighborhood_graphs(&_, &res, vs._, order, (igraph_neimode_t)mode) );
 	}
 
 
@@ -578,7 +578,7 @@ namespace igraph {
 	}
 	::tempobj::force_temporary_class<ReferenceVector<VertexVector> >::type Graph::biconnected_components() const MAY_THROW_EXCEPTION {
 		Integer no;
-		XXINTRNL_TEMP_RETURN_PTRVEC(VertexVector, res, 0, igraph_biconnected_components(&_, &no, &res, NULL) );
+		XXINTRNL_TEMP_RETURN_PTRVEC(VertexVector, igraph_vector_t, res, 0, igraph_biconnected_components(&_, &no, &res, NULL) );
 	}
 	::tempobj::force_temporary_class<VertexVector>::type Graph::articulation_points() const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_articulation_points(&_, &res));
@@ -832,22 +832,22 @@ namespace igraph {
 		TRY(igraph_maximal_cliques(&_, &res));
 		return ReferenceVector<Vector>::adopt<igraph_vector_t>(res);
 	}
-	
+
 	Integer Graph::clique_number() const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_clique_number(&_, &res) );
 	}
 	
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::independent_vertex_sets(Integer min_size, Integer max_size) const {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, res, 0, igraph_independent_vertex_sets(&_, &res, min_size, max_size) );
+		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, igraph_vector_t, res, 0, igraph_independent_vertex_sets(&_, &res, min_size, max_size) );
 	}	
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::independent_vertex_sets(const Integer max_size) const {
 		return independent_vertex_sets(0, max_size);
 	}	
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::largest_independent_vertex_sets() const {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, res, 0, igraph_largest_independent_vertex_sets(&_, &res) );
+		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, igraph_vector_t, res, 0, igraph_largest_independent_vertex_sets(&_, &res) );
 	}	
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::maximal_independent_vertex_sets() const {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, res, 0, igraph_maximal_independent_vertex_sets(&_, &res) );
+		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, igraph_vector_t, res, 0, igraph_maximal_independent_vertex_sets(&_, &res) );
 	}	
 	Integer Graph::independence_number() const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_independence_number(&_, &res) );

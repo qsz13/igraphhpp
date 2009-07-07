@@ -811,17 +811,28 @@ namespace igraph {
 #pragma mark 11. Cliques
 	
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::cliques(const Integer min_size, const Integer max_size) const {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, res, 0, igraph_cliques(&_, &res, min_size, max_size) );
-	}	
+		igraph_vector_ptr_t res;
+		TRY(igraph_vector_ptr_init(&res, 0));
+		TRY(igraph_cliques(&_, &res, min_size, max_size));
+		return ReferenceVector<Vector>::adopt<igraph_vector_t>(res);
+	}
+	
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::cliques(const Integer max_size) const {
 		return cliques(0, max_size);
 	}	
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::largest_cliques() const {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, res, 0, igraph_largest_cliques(&_, &res) );
+		igraph_vector_ptr_t res;
+		TRY(igraph_vector_ptr_init(&res, 0));
+		TRY(igraph_largest_cliques(&_, &res));
+		return ReferenceVector<Vector>::adopt<igraph_vector_t>(res);
 	}	
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::maximal_cliques() const {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, res, 0, igraph_maximal_cliques(&_, &res) );
-	}	
+		igraph_vector_ptr_t res;
+		TRY(igraph_vector_ptr_init(&res, 0));
+		TRY(igraph_maximal_cliques(&_, &res));
+		return ReferenceVector<Vector>::adopt<igraph_vector_t>(res);
+	}
+	
 	Integer Graph::clique_number() const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_clique_number(&_, &res) );
 	}

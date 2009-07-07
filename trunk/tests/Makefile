@@ -1,5 +1,7 @@
+SHELL := /bin/bash
+
 Compiler=g++-4.4
-Options=-std=gnu++0x -Wall -Wno-unknown-pragmas -O2 -ligraph -lgsl -lgslcblas -I../ -I/opt/local/include -I/usr/local/include -L/opt/local/lib -Wno-attributes -fno-strict-aliasing
+Options=-std=gnu++0x -Wall -Wno-unknown-pragmas -g -O0 -ligraph -I../ -I/opt/local/include -I/usr/local/include -L/opt/local/lib -Wno-attributes -fno-strict-aliasing
 
 %.exe:	%.cpp
 	$(Compiler) $(Options) -o $@ $^

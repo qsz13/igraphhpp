@@ -143,7 +143,7 @@ namespace igraph {
 			old_size = _.end - _.stor_begin;
 			if (new_size < old_size)
 				for (void** it = _.stor_begin + new_size; it != _.end; ++ it)
-					delete *it;
+					delete reinterpret_cast<T*>(*it);
 		}
 		TRY(igraph_vector_ptr_resize(&_, new_size));
 		if (manage_children_by_new_and_delete)

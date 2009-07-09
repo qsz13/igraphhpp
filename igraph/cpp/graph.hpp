@@ -456,6 +456,30 @@ namespace igraph {
 		
 		static ::tempobj::force_temporary_class<Graph>::type read(const char* filename, GraphFormat format = GraphFormat_auto);
 		
+
+#pragma mark -
+#pragma mark 16. Maximum Flows, Minimum Cuts and related measures
+
+		enum VerticesConnectedAction {
+			 VerticesConnectedAction_Error = IGRAPH_VCONN_NEI_ERROR,
+			 VerticesConnectedAction_Infinity = IGRAPH_VCONN_NEI_INFINITY,
+			 VerticesConnectedAction_Ignore = IGRAPH_VCONN_NEI_IGNORE,
+		};
+
+		// TODO: igraph_maxflow_value()
+		// TODO: igraph_st_mincut_value()
+		// TODO: igraph_mincut_value()
+		// TODO: igraph_mincut()
+		Integer st_edge_connectivity(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
+		Integer edge_connectivity(Boolean checks) const MAY_THROW_EXCEPTION;
+		Integer st_vertex_connectivity(Vertex source, Vertex target, VerticesConnectedAction action) const MAY_THROW_EXCEPTION;
+		Integer vertex_connectivity(Boolean checks) const MAY_THROW_EXCEPTION;
+		Integer edge_disjoint_paths(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
+		Integer vertex_disjoint_paths(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
+		Integer adhesion(Boolean checks) const MAY_THROW_EXCEPTION;
+		Integer cohesion(Boolean checks) const MAY_THROW_EXCEPTION;
+
+
 #pragma mark -
 #pragma mark 17. Detecting Community Structure
 		

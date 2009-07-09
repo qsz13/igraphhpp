@@ -41,7 +41,7 @@ int main () {
 	Graph::compose(F,H).writer(stdout).adjlist();  printf("\n---\n");
 
 	printf("\n\nGraph operator test\n----------------\n");
-	(F ^ H).writer(stdout).adjlist();  printf("\n---\n");
+	(F + H).writer(stdout).adjlist();  printf("\n---\n");
 	(F | H).writer(stdout).adjlist();  printf("\n---\n");
 	(F & H).writer(stdout).adjlist();  printf("\n---\n");
 	(F - H).writer(stdout).adjlist();  printf("\n---\n");
@@ -52,11 +52,11 @@ int main () {
 	t1.writer(stdout).adjlist();  printf("\n---\n");
 	Graph t2 = (F - G) | H;
 	t2.writer(stdout).adjlist();  printf("\n---\n");
-	Graph t3 = (F - G) ^ (J & F);
+	Graph t3 = (F - G) + (J & F);
 	t3.writer(stdout).adjlist();  printf("\n---\n");
 
 	printf("\n\ngraph operation : decompose\n----------------\n");
-	ReferenceVector<Graph> glist = (F ^ G ^ H ^ J).decompose();
+	ReferenceVector<Graph> glist = (F + G + H + J).decompose();
 	for(long i=0; i<glist.size(); ++i) {
 		glist[i].writer(stdout).adjlist();  printf("\n---\n");
 	}

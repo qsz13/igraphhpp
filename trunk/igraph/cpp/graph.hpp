@@ -488,24 +488,42 @@ namespace igraph {
 #pragma mark -
 #pragma mark 18. Graph Operators
 
+		/// \brief Return the disjoint union of two graphs
 		static ::tempobj::force_temporary_class<Graph>::type disjoint_union(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
-		static ::tempobj::force_temporary_class<Graph>::type disjoint_union(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
+		/// \brief Return the disjoint union of many graphs
+		static ::tempobj::force_temporary_class<Graph>::type disjoint_union(const ReferenceVector<Graph>& graphs) MAY_THROW_EXCEPTION;
+		/// \brief Return the merge (i.e. union) of many graphs, resulting graph contains all edges in both graphs
 		static ::tempobj::force_temporary_class<Graph>::type merge(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
-		static ::tempobj::force_temporary_class<Graph>::type merge(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
+		/// \brief Return the merge (i.e. union) of many graphs, resulting graph contains all edges in all graphs
+		static ::tempobj::force_temporary_class<Graph>::type merge(const ReferenceVector<Graph>& graphs) MAY_THROW_EXCEPTION;
+		/// \brief Return the intersection of two graphs, resulting graph contains edges common in both graphs
 		static ::tempobj::force_temporary_class<Graph>::type intersection(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
+		/// \brief Return the intersection of many graphs, resulting graph contains edges common in all graphs
 		static ::tempobj::force_temporary_class<Graph>::type intersection(const ReferenceVector<Graph>& g) MAY_THROW_EXCEPTION;
+		/// \brief Return the difference between two graphs
 		static ::tempobj::force_temporary_class<Graph>::type difference(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
+		/// \brief Return the complementer graph
 		static ::tempobj::force_temporary_class<Graph>::type complementer(const Graph& x, SelfLoops loops=NoSelfLoops) MAY_THROW_EXCEPTION;
+		/// \brief Return the composition of two graphs
 		static ::tempobj::force_temporary_class<Graph>::type compose(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
 
+		/// \brief Disjoint union of two graphs, same as disjoint_union()
 		::tempobj::force_temporary_class<Graph>::type operator+ (const Graph& other) const MAY_THROW_EXCEPTION;
+		/// \brief Merge (i.e. union) of two graphs, same as merge()
 		::tempobj::force_temporary_class<Graph>::type operator| (const Graph& other) const MAY_THROW_EXCEPTION;
+		/// \brief Intersection of two graphs, same as intersection()
 		::tempobj::force_temporary_class<Graph>::type operator& (const Graph& other) const MAY_THROW_EXCEPTION;
+		/// \brief Difference between two graphs, same as difference()
 		::tempobj::force_temporary_class<Graph>::type operator- (const Graph& other) const MAY_THROW_EXCEPTION;
+		/// \brief Complementerary graph, similar to complementer()
 		::tempobj::force_temporary_class<Graph>::type operator~ () const MAY_THROW_EXCEPTION;
+		/// \brief Disjoint union of two graphs
 		Graph& operator+= (const Graph& other) MAY_THROW_EXCEPTION;
+		/// \brief Merge (i.e. union) of two graphs
 		Graph& operator|= (const Graph& other) MAY_THROW_EXCEPTION;
+		/// \brief Intersection of two graphs
 		Graph& operator&= (const Graph& other) MAY_THROW_EXCEPTION;
+		/// \brief Difference between two graphs
 		Graph& operator-= (const Graph& other) MAY_THROW_EXCEPTION;
 		
 #pragma mark -

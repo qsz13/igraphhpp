@@ -804,6 +804,7 @@ namespace igraph {
 		friend class GraphReader;
 		template<typename U>
 		friend class BasicMatrix;
+		friend class Community;
 		 
 	};
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicVector<T>);

@@ -802,8 +802,8 @@ namespace igraph {
 		XXINTRNL_TEMP_RETURN_MATRIX(res, igraph_get_adjacency(&_, &res, (igraph_get_adjacency_t)type));
 	}
 	// any name for igraph_bool_t?
-	::tempobj::force_temporary_class<Vector>::type Graph::get_edgelist(igraph_bool_t bycol) const MAY_THROW_EXCEPTION {
-		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_get_edgelist(&_, &res, bycol) );
+	::tempobj::force_temporary_class<Vector>::type Graph::get_edgelist(EdgelistSequenceOrdering bycol) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_get_edgelist(&_, &res, static_cast<igraph_bool_t>(bycol)) );
 	}
 
 
@@ -851,6 +851,15 @@ namespace igraph {
 	}	
 	Integer Graph::independence_number() const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_independence_number(&_, &res) );
+	}
+	
+	
+#pragma mark -
+#pragma mark 12. Graph Isomorphism
+	::tempobj::force_temporary_class<Graph>::type Graph::permute_vertices(const VertexVector& permutation) const MAY_THROW_EXCEPTION {
+		igraph_t res;
+		TRY(igraph_permute_vertices(&_, &res, &permutation._));
+		return ::tempobj::force_move(Graph(&_, ::tempobj::OwnershipTransferMove));
 	}
 
 
@@ -1023,6 +1032,13 @@ namespace igraph {
 	}
 	Graph& Graph::operator-= (const Graph& other) MAY_THROW_EXCEPTION {
 		return (*this = *this - other);
+	}
+	
+#pragma mark -
+#pragma mark Miscellaneous
+	
+	Graph& Graph::join(const Graph& other) MAY_THROW_EXCEPTION {
+		return add_vertices(other.vcount()).add_edges(other.get_edgelist() + vcount());
 	}
 	
 #undef XXINTRNL_FORWARD_GRAPH_CREATION

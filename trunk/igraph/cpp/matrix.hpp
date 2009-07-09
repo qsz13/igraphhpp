@@ -165,7 +165,7 @@ namespace igraph {
 			}
 			::std::fprintf(f, "\n");
 		}
-
+		friend class Community;
 		friend class Graph;
 	};
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicMatrix<T>);

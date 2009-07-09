@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/graphio.hpp>
 #include <igraph/cpp/vector.hpp>
 #include <igraph/cpp/referencevector.hpp>
+#include <igraph/cpp/community.hpp>
 
 namespace gsl {
 	class Random;
@@ -446,6 +447,11 @@ namespace igraph {
 		static ::tempobj::force_temporary_class<Graph>::type read(const char* filename, GraphFormat format = GraphFormat_auto);
 		
 #pragma mark -
+#pragma mark 17. Detecting Community Structure
+		
+		Community community() const throw() { return Community(*this); }
+		
+#pragma mark -
 #pragma mark 18. Graph Operators
 
 		static ::tempobj::force_temporary_class<Graph>::type disjoint_union(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
@@ -473,6 +479,7 @@ namespace igraph {
 		friend class VertexIterator;
 		friend class EdgeIterator;
 		friend class AdjacencyList;
+		friend class Community;
 	};
 	
 	MEMORY_MANAGER_INTERFACE_EX(Graph);

@@ -40,6 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/edgeselector.hpp>
 #include <igraph/cpp/edgeiterator.hpp>
 
+#include <igraph/cpp/community.hpp>
+
 //------------------------------------------------------------------------------
 
 #include <igraph/cpp/impl/vertexselector.cpp>
@@ -51,5 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/impl/adjlist.cpp>
 
 #include <igraph/cpp/impl/iterators.cpp>
+
+#include <igraph/cpp/impl/community.cpp>
 
 #endif

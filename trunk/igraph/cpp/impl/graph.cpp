@@ -975,6 +975,40 @@ namespace igraph {
 		throw ::std::runtime_error("File type cannot be determined.");
 	}
 
+
+#pragma mark -
+#pragma mark 16. Maximum Flows, Minimum Cuts and related measures
+
+	// TODO: igraph_maxflow_value()
+	// TODO: igraph_st_mincut_value()
+	// TODO: igraph_mincut_value()
+	// TODO: igraph_mincut()
+	Integer Graph::st_edge_connectivity(Vertex source, Vertex target) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_st_edge_connectivity(&_, &res, source, target) );
+	}
+	Integer Graph::edge_connectivity(Boolean checks) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_edge_connectivity(&_, &res, checks) );
+	}
+	Integer Graph::st_vertex_connectivity(Vertex source, Vertex target, VerticesConnectedAction action) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_st_vertex_connectivity(&_, &res, source, target, action) );
+	}
+	Integer Graph::vertex_connectivity(Boolean checks) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_vertex_connectivity(&_, &res, checks) );
+	}
+	Integer Graph::edge_disjoint_paths(Vertex source, Vertex target) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_edge_disjoint_paths(&_, &res, source, target) );
+	}
+	Integer Graph::vertex_disjoint_paths(Vertex source, Vertex target) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_vertex_disjoint_paths(&_, &res, source, target) );
+	}
+	Integer Graph::adhesion(Boolean checks) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_adhesion(&_, &res, checks) );
+	}
+	Integer Graph::cohesion(Boolean checks) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_cohesion(&_, &res, checks) );
+	}
+
+
 #pragma mark -
 #pragma mark 18. Graph Operators
 

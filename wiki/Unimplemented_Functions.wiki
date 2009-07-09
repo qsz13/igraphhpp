@@ -50,6 +50,7 @@ Besides wrapping the original ones, we also need to create the corresponding one
 All unimplemented.
 
 = 10 Structural Properties of Graphs ==
+<font color="green">(_to be implemented by_ Hon Wai, LAU.)</font>
 == 10.2 Shortest Path Related Functions ==
  * `igraph_get_all_shortest_paths`
 
@@ -70,7 +71,15 @@ All unimplemented.
 All unimplemented.
 
 = 14 Generating Layouts for Graph Drawing =
-All unimplemented.
+ * `igraph_layout_graphopt`
+ * `10.1.4. The DrL layout generator`
+ * `igraph_layout_fruchterman_reingold`
+ * `igraph_layout_kamada_kawai`
+ * `igraph_layout_grid_fruchterman_reingold`
+ * `igraph_layout_lgl`
+ * `igraph_layout_fruchterman_reingold_3d`
+ * `igraph_layout_kamada_kawai_3d`
+ * `igraph_layout_merge_dla`
 
 = 15 Reading and Writing Graphs from and to Files =
 == 15.1 Simple edge list and similar formats ==
@@ -78,7 +87,10 @@ All unimplemented.
  * `igraph_read_graph_dimacs` _requires_ <font color="red">!StringVector</font>
 
 = 16 Maximum Flows, Minimum Cuts and related measures =
-All unimplemented.
+ * `igraph_maxflow_value`
+ * `igraph_st_mincut_value`
+ * `igraph_mincut_value`
+ * `igraph_mincut`
 
 = 17 Detecting Community Structure =
  * `igraph_community_spinglass_single`

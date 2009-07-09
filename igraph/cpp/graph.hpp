@@ -474,22 +474,18 @@ namespace igraph {
 		static ::tempobj::force_temporary_class<Graph>::type complementer(const Graph& x, SelfLoops loops=NoSelfLoops) MAY_THROW_EXCEPTION;
 		static ::tempobj::force_temporary_class<Graph>::type compose(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION;
 
-		::tempobj::force_temporary_class<Graph>::type operator^ (const Graph& other) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Graph>::type operator+ (const Graph& other) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Graph>::type operator| (const Graph& other) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Graph>::type operator& (const Graph& other) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Graph>::type operator- (const Graph& other) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Graph>::type operator~ () const MAY_THROW_EXCEPTION;
-		Graph& operator^= (const Graph& other) MAY_THROW_EXCEPTION;
+		Graph& operator+= (const Graph& other) MAY_THROW_EXCEPTION;
 		Graph& operator|= (const Graph& other) MAY_THROW_EXCEPTION;
 		Graph& operator&= (const Graph& other) MAY_THROW_EXCEPTION;
 		Graph& operator-= (const Graph& other) MAY_THROW_EXCEPTION;
 		
 #pragma mark -
 #pragma mark Miscellaneous
-		
-		/** Combine two graphs together. The resulting graph has N1 + N2 vertices and M1 + M2 edges. */
-		Graph& join(const Graph& other) MAY_THROW_EXCEPTION;
-
 
 		friend class VertexSelector;
 		friend class EdgeSelector;

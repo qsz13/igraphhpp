@@ -1006,7 +1006,7 @@ namespace igraph {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_compose(&tmp, &x._, &y._) );
 	}
 
-	::tempobj::force_temporary_class<Graph>::type Graph::operator^ (const Graph& other) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::operator+ (const Graph& other) const MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union(&tmp, &_, &other._) );
 	}
 	::tempobj::force_temporary_class<Graph>::type Graph::operator| (const Graph& other) const MAY_THROW_EXCEPTION  {
@@ -1021,8 +1021,8 @@ namespace igraph {
 	::tempobj::force_temporary_class<Graph>::type Graph::operator~ () const MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_complementer(&tmp, &_, (igraph_bool_t)NoSelfLoops) );
 	}
-	Graph& Graph::operator^= (const Graph& other) MAY_THROW_EXCEPTION {
-		return (*this = *this ^ other);
+	Graph& Graph::operator+= (const Graph& other) MAY_THROW_EXCEPTION {
+		return (*this = *this + other);
 	}
 	Graph& Graph::operator|= (const Graph& other) MAY_THROW_EXCEPTION {
 		return (*this = *this | other);
@@ -1036,11 +1036,7 @@ namespace igraph {
 	
 #pragma mark -
 #pragma mark Miscellaneous
-	
-	Graph& Graph::join(const Graph& other) MAY_THROW_EXCEPTION {
-		return add_vertices(other.vcount()).add_edges(other.get_edgelist() + vcount());
-	}
-	
+		
 #undef XXINTRNL_FORWARD_GRAPH_CREATION
 #undef XXINTRNL_TEMP_RETURN_MATRIX
 #undef XXINTRNL_TEMP_RETURN_VECTOR

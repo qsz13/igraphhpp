@@ -81,13 +81,8 @@ All unimplemented.
 All unimplemented.
 
 = 17 Detecting Community Structure =
- * `igraph_community_spinglass` <font color="green">(_to be implemented by_ Kenny.)</font>
  * `igraph_community_spinglass_single`
- * `igraph_community_walktrap` <font color="green">(_to be implemented by_ Kenny.)</font>
  * `igraph_community_leading_eigenvector_*`
- * `igraph_community_edge_betweenness` <font color="green">(_to be implemented by_ Kenny.)</font>
- * `igraph_community_fastgreedy` <font color="green">(_to be implemented by_ Kenny.)</font>
- * `igraph_community_label_propagation` <font color="green">(_to be implemented by_ Kenny.)</font>
 
 = 19 Using ARPACK for igraph graphs =
 All unimplemented.

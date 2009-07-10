@@ -35,9 +35,11 @@ namespace igraph {
 		const igraph_t* g;
 		igraph_vector_t* partition1, *partition2, *cut;
 		const igraph_vector_t* capacity;
+		bool called;
 				
 	public:
 		Mincut(const Graph& graph) throw();
+		~Mincut();
 
 		Mincut& get_partition1(Vector& first_partition) throw();
 		Mincut& get_partition2(Vector& second_partition) throw();

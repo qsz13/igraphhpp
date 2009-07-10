@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/vector.hpp>
 #include <igraph/cpp/referencevector.hpp>
 #include <igraph/cpp/community.hpp>
+#include <igraph/cpp/mincut.hpp>
 
 namespace gsl {
 	class Random;
@@ -408,21 +409,21 @@ namespace igraph {
 #pragma mark -
 #pragma mark 14. Generating Layouts for Graph Drawing
 
-	::tempobj::force_temporary_class<Matrix>::type layout_random() const MAY_THROW_EXCEPTION;
-	::tempobj::force_temporary_class<Matrix>::type layout_circle() const MAY_THROW_EXCEPTION;
-	// TODO: igraph_layout_graphopt
-	// TODO: 10.1.4. The DrL layout generator
-	// TODO: igraph_layout_fruchterman_reingold
-	// TODO: igraph_layout_kamada_kawai
-	::tempobj::force_temporary_class<Matrix>::type layout_reingold_tilford(Vertex root) const MAY_THROW_EXCEPTION;
-	::tempobj::force_temporary_class<Matrix>::type layout_reingold_tilford_circular(Vertex root) const MAY_THROW_EXCEPTION;
-	// TODO: igraph_layout_grid_fruchterman_reingold
-	// TODO: igraph_layout_lgl
-	::tempobj::force_temporary_class<Matrix>::type layout_random_3d() const MAY_THROW_EXCEPTION;
-	::tempobj::force_temporary_class<Matrix>::type layout_sphere() const MAY_THROW_EXCEPTION;
-	// TODO: igraph_layout_fruchterman_reingold_3d
-	// TODO: igraph_layout_kamada_kawai_3d
-	// TODO: igraph_layout_merge_dla
+		::tempobj::force_temporary_class<Matrix>::type layout_random() const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Matrix>::type layout_circle() const MAY_THROW_EXCEPTION;
+		// TODO: igraph_layout_graphopt
+		// TODO: 10.1.4. The DrL layout generator
+		// TODO: igraph_layout_fruchterman_reingold
+		// TODO: igraph_layout_kamada_kawai
+		::tempobj::force_temporary_class<Matrix>::type layout_reingold_tilford(Vertex root) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Matrix>::type layout_reingold_tilford_circular(Vertex root) const MAY_THROW_EXCEPTION;
+		// TODO: igraph_layout_grid_fruchterman_reingold
+		// TODO: igraph_layout_lgl
+		::tempobj::force_temporary_class<Matrix>::type layout_random_3d() const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Matrix>::type layout_sphere() const MAY_THROW_EXCEPTION;
+		// TODO: igraph_layout_fruchterman_reingold_3d
+		// TODO: igraph_layout_kamada_kawai_3d
+		// TODO: igraph_layout_merge_dla
 
 		
 #pragma mark -
@@ -466,18 +467,21 @@ namespace igraph {
 			 VerticesConnectedAction_Ignore = IGRAPH_VCONN_NEI_IGNORE,
 		};
 
-		// TODO: igraph_maxflow_value()
-		// TODO: igraph_st_mincut_value()
-		// TODO: igraph_mincut_value()
-		// TODO: igraph_mincut()
+		Real maxflow_value(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
+		Real maxflow_value(Vertex source, Vertex target, Vector capacity) const MAY_THROW_EXCEPTION;
+		Real st_mincut_value(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
+		Real st_mincut_value(Vertex source, Vertex target, Vector capacity) const MAY_THROW_EXCEPTION;
+		Real mincut_value() const MAY_THROW_EXCEPTION;
+		Real mincut_value(Vector capacity) const MAY_THROW_EXCEPTION;
+		Mincut mincut() const throw() { return Mincut(*this); }
 		Integer st_edge_connectivity(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
-		Integer edge_connectivity(Boolean checks) const MAY_THROW_EXCEPTION;
+		Integer edge_connectivity(Boolean checks = true) const MAY_THROW_EXCEPTION;
 		Integer st_vertex_connectivity(Vertex source, Vertex target, VerticesConnectedAction action) const MAY_THROW_EXCEPTION;
-		Integer vertex_connectivity(Boolean checks) const MAY_THROW_EXCEPTION;
+		Integer vertex_connectivity(Boolean checks = true) const MAY_THROW_EXCEPTION;
 		Integer edge_disjoint_paths(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
 		Integer vertex_disjoint_paths(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
-		Integer adhesion(Boolean checks) const MAY_THROW_EXCEPTION;
-		Integer cohesion(Boolean checks) const MAY_THROW_EXCEPTION;
+		Integer adhesion(Boolean checks = true) const MAY_THROW_EXCEPTION;
+		Integer cohesion(Boolean checks = true) const MAY_THROW_EXCEPTION;
 
 
 #pragma mark -

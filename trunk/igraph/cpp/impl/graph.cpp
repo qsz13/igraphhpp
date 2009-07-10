@@ -979,10 +979,24 @@ namespace igraph {
 #pragma mark -
 #pragma mark 16. Maximum Flows, Minimum Cuts and related measures
 
-	// TODO: igraph_maxflow_value()
-	// TODO: igraph_st_mincut_value()
-	// TODO: igraph_mincut_value()
-	// TODO: igraph_mincut()
+	Real Graph::maxflow_value(Vertex source, Vertex target) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_maxflow_value(&_, &res, source, target, NULL) );
+	}
+	Real Graph::maxflow_value(Vertex source, Vertex target, Vector capacity) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_maxflow_value(&_, &res, source, target, &capacity._) );
+	}
+	Real Graph::st_mincut_value(Vertex source, Vertex target) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_st_mincut_value(&_, &res, source, target, NULL) );
+	}
+	Real Graph::st_mincut_value(Vertex source, Vertex target, Vector capacity) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_st_mincut_value(&_, &res, source, target, &capacity._) );
+	}
+	Real Graph::mincut_value() const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_mincut_value(&_, &res, NULL) );
+	}
+	Real Graph::mincut_value(Vector capacity) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_mincut_value(&_, &res, &capacity._) );
+	}
 	Integer Graph::st_edge_connectivity(Vertex source, Vertex target) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_st_edge_connectivity(&_, &res, source, target) );
 	}

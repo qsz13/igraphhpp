@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace igraph {
 	Community::Community(const Graph& g) throw() : _g(&g._), _weights(NULL), _fixed(NULL), _modularity(NULL), _temperature(NULL), _membership(NULL), _csize(NULL), _merges(NULL), _result(NULL), _bridges(NULL), _edge_betweenness(NULL) {};
 	
-	Community& Community::set_weights(const Vector& edge_weights) { _weights = &edge_weights._; return *this; };
-	Community& Community::set_fixed_labels(const BoolVector& fixed) { _fixed = &fixed._; return *this; };
+	Community& Community::set_weights(const Vector& edge_weights) throw() { _weights = &edge_weights._; return *this; };
+	Community& Community::set_fixed_labels(const BoolVector& fixed) throw() { _fixed = &fixed._; return *this; };
 	
 	Community& Community::get_modularity(Vector& modularity_store) throw() { _modularity = &modularity_store._; return *this; }
 	Community& Community::get_membership(Vector& membership_store) throw() { _membership = &membership_store._; return *this; }

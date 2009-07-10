@@ -805,6 +805,7 @@ namespace igraph {
 		template<typename U>
 		friend class BasicMatrix;
 		friend class Community;
+		friend class Mincut;
 		 
 	};
 	MEMORY_MANAGER_INTERFACE_EX_WITH_TEMPLATE(template<typename T>, BasicVector<T>);

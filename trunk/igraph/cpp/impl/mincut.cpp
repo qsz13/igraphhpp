@@ -24,8 +24,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace igraph {
 
-	Mincut::Mincut(const Graph& ig) throw() {
+	Mincut::Mincut(const Graph& ig) throw() : partition1(NULL), partition2(NULL), cut(NULL), capacity(NULL), called(false) {
 		g = ig.get();
+	}
+	Mincut::~Mincut() {
+		if(!called)  compute();
 	}
 
 	Mincut& Mincut::get_partition1(Vector& first_partition) throw() {
@@ -48,6 +51,7 @@ namespace igraph {
 	Integer Mincut::compute() MAY_THROW_EXCEPTION {
 		Integer value;
 		TRY( igraph_mincut(g, &value, partition1, partition2, cut, capacity) );
+		called = false;
 		return value;
 	}
 }

@@ -146,7 +146,9 @@ if __name__ == "__main__":
 
     s = ""
     for fn,row in results.iteritems():
-        s += "<tr><td>" + fn + "</td>";
+        cpfilepath = compiler_message_path + fn + ".txt"
+        os.system("cp " + igraphhpp_test_path + fn + " " + cpfilepath);
+        s += "<tr><td><a href='" + cpfilepath + "'>"+ fn + "</a></td>";
         for res in row:
             if(res[1]>0):
                 s += "<td class='fail' title='"+str(res[1])+"'><a href='" + res[0] + "'>FAIL</a></td>"

@@ -102,7 +102,7 @@ namespace igraph {
 		 - \b Complexity: O(\p count)
 		 - \b Wraps: \c igraph_vector_init
 		 */
-		BasicVector(ibt count) MAY_THROW_EXCEPTION;
+		BasicVector(int count) MAY_THROW_EXCEPTION;
 		
 #if XXINTRNL_CXX0X
 		/// Create a Vector using initializer list (C++0x only.)

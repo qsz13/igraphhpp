@@ -31,7 +31,7 @@ template<> BasicVector<BASE>::BasicVector(BASE* const array, const long count) M
 	TRY(FUNC(init_copy)(&_, array, count));
 }
 
-template<> BasicVector<BASE>::BasicVector(const long count) MAY_THROW_EXCEPTION {
+template<> BasicVector<BASE>::BasicVector(const int count) MAY_THROW_EXCEPTION {
 	XXINTRNL_DEBUG_CALL_INITIALIZER(BasicVector, <BASE>);
 	TRY(FUNC(init)(&_, count));
 }

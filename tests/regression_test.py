@@ -38,7 +38,7 @@ compiler_command = {
 "g++-4.2" : " g++-4.2 " + options + links + iofiles,
 "g++-4.1" : " g++-4.1 " + options + links + iofiles,
 "llvm-g++-4.2" : " llvm-g++ " + options + links + iofiles,
-"msvc2008" : " /home/share/msvc/bin/cl.exe /Tp%(infn)s /wd4068 /I/home/share/msvc/include /I%(igraphhpp_path)s /I/usr/include/ /link /LIBPATH:/home/share/msvc/lib /Fe%(outfn)s  1> %(msgfn)s "
+"msvc2008" : " /home/share/msvc/bin/cl.exe /Tp%(infn)s /Fe%(outfn)s /wd4068 /I/home/share/msvc/include /I%(igraphhpp_path)s /I/usr/include/ /link /LIBPATH:/home/share/msvc/lib  1> %(msgfn)s "
 }
 
 
@@ -91,9 +91,12 @@ def test(igraphhpp_path,igraphhpp_test_path,name,commands,compiler_message_path)
         + "\n"+cmd+"' > "+msgfn);
         return_code = os.system(cmd)
         compile_result += [[msgfn,return_code]]
-        print infn, title, return_code
-        if return_code == 0:
-            os.remove(outfn)
+        print cmd, return_code
+        try:
+            if return_code == 0:
+                os.remove(outfn)
+        except:
+            pass
     return compile_result
 
 

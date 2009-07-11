@@ -26,13 +26,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 using namespace igraph;
 
-
 int main () {
 
 	Graph g = (Graph::full(5) + Graph::full(5)).add_edge(0,7).add_edge(1,8).add_edge(2,6);
 	g.writer(stdout).edgelist();
 
-	Vector p1(1), p2(1), cut(1), capacity(1);
+	Vector p1(0), p2(0), cut(0), capacity(0);
 	Integer numcut;
 	numcut = g.mincut().get_cut(cut).get_partition1(p1).compute();
 	//igraph_mincut(g.get(), &numcut, &p1._, NULL, NULL, NULL);

@@ -1,62 +1,31 @@
-#Some Examples
+/*
+igraph examples
 
-<wiki:toc />
+Copyright (C) 2009  Hon Wai, LAU <lau65536@gmail.com>
 
-= Introduction =
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-A prior to use the igraph, the igraph library must be installed (http://igraph.sf.net/). The header file of the C++ wrapper is igraph.hpp. All related components such as `Graph`, `Vector`, `Matrix`, etc. are available in the namespace `igraph` by simply including the igraph.hpp. In the following examples, we assume the following is used 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-{{{
-#include <cstdio>
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+
 #include <igraph/igraph.hpp>
-using namespace std;
-using namespace igraph;
-}}}
-
-The three examples below are translated from the examples in the original igraph documentation.
-
-== Example 1 ==
-
-{{{
-int main () {
-
-	Graph g = Graph::erdos_renyi_game(1000, 5.0/1000);
-	Real diameter = g.diameter();
-	printf("Diameter of a random graph with average degree 5: %f\n", (double) diameter);
-
-	return 0;
-}
-}}}
-
-== Example 2 ==
-{{{
-#include <igraph/igraph.hpp>
+#include <algorithm>
 #include <cstdio>
 using namespace std;
 using namespace igraph;
 
 
-int main () {
-
-	Vector dimvector("30 30");
-	Graph g = Graph::lattice(dimvector);
-
-	printf("Average path length (lattice):            %f\n", (double)g.average_path_length() );
-
-	Vector edges(20);
-	srand(100);
-	for(int i=0; i<edges.size(); i++)
-		edges[i] = rand() % (int)g.size();
-
-	g.add_edges(edges);
-	printf("Average path length (randomized lattice): %f\n", (double)g.average_path_length() );
-
-	return 0;
-}
-}}}
-
-== Example 3 ==
-{{{
 int main () {
 
 	Vertex edges[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
@@ -89,4 +58,3 @@ int main () {
 
 	return 0;
 }
-}}}

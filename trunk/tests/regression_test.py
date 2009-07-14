@@ -145,7 +145,10 @@ if __name__ == "__main__":
         results[infn] = test(igraphhpp_path,igraphhpp_test_path,infn,compiler_command,compiler_message_path)
 
     s = ""
-    for fn,row in results.iteritems():
+    sortedfn = results.keys()
+    sortedfn.sort()
+    for fn in sortedfn:
+        row = results[fn]
         cpfilepath = compiler_message_path + fn + ".txt"
         os.system("cp " + igraphhpp_test_path + fn + " " + cpfilepath);
         s += "<tr><td><a href='" + cpfilepath + "'>"+ fn + "</a></td>";

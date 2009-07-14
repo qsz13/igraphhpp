@@ -83,7 +83,7 @@ def listdir(root, path=""):
 def test(igraphhpp_path,igraphhpp_test_path,name,commands,compiler_message_path):
     compile_result = []
     for title,base_cmd in commands.iteritems():
-        msgfn = compiler_message_path + title + name + ".txt"
+        msgfn = compiler_message_path + (title + name + ".txt").replace("/","_")
         infn = igraphhpp_test_path+name
         cmd = base_cmd % {"igraphhpp_path":igraphhpp_path, "outfn":outfn, "infn":infn, "msgfn":msgfn};
         os.system("echo 'Test cases: (" + title + "," + name + ")  start at "
@@ -100,15 +100,7 @@ def test(igraphhpp_path,igraphhpp_test_path,name,commands,compiler_message_path)
     return compile_result
 
 
-
-
-if __name__ == "__main__":
-    if(len(os.sys.argv)!=3 and len(os.sys.argv)!=4):
-        print '''Usage: working_directory igraphhpp_root_directory [force]\n
-        if force is used, no svn update and preform regression test directly 
-        e.g. python regression_test.py ./ ../ force
-        '''
-        exit(0)
+def run(os):
     working_dir = os.sys.argv[1]
     igraphhpp_path = os.path.abspath(os.sys.argv[2])
     igraphhpp_test_path = igraphhpp_path + "/" + igraphhpp_test_relative_path
@@ -171,7 +163,21 @@ if __name__ == "__main__":
     
     os.system("doxygen")
     
-    #TODO: create better output
+    #TODO: keep some copy of few recent regression test
     #TODO: check the correctness of the running result
 
 
+
+
+if __name__ == "__main__":
+    if(len(os.sys.argv)!=3 and len(os.sys.argv)!=4):
+        print '''Usage: working_directory igraphhpp_root_directory [force]\n
+        if force is used, no svn update and preform regression test directly 
+        e.g. python regression_test.py ./ ../ force
+        '''
+        exit(0)
+        
+    try:
+        run(os)
+    except:
+        print "ERROR!!"

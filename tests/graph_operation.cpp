@@ -26,19 +26,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 using namespace igraph;
 
-int main () {    
-	Graph F = Graph::full(5);
-	Graph G = Graph::full(4);
-	Graph H = Graph::star(5);
-	Graph J = Graph::full(3);
+int main () {
+	Graph F = Graph::ring(6);
+	Graph G = Graph::lattice_2d(2,3);
+	Graph H = Graph::star(6);
+	Graph J = Graph::full(6);
 
 	printf("\n\nGraph operation fucntion test\n----------------\n");	
 	Graph::disjoint_union(F,H).writer(stdout).adjlist();  printf("\n---\n");
 	Graph::merge(F,H).writer(stdout).adjlist();  printf("\n---\n");
 	Graph::intersection(F,H).writer(stdout).adjlist();  printf("\n---\n");
 	Graph::difference(F,H).writer(stdout).adjlist();  printf("\n---\n");
-	Graph::complementer(F).writer(stdout).adjlist();  printf("\n---\n");
+	Graph::complementer(H).writer(stdout).adjlist();  printf("\n---\n");
 	Graph::compose(F,H).writer(stdout).adjlist();  printf("\n---\n");
+	Graph::multiply(F,3).writer(stdout).adjlist();  printf("\n---\n");
 
 	printf("\n\nGraph operator test\n----------------\n");
 	(F + H).writer(stdout).adjlist();  printf("\n---\n");
@@ -48,22 +49,21 @@ int main () {
 	(~H).writer(stdout).adjlist();  printf("\n---\n");
 
 	printf("\n\nGraph operators combination test\n----------------\n");
-	Graph t1 = (~H) - J;
+	Graph t1 = (~H) - F;
 	t1.writer(stdout).adjlist();  printf("\n---\n");
-	Graph t2 = (F - G) | H;
+	Graph t2 = (J - G) | H;
 	t2.writer(stdout).adjlist();  printf("\n---\n");
-	Graph t3 = (F - G) + (J & F);
+	Graph t3 = (J - G) + (F & H);
 	t3.writer(stdout).adjlist();  printf("\n---\n");
 
 	printf("\n\ngraph operation : decompose\n----------------\n");
-	ReferenceVector<Graph> glist = (F + G + H + J).decompose();
+	ReferenceVector<Graph> glist = (F + G + H).decompose();
 	for(long i=0; i<glist.size(); ++i) {
 		glist[i].writer(stdout).adjlist();  printf("\n---\n");
 	}
 
 	printf("\n\ngraph operation many\n----------------\n");
-	glist.push_back(F);
-	glist.push_back(G);
+	glist.push_back(J);
 	Graph::disjoint_union(glist).writer(stdout).adjlist();  printf("\n---\n");
 	Graph::merge(glist).writer(stdout).adjlist();  printf("\n---\n");
 	Graph::intersection(glist).writer(stdout).adjlist();  printf("\n---\n");

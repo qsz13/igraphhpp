@@ -22,7 +22,6 @@ import os
 import time
 
 igraphhpp_test_relative_path = "tests/"
-compiler_message_path = "compiler_message/"
 last_status_fn = "svn_update_last_status.txt"
 compiler_result_fn = 'compiling_result.html'
 outfn = "tmp.exe"
@@ -83,7 +82,11 @@ def listdir(root, path=""):
 def test(igraphhpp_path,igraphhpp_test_path,name,commands,compiler_message_path):
     compile_result = []
     for title,base_cmd in commands.iteritems():
-        msgfn = compiler_message_path + (title + name + ".txt").replace("/","_")
+        msgfnsplit = os.path.split(compiler_message_path + name + ".txt")
+        print msgfnsplit
+        if(len(msgfnsplit[0]) != 0 and os.path.exists(msgfnsplit[0]) == False):
+            os.makedirs(msgfnsplit[0], mode=0777)
+        msgfn = os.path.join(msgfnsplit[0], title + "-" + msgfnsplit[1])
         infn = igraphhpp_test_path+name
         cmd = base_cmd % {"igraphhpp_path":igraphhpp_path, "outfn":outfn, "infn":infn, "msgfn":msgfn};
         os.system("echo 'Test cases: (" + title + "," + name + ")  start at "
@@ -132,6 +135,9 @@ def run(os):
         if os.path.splitext(fn)[1] == ".cpp":
             filelists += [fn]
     
+    compiler_message_path = time.strftime("%Y%b%d-%H%M%S") + "/"
+    if(os.path.exists(compiler_message_path) == False):
+        os.makedirs(compiler_message_path, mode=0777)
     results = {}
     for infn in filelists:
         results[infn] = test(igraphhpp_path,igraphhpp_test_path,infn,compiler_command,compiler_message_path)
@@ -141,7 +147,7 @@ def run(os):
     sortedfn.sort()
     for fn in sortedfn:
         row = results[fn]
-        cpfilepath = compiler_message_path + fn + ".txt"
+        cpfilepath = os.path.join(compiler_message_path, fn + ".txt")
         os.system("cp " + igraphhpp_test_path + fn + " " + cpfilepath);
         s += "<tr><td><a href='" + cpfilepath + "'>"+ fn + "</a></td>";
         for res in row:
@@ -155,14 +161,16 @@ def run(os):
                     s += "<td class='pass'><a href='" + res[0] + "'>PASS</a></td>"
         s += "</tr>"
     
-    f = open(compiler_result_fn, 'w')
+    f = open(compiler_message_path+compiler_result_fn, 'w')
     f.write(htmlcode % {
     "time" : starting_time, "revision" : new_status.split("\n")[-2],
     "header" : header, "result" : s}
     )
     
-    os.system("doxygen")
+    os.symlink(compiler_message_path+compiler_result_fn, compiler_result_fn)
     
+    os.system("doxygen")
+
     #TODO: keep some copy of few recent regression test
     #TODO: check the correctness of the running result
 
@@ -177,7 +185,4 @@ if __name__ == "__main__":
         '''
         exit(0)
         
-    try:
-        run(os)
-    except:
-        print "ERROR!!"
+    run(os)

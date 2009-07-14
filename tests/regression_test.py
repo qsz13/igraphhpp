@@ -81,11 +81,11 @@ def listdir(root, path=""):
 
 def test(igraphhpp_path,igraphhpp_test_path,name,commands,compiler_message_path):
     compile_result = []
-    for title,base_cmd in commands.iteritems():
+    for title,base_cmd in commands.iteritems():        
+        rel_path = os.path.split(compiler_message_path + name + ".txt")
+        if(len(rel_path[0]) != 0 and os.path.exists(rel_path[0]) == False):
+            os.makedirs(rel_path[0], mode=0777)
         msgfnsplit = os.path.split(compiler_message_path + name + ".txt")
-        print msgfnsplit
-        if(len(msgfnsplit[0]) != 0 and os.path.exists(msgfnsplit[0]) == False):
-            os.makedirs(msgfnsplit[0], mode=0777)
         msgfn = os.path.join(msgfnsplit[0], title + "-" + msgfnsplit[1])
         infn = igraphhpp_test_path+name
         cmd = base_cmd % {"igraphhpp_path":igraphhpp_path, "outfn":outfn, "infn":infn, "msgfn":msgfn};
@@ -166,12 +166,12 @@ def run(os):
     "time" : starting_time, "revision" : new_status.split("\n")[-2],
     "header" : header, "result" : s}
     )
+    f.close()
     
-    os.symlink(compiler_message_path+compiler_result_fn, compiler_result_fn)
+    os.system("cp " + compiler_message_path + compiler_result_fn + " " + compiler_result_fn);
     
     os.system("doxygen")
 
-    #TODO: keep some copy of few recent regression test
     #TODO: check the correctness of the running result
 
 

@@ -1,6 +1,6 @@
 /*
 
-igraph_cliques.cpp ... Test if Graph::cliques return correct results
+graph_operation.cpp ... Tests all graph opertions including disjoint union, merge, intersection...
 
 Copyright (C) 2009  Hon Wai, LAU <lau65536@gmail.com>
 
@@ -18,8 +18,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-
-// Converted from igraph's examples/simple/igraph_cliques.c
 
 #include <igraph/igraph.hpp>
 #include <cstdio>

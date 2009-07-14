@@ -1,3 +1,7 @@
+#Some Examples
+
+<wiki:toc />
+
 = Introduction =
 
 A prior to use the igraph, the igraph library must be installed (http://igraph.sf.net/). The header file of the C++ wrapper is igraph.hpp. All related components such as `Graph`, `Vector`, `Matrix`, etc. are available in the namespace `igraph` by simply including the igraph.hpp. In the following examples, we assume the following is used 

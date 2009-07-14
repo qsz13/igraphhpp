@@ -49,21 +49,6 @@ Besides wrapping the original ones, we also need to create the corresponding one
 = 9 Graph, Vertex and Edge Attributes =
 All unimplemented.
 
-= 10 Structural Properties of Graphs ==
-<font color="green">(_to be implemented by_ Hon Wai, LAU.)</font>
-== 10.2 Shortest Path Related Functions ==
- * `igraph_get_all_shortest_paths`
-
-== 10.5 Centrality Measures ==
- * `igraph_pagerank`
- * `igraph_pagerank_old`
- * `igraph_eigenvector_centrality`
- * `igraph_hub_score`
- * `igraph_authority_score`
-
-== 10.17 Other Operations ==
- * `igraph_avg_nearest_neighbor_degree`
-
 = 12 Graph Isomorphism =
 All unimplemented.
 
@@ -86,18 +71,9 @@ All unimplemented.
  * `igraph_read_graph_ncol` _requires_ <font color="red">!StringVector</font>
  * `igraph_read_graph_dimacs` _requires_ <font color="red">!StringVector</font>
 
-= 16 Maximum Flows, Minimum Cuts and related measures =
- * `igraph_maxflow_value`
- * `igraph_st_mincut_value`
- * `igraph_mincut_value`
- * `igraph_mincut`
-
 = 17 Detecting Community Structure =
  * `igraph_community_spinglass_single`
  * `igraph_community_leading_eigenvector_*`
-
-= 19 Using ARPACK for igraph graphs =
-All unimplemented.
 
 = 20 Bipartite, i.e. two-mode graphs =
 All unimplemented.

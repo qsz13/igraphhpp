@@ -1071,221 +1071,42 @@ namespace igraph {
 #pragma mark -
 #pragma mark 18. Graph Operators
 
-/** 
- * </para><para>
- * First the vertices of the second graph will be relabeled with new
- * vertex ids to have two disjoint sets of vertex ids, then the union
- * of the two graphs will be formed.
- * If the two graphs have |V1| and |V2| vertices and |E1| and |E2|
- * edges respectively then the new graph will have |V1|+|V2| vertices
- * and |E1|+|E2| edges.
- *
- * </para><para>
- * Both graphs need to have the same directedness, ie. either both
- * directed or both undirected.
- *
- * </para><para>
- * The current version of this function cannot handle graph, vertex
- * and edge attributes, they will be lost.
- *
- * \param x The first graph.
- * \param y The second graph.
- * \return resulting graph.
- * \sa \ref disjoint_union() for creating the disjoint union of more than two graphs, \ref merge() for non-disjoint
- * union.
- *
- * Time complexity: O(|V1|+|V2|+|E1|+|E2|).
- *
- * Wrapping function: igraph_disjoint_union()
- */
+
 	::tempobj::force_temporary_class<Graph>::type Graph::disjoint_union(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union(&tmp, &x._, &y._) );
 	}
-
-/**
- * </para><para>
- * First the vertices in the graphs will be relabed with new vertex
- * ids to have pairwise disjoint vertex id sets and then the union of
- * the graphs is formed.
- * The number of vertices and edges in the result is the total number
- * of vertices and edges in the graphs.
- *
- * </para><para>
- * Both graphs need to have the same directedness, ie. either both
- * directed or both undirected.
- *
- * </para><para>
- * The current version of this function cannot handle graph, vertex
- * and edge attributes, they will be lost.
- *
- * \param graphs: set of graphs in ReferenceVector
- * \return resulting graph
- * \sa \ref disjoint_union() for an easier syntax if you have only two graphs, \ref union() for non-disjoint union.
- *
- * Time complexity: O(|V|+|E|), the number of vertices plus the number
- * of edges in the result.
- *
- * Wrapping function: igraph_disjoint_union_many()
- */
 	::tempobj::force_temporary_class<Graph>::type Graph::disjoint_union(const ReferenceVector<Graph>& graphs) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_disjoint_union_many(&tmp, &graphs._) );
 	}
-
-/**
- * </para><para>
- * The number of vertices in the result is that of the larger graph
- * from the two arguments. The result graph contains edges which are
- * present in at least one of the operand graphs.
- *
- * \param x The first graph.
- * \param y The second graph.
- * \return resulting graph.
- * \sa \ref merge() for the union of many graphs, \ref intersection() and \ref difference() for other operators.
- *
- * Time complexity: O(|V|+|E|), |V| is the number of
- * vertices, |E| the number of edges in the result graph.
- *
- * Wrapping function: igraph_union()
- */
 	::tempobj::force_temporary_class<Graph>::type Graph::merge(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union(&tmp, &x._, &y._) );
 	}
-
-
-/**
- * </para><para>
- * The result graph will contain as many vertices as the largest graph
- * among the agruments does, and an edge will be included in it if it
- * is part of at least one operand graph.
- *
- * </para><para>
- * The directedness of the operand graphs must be the same.
- *
- * \param graphs: set of graphs in ReferenceVector
- * \return resulting graph
- * \sa \ref merge() for the union of two graphs, \ref intersection(), \ref intersection() and \ref difference for other operators.
- *
- * Time complexity: O(|V|+|E|), |V| is the number of vertices
- * in largest graph and |E| is the number of edges in the result graph.
- *
- * Wrapping function: igraph_union_many()
- */
 	::tempobj::force_temporary_class<Graph>::type Graph::merge(const ReferenceVector<Graph>& graphs) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_union_many(&tmp, &graphs._) );
 	}
-
-/**
- * </para><para>
- * The result graph contains only edges present both in the first and
- * the second graph. The number of vertices in the result graph is the
- * same as the larger from the two arguments.
- *
- * \param x The first graph.
- * \param y The second graph.
- * \return resulting graph.
- * \sa \ref intersection() to calculate the intersection of many graphs at once, merge(), \ref difference() for other operators.
- *
- * Time complexity: O(|V|+|E|), |V| is the number of nodes, |E|
- * is the number of edges in the smaller graph of the two. (The one
- * containing less vertices is considered smaller.)
- *
- * Wrapping function: igraph_intersection()
- */
 	::tempobj::force_temporary_class<Graph>::type Graph::intersection(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection(&tmp, &x._, &y._) );
 	}
-
-/**
- * </para><para>
- * This function calculates the intersection of the graphs stored in
- * the \c graphs argument. Only those edges will be included in the
- * result graph which are part of every graph in \c graphs.
- *
- * </para><para>
- * The number of vertices in the result graph will be the maximum
- * number of vertices in the argument graphs.
- *
- * \param graphs: set of graphs in ReferenceVector
- * \return resulting graph
- * \sa \ref intersection() for the intersection of two graphs, \ref union(), \ref union() and \ref difference() for other operators.
- *
- * Time complexity: O(|V|+|E|), |V| is the number of vertices,
- * |E| is the number of edges in the smallest graph (ie. the graph having
- * the less vertices).
- *
- * Wrapping function: igraph_intersection_many()
- */
 	::tempobj::force_temporary_class<Graph>::type Graph::intersection(const ReferenceVector<Graph>& graphs) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_intersection_many(&tmp, &graphs._) );
 	}
-
-/**
- * </para><para>
- * The number of vertices in the result is the number of vertices in
- * the original graph, ie. the left, first operand. In the results
- * graph only edges will be included from \c x which are not
- * present in \c y.
- *
- * \param x The first graph.
- * \param y The second graph.
- * \return resulting graph.
- * \sa \ref intersection() and \ref merge() for other operators.
- *
- * Time complexity: O(|V|+|E|), |V| is the number vertices in
- * the smaller graph, |E| is the
- * number of edges in the result graph.
- *
- * Wrapping function: igraph_difference()
- */
 	::tempobj::force_temporary_class<Graph>::type Graph::difference(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_difference(&tmp, &x._, &y._) );
 	}
-
-/**
- * </para><para>The complementer graph means that all edges which are
- * not part of the original graph will be included in the result.
- *
- * \param x The first graph.
- * \param loops Whether to add loop edges to the complementer graph.
- * \return resulting graph.
- * \sa \ref merge(), \ref intersection() and \ref difference().
- *
- * Time complexity: O(|V|+|E1|+|E2|), |V| is the number of
- * vertices in the graph, |E1| is the number of edges in the original
- * and |E2| in the complementer graph.
- *
- * Wrapping function: igraph_complementer()
- */
 	::tempobj::force_temporary_class<Graph>::type Graph::complementer(const Graph& x, SelfLoops loops) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_complementer(&tmp, &x._, (igraph_bool_t)loops) );
 	}
-
-/**
- * The composition of graphs contains the same number of vertices as
- * the bigger graph of the two operands. It contains an (i,j) edge if
- * and only if there is a k vertex, such that the first graphs
- * contains an (i,k) edge and the second graph a (k,j) edge.
- *
- * </para><para>This is of course exactly the composition of two
- * binary relations.
- *
- * </para><para>Two two graphs must have the same directedness,
- * otherwise the function returns with an error message.
- * Note that for undirected graphs the two relations are by definition
- * symmetric.
- *
- * \param x The first graph.
- * \param y The second graph.
- * \return resulting graph.
- *
- * Time complexity: O(|V|*d1*d2), |V| is the number of vertices in the
- * first graph, d1 and d2 the average degree in the first and second
- * graphs.
- *
- * Wrapping function: igraph_compose()
- */
 	::tempobj::force_temporary_class<Graph>::type Graph::compose(const Graph& x, const Graph& y) MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(tmp, igraph_compose(&tmp, &x._, &y._) );
+	}
+	::tempobj::force_temporary_class<Graph>::type Graph::multiply(const Graph& g, long num_of_copy) MAY_THROW_EXCEPTION {
+		igraph_vector_ptr_t graphs;
+		igraph_t res;
+		TRY( igraph_vector_ptr_init(&graphs, num_of_copy) );
+		for(long i=0; i<num_of_copy; ++i)
+			VECTOR(graphs)[i] = (void*)(&g._);
+		TRY( igraph_disjoint_union_many(&res, &graphs) );
+		return ::tempobj::force_move(Graph(&res, ::tempobj::OwnershipTransferMove));
 	}
 
 	::tempobj::force_temporary_class<Graph>::type Graph::operator+ (const Graph& other) const MAY_THROW_EXCEPTION {

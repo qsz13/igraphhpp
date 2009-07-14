@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/referencevector.hpp>
 #include <igraph/cpp/community.hpp>
 #include <igraph/cpp/mincut.hpp>
+#include <igraph/cpp/arpack.hpp>
 
 namespace gsl {
 	class Random;
@@ -96,7 +97,7 @@ namespace igraph {
 		Graph& delete_edge(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION;
 		Graph& delete_edge(const Edge eid) MAY_THROW_EXCEPTION;
 		
-		Graph& delete_vertices(const VertexSelector& vs) MAY_THROW_EXCEPTION;
+		Graph& delete_vertices(const VertexSelector& vids) MAY_THROW_EXCEPTION;
 		
 		__attribute__((deprecated,warning("Graph::connect is deprecated. Use Graph::add_edge instead.")))
 		Graph& connect(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION { return add_edge(from, to); }
@@ -220,20 +221,20 @@ namespace igraph {
 		::tempobj::force_temporary_class<Matrix>::type shortest_paths_johnson(const VertexSelector& from, Vector& weights, NeighboringMode mode) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<ReferenceVector<Vector> >::type get_shortest_paths(Integer from, const VertexSelector& to, NeighboringMode mode) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<ReferenceVector<Vector> >::type get_shortest_paths_dijkstra(Integer from, const VertexSelector& to, Vector& weights, NeighboringMode mode) const MAY_THROW_EXCEPTION;
-		// TODO: implement igraph_get_all_shortest_paths()
-		Real average_path_length(Directedness directedness, Boolean unconn) const MAY_THROW_EXCEPTION;
-		std::pair<Vector,Real> path_length_hist(Directedness directedness) const MAY_THROW_EXCEPTION;
-		Integer diameter(Directedness directedness, Boolean unconn) const MAY_THROW_EXCEPTION;
-		::tempobj::force_temporary_class<Vector>::type get_diameter(Directedness directedness, Boolean unconn) const MAY_THROW_EXCEPTION;
-		std::pair<Integer,Integer> farthest_nodes(Directedness directedness, Boolean unconn) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<ReferenceVector<Vector> >::type get_all_shortest_paths(Integer from, const VertexSelector& to, NeighboringMode mode) const MAY_THROW_EXCEPTION;
+		Real average_path_length(Directedness directedness=Directed, Boolean unconn=true) const MAY_THROW_EXCEPTION;
+		std::pair<Vector,Real> path_length_hist(Directedness directedness=Directed) const MAY_THROW_EXCEPTION;
+		Integer diameter(Directedness directedness=Directed, Boolean unconn=true) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Vector>::type get_diameter(Directedness directedness=Directed, Boolean unconn=true) const MAY_THROW_EXCEPTION;
+		std::pair<Integer,Integer> farthest_nodes(Directedness directedness=Directed, Boolean unconn=true) const MAY_THROW_EXCEPTION;
 		Integer girth() const MAY_THROW_EXCEPTION;
 		Integer girth(Vector& circle) const MAY_THROW_EXCEPTION;
 
 #pragma mark -
 #pragma mark 10.3 Neighborhood of a vertex
-		::tempobj::force_temporary_class<Vector>::type neighborhood_size(VertexSelector& vs, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION;
-		::tempobj::force_temporary_class<ReferenceVector<VertexVector> >::type neighborhood(VertexSelector& vs, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION;
-		::tempobj::force_temporary_class<ReferenceVector<Graph> >::type neighborhood_graphs(VertexSelector& vs, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Vector>::type neighborhood_size(VertexSelector& vids, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<ReferenceVector<VertexVector> >::type neighborhood(VertexSelector& vids, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<ReferenceVector<Graph> >::type neighborhood_graphs(VertexSelector& vids, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION;
 
 
 #pragma mark -
@@ -244,7 +245,7 @@ namespace igraph {
 		};
 		
 		::tempobj::force_temporary_class<VertexVector>::type subcomponent(const Vertex representative, const NeighboringMode mode = OutNeighbors) const MAY_THROW_EXCEPTION;
-		::tempobj::force_temporary_class<Graph>::type subgraph(const VertexSelector& vs) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Graph>::type subgraph(const VertexSelector& vids) const MAY_THROW_EXCEPTION;
 		void cluster(Vector& cluster_id_each_vertex_belongs_to, Vector& size_of_each_cluster, Connectedness connectedness = WeaklyConnected) const MAY_THROW_EXCEPTION;
 		Integer cluster_count(const Connectedness connectedness = WeaklyConnected) const MAY_THROW_EXCEPTION;
 		
@@ -259,18 +260,20 @@ namespace igraph {
 #pragma mark -
 #pragma mark 10.5 Centrality Measures
 
-		::tempobj::force_temporary_class<Vector>::type closeness(const VertexSelector& vids, NeighboringMode neimode) const MAY_THROW_EXCEPTION;
-		::tempobj::force_temporary_class<Vector>::type betweenness(const VertexSelector& vids, Directedness directedness) const MAY_THROW_EXCEPTION;
-		::tempobj::force_temporary_class<Vector>::type edge_betweenness(Directedness directedness) const MAY_THROW_EXCEPTION;
-		// TODO: igraph_pagerank
-		// TODO: igraph_pagerank_old
+		::tempobj::force_temporary_class<Vector>::type closeness(const VertexSelector& vids, NeighboringMode neimode=AllNeighbors) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Vector>::type betweenness(const VertexSelector& vids, Directedness directedness=Directed) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Vector>::type edge_betweenness(Directedness directedness=Directed) const MAY_THROW_EXCEPTION;
+		std::pair<Vector,Real> pagerank(const VertexSelector& vids, Directedness directedness, Real damping, ArpackOptions& options) const MAY_THROW_EXCEPTION;
+		std::pair<Vector,Real> pagerank(const VertexSelector& vids, Directedness directedness, Real damping, const Vector& weights, ArpackOptions& options) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Vector>::type constraint(const VertexSelector& vids) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Vector>::type constraint(const VertexSelector& vids, const Vector& weights) const MAY_THROW_EXCEPTION;
 		Integer maxdegree(const VertexSelector& vids, NeighboringMode neimode, SelfLoops countloops) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Vector>::type strength(const VertexSelector& vids, const Vector& weights, NeighboringMode neimode, SelfLoops countloops) const MAY_THROW_EXCEPTION;
-		// TODO: igraph_eigenvector_centrality
-		// TODO: igraph_hub_score
-		// TODO: igraph_authority_score
+		std::pair<Vector,Real> eigenvector_centrality(Boolean scale, ArpackOptions& options) const MAY_THROW_EXCEPTION;
+		std::pair<Vector,Real> eigenvector_centrality(Boolean scale, const Vector& weights, ArpackOptions& options) const MAY_THROW_EXCEPTION;
+		std::pair<Vector,Real> hub_score(Boolean scale, ArpackOptions& options) const MAY_THROW_EXCEPTION;
+		std::pair<Vector,Real> authority_score(Boolean scale, ArpackOptions& options) const MAY_THROW_EXCEPTION;
+
 
 
 #pragma mark -
@@ -295,7 +298,7 @@ namespace igraph {
 #pragma mark 10.8 Spanning Tree
 
 		::tempobj::force_temporary_class<Graph>::type minimum_spanning_tree() const MAY_THROW_EXCEPTION;
-		::tempobj::force_temporary_class<Graph>::type minimum_spanning_tree(const Vector weights) const MAY_THROW_EXCEPTION;
+		::tempobj::force_temporary_class<Graph>::type minimum_spanning_tree(const Vector& weights) const MAY_THROW_EXCEPTION;
 
 
 #pragma mark -
@@ -382,7 +385,14 @@ namespace igraph {
 		Real density(SelfLoops countLoops) const MAY_THROW_EXCEPTION;
 		Real reciprocity(Boolean ignore_loops) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<BoolVector>::type is_mutual(const EdgeSelector& es) /*const?*/ MAY_THROW_EXCEPTION;
-		// TODO: igraph_avg_nearest_neighbor_degree
+
+		::tempobj::force_temporary_class<Vector>::type avg_nearest_neighbor_degree_knn(const VertexSelector& vids);
+		::tempobj::force_temporary_class<Vector>::type avg_nearest_neighbor_degree_knn(const VertexSelector& vids, const Vector& weights);
+		::tempobj::force_temporary_class<Vector>::type avg_nearest_neighbor_degree_knnk(const VertexSelector& vids);
+		::tempobj::force_temporary_class<Vector>::type avg_nearest_neighbor_degree_knnk(const VertexSelector& vids, const Vector& weights);
+		void avg_nearest_neighbor_degree_both(Vector& knn, Vector& knnk, const VertexSelector& vids);
+		void avg_nearest_neighbor_degree_both(Vector& knn, Vector& knnk, const VertexSelector& vids, const Vector& weights);
+
 		::tempobj::force_temporary_class<Matrix>::type get_adjacency(GetAdjacency type = GetAdjacency_Both) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<Vector>::type get_edgelist(EdgelistSequenceOrdering bycol = EdgelistSequenceOrdering_Default) const MAY_THROW_EXCEPTION;
 
@@ -468,11 +478,11 @@ namespace igraph {
 		};
 
 		Real maxflow_value(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
-		Real maxflow_value(Vertex source, Vertex target, Vector capacity) const MAY_THROW_EXCEPTION;
+		Real maxflow_value(Vertex source, Vertex target, const Vector& capacity) const MAY_THROW_EXCEPTION;
 		Real st_mincut_value(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
-		Real st_mincut_value(Vertex source, Vertex target, Vector capacity) const MAY_THROW_EXCEPTION;
+		Real st_mincut_value(Vertex source, Vertex target, const Vector& capacity) const MAY_THROW_EXCEPTION;
 		Real mincut_value() const MAY_THROW_EXCEPTION;
-		Real mincut_value(Vector capacity) const MAY_THROW_EXCEPTION;
+		Real mincut_value(const Vector& capacity) const MAY_THROW_EXCEPTION;
 		Mincut mincut() const throw() { return Mincut(*this); }
 		Integer st_edge_connectivity(Vertex source, Vertex target) const MAY_THROW_EXCEPTION;
 		Integer edge_connectivity(Boolean checks = true) const MAY_THROW_EXCEPTION;

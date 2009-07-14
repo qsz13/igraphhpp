@@ -130,8 +130,8 @@ namespace igraph {
 	Graph& Graph::delete_edge(const Vertex from, const Vertex to) MAY_THROW_EXCEPTION { return delete_edges(EdgeSelector::fromto(from, to)); }
 	Graph& Graph::delete_edge(const Edge eid) MAY_THROW_EXCEPTION { return delete_edges(EdgeSelector::single(eid)); }
 
-	Graph& Graph::delete_vertices(const VertexSelector& vs) MAY_THROW_EXCEPTION {
-		TRY(igraph_delete_vertices(&_, vs._));
+	Graph& Graph::delete_vertices(const VertexSelector& vids) MAY_THROW_EXCEPTION {
+		TRY(igraph_delete_vertices(&_, vids._));
 		return *this;
 	}
 
@@ -495,7 +495,10 @@ namespace igraph {
 	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::get_shortest_paths_dijkstra(Integer from, const VertexSelector& to, Vector& weights, NeighboringMode mode) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, igraph_vector_t, res, to.size(*this), igraph_get_shortest_paths_dijkstra(&_, &res, from, to._, &weights._, (igraph_neimode_t)mode) );
 	}
-	// TODO: implement igraph_get_all_shortest_paths()
+	// what is the difference between igraph_get_shortest_paths() and igraph_get_all_shortest_paths()?
+	::tempobj::force_temporary_class<ReferenceVector<Vector> >::type Graph::get_all_shortest_paths(Integer from, const VertexSelector& to, NeighboringMode mode) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_PTRVEC(Vector, igraph_vector_t, res, to.size(*this), igraph_get_all_shortest_paths(&_, &res, NULL, from, to._, (igraph_neimode_t)mode) );
+	}
 	// TODO: give enum for the unconn Boolean
 	Real Graph::average_path_length(Directedness directedness, Boolean unconn) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_average_path_length(&_, &res, directedness, (igraph_bool_t)unconn) );
@@ -527,14 +530,14 @@ namespace igraph {
 #pragma mark -
 #pragma mark 10.3 Neighborhood of a vertex
 
-	::tempobj::force_temporary_class<Vector>::type Graph::neighborhood_size(VertexSelector& vs, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION {
-		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_neighborhood_size(&_, &res, vs._, order, (igraph_neimode_t)mode) );
+	::tempobj::force_temporary_class<Vector>::type Graph::neighborhood_size(VertexSelector& vids, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_neighborhood_size(&_, &res, vids._, order, (igraph_neimode_t)mode) );
 	}
-	::tempobj::force_temporary_class<ReferenceVector<VertexVector> >::type Graph::neighborhood(VertexSelector& vs, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION {
-		XXINTRNL_TEMP_RETURN_PTRVEC(VertexVector, igraph_vector_t, res, 0, igraph_neighborhood(&_, &res, vs._, order, (igraph_neimode_t)mode) );
+	::tempobj::force_temporary_class<ReferenceVector<VertexVector> >::type Graph::neighborhood(VertexSelector& vids, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_PTRVEC(VertexVector, igraph_vector_t, res, 0, igraph_neighborhood(&_, &res, vids._, order, (igraph_neimode_t)mode) );
 	}
-	::tempobj::force_temporary_class<ReferenceVector<Graph> >::type Graph::neighborhood_graphs(VertexSelector& vs, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION {
-		XXINTRNL_TEMP_RETURN_PTRVEC(Graph, igraph_t, res, 0, igraph_neighborhood_graphs(&_, &res, vs._, order, (igraph_neimode_t)mode) );
+	::tempobj::force_temporary_class<ReferenceVector<Graph> >::type Graph::neighborhood_graphs(VertexSelector& vids, Integer order, NeighboringMode mode) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_PTRVEC(Graph, igraph_t, res, 0, igraph_neighborhood_graphs(&_, &res, vids._, order, (igraph_neimode_t)mode) );
 	}
 
 
@@ -544,8 +547,8 @@ namespace igraph {
 	::tempobj::force_temporary_class<VertexVector>::type Graph::subcomponent(const Vertex representative, const NeighboringMode mode) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_subcomponent(&_, &res, representative, (igraph_neimode_t)mode));
 	}
-	::tempobj::force_temporary_class<Graph>::type Graph::subgraph(const VertexSelector& vs) const MAY_THROW_EXCEPTION {
-		XXINTRNL_FORWARD_GRAPH_CREATION(res, igraph_subgraph(&_, &res, vs._) );
+	::tempobj::force_temporary_class<Graph>::type Graph::subgraph(const VertexSelector& vids) const MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(res, igraph_subgraph(&_, &res, vids._) );
 	}
 	void Graph::cluster(Vector& cluster_id_each_vertex_belongs_to, Vector& size_of_each_cluster, Connectedness connectedness) const MAY_THROW_EXCEPTION {
 		igraph_vector_t membership, csize;
@@ -597,8 +600,17 @@ namespace igraph {
 	::tempobj::force_temporary_class<Vector>::type Graph::edge_betweenness(Directedness directedness) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_edge_betweenness(&_, &res, directedness) );
 	}
-	// TODO: igraph_pagerank
-	// TODO: igraph_pagerank_old
+	std::pair<Vector,Real> Graph::pagerank(const VertexSelector& vids, Directedness directedness, Real damping, ArpackOptions& options) const MAY_THROW_EXCEPTION {
+		std::pair<Vector,Real> res;
+		TRY( igraph_pagerank(&_, &res.first._, &res.second, vids._, directedness, damping, NULL, &options._) );
+		return res;
+	}
+	std::pair<Vector,Real> Graph::pagerank(const VertexSelector& vids, Directedness directedness, Real damping, const Vector& weights, ArpackOptions& options) const MAY_THROW_EXCEPTION {
+		std::pair<Vector,Real> res;
+		TRY( igraph_pagerank(&_, &res.first._, &res.second, vids._, directedness, damping, &weights._, &options._) );
+		return res;
+	}
+	// NOT implemented: igraph_pagerank_old()
 	::tempobj::force_temporary_class<Vector>::type Graph::constraint(const VertexSelector& vids) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_constraint(&_, &res, vids._, NULL) );
 	}
@@ -611,9 +623,26 @@ namespace igraph {
 	::tempobj::force_temporary_class<Vector>::type Graph::strength(const VertexSelector& vids, const Vector& weights, NeighboringMode neimode, SelfLoops countloops) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_strength(&_, &res, vids._, (igraph_neimode_t)neimode, countloops, &weights._) );
 	}
-	// TODO: igraph_eigenvector_centrality
-	// TODO: igraph_hub_score
-	// TODO: igraph_authority_score
+	std::pair<Vector,Real> Graph::eigenvector_centrality(Boolean scale, ArpackOptions& options) const MAY_THROW_EXCEPTION {
+		std::pair<Vector,Real> res;
+		TRY( igraph_eigenvector_centrality(&_, &res.first._, &res.second, scale, NULL, &options._) );
+		return res;
+	}
+	std::pair<Vector,Real> Graph::eigenvector_centrality(Boolean scale, const Vector& weights, ArpackOptions& options) const MAY_THROW_EXCEPTION {
+		std::pair<Vector,Real> res;
+		TRY( igraph_eigenvector_centrality(&_, &res.first._, &res.second, scale, &weights._, &options._) );
+		return res;
+	}
+	std::pair<Vector,Real> Graph::hub_score(Boolean scale, ArpackOptions& options) const MAY_THROW_EXCEPTION {
+		std::pair<Vector,Real> res;
+		TRY( igraph_hub_score(&_, &res.first._, &res.second, scale, &options._) );
+		return res;
+	}
+	std::pair<Vector,Real> Graph::authority_score(Boolean scale, ArpackOptions& options) const MAY_THROW_EXCEPTION {
+		std::pair<Vector,Real> res;
+		TRY( igraph_authority_score(&_, &res.first._, &res.second, scale, &options._) );
+		return res;
+	}
 
 
 #pragma mark -
@@ -656,7 +685,7 @@ namespace igraph {
 	::tempobj::force_temporary_class<Graph>::type Graph::minimum_spanning_tree() const MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(mst, igraph_minimum_spanning_tree_unweighted(&_, &mst));
 	}
-	::tempobj::force_temporary_class<Graph>::type Graph::minimum_spanning_tree(const Vector weights) const MAY_THROW_EXCEPTION {
+	::tempobj::force_temporary_class<Graph>::type Graph::minimum_spanning_tree(const Vector& weights) const MAY_THROW_EXCEPTION {
 		XXINTRNL_FORWARD_GRAPH_CREATION(mst, igraph_minimum_spanning_tree_prim(&_, &mst, &weights._));
 	}
 
@@ -797,11 +826,27 @@ namespace igraph {
 		TRY( igraph_is_mutual(&_, &res, es._) );
 		return ::tempobj::force_move(BoolVector(&res, ::tempobj::OwnershipTransferMove));
 	}
-	// TODO: igraph_avg_nearest_neighbor_degree
+	::tempobj::force_temporary_class<Vector>::type Graph::avg_nearest_neighbor_degree_knn(const VertexSelector& vids) {
+		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_avg_nearest_neighbor_degree(&_, vids._, &res, NULL, NULL) );
+	}
+	::tempobj::force_temporary_class<Vector>::type Graph::avg_nearest_neighbor_degree_knn(const VertexSelector& vids, const Vector& weights) {
+		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_avg_nearest_neighbor_degree(&_, vids._, &res, NULL, &weights._) );
+	}
+	::tempobj::force_temporary_class<Vector>::type Graph::avg_nearest_neighbor_degree_knnk(const VertexSelector& vids) {
+		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_avg_nearest_neighbor_degree(&_, vids._, NULL, &res, NULL) );
+	}
+	::tempobj::force_temporary_class<Vector>::type Graph::avg_nearest_neighbor_degree_knnk(const VertexSelector& vids, const Vector& weights) {
+		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_avg_nearest_neighbor_degree(&_, vids._, NULL, &res, &weights._) );
+	}
+	void Graph::avg_nearest_neighbor_degree_both(Vector& knn, Vector& knnk, const VertexSelector& vids) {
+		TRY( igraph_avg_nearest_neighbor_degree(&_, vids._, &knn._, &knnk._, NULL) );
+	}
+	void Graph::avg_nearest_neighbor_degree_both(Vector& knn, Vector& knnk, const VertexSelector& vids, const Vector& weights) {
+		TRY( igraph_avg_nearest_neighbor_degree(&_, vids._, &knn._, &knnk._, &weights._) );
+	}
 	::tempobj::force_temporary_class<Matrix>::type Graph::get_adjacency(GetAdjacency type) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_MATRIX(res, igraph_get_adjacency(&_, &res, (igraph_get_adjacency_t)type));
 	}
-	// any name for igraph_bool_t?
 	::tempobj::force_temporary_class<Vector>::type Graph::get_edgelist(EdgelistSequenceOrdering bycol) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_get_edgelist(&_, &res, static_cast<igraph_bool_t>(bycol)) );
 	}
@@ -982,19 +1027,19 @@ namespace igraph {
 	Real Graph::maxflow_value(Vertex source, Vertex target) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_maxflow_value(&_, &res, source, target, NULL) );
 	}
-	Real Graph::maxflow_value(Vertex source, Vertex target, Vector capacity) const MAY_THROW_EXCEPTION {
+	Real Graph::maxflow_value(Vertex source, Vertex target, const Vector& capacity) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_maxflow_value(&_, &res, source, target, &capacity._) );
 	}
 	Real Graph::st_mincut_value(Vertex source, Vertex target) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_st_mincut_value(&_, &res, source, target, NULL) );
 	}
-	Real Graph::st_mincut_value(Vertex source, Vertex target, Vector capacity) const MAY_THROW_EXCEPTION {
+	Real Graph::st_mincut_value(Vertex source, Vertex target, const Vector& capacity) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_st_mincut_value(&_, &res, source, target, &capacity._) );
 	}
 	Real Graph::mincut_value() const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_mincut_value(&_, &res, NULL) );
 	}
-	Real Graph::mincut_value(Vector capacity) const MAY_THROW_EXCEPTION {
+	Real Graph::mincut_value(const Vector& capacity) const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Real, res, igraph_mincut_value(&_, &res, &capacity._) );
 	}
 	Integer Graph::st_edge_connectivity(Vertex source, Vertex target) const MAY_THROW_EXCEPTION {

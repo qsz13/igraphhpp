@@ -715,11 +715,11 @@ namespace igraph {
 #pragma mark -
 #pragma mark 10.10 Directedness conversion
 
-	Graph& Graph::to_undirected(const ToDirectedMode mode) MAY_THROW_EXCEPTION {
+	Graph& Graph::to_undirected(const ToUndirectedMode mode) MAY_THROW_EXCEPTION {
 		TRY(igraph_to_undirected(&_, (igraph_to_undirected_t)mode));
 		return *this;
 	}
-	Graph& Graph::to_directed(const ToUndirectedMode mode) MAY_THROW_EXCEPTION {
+	Graph& Graph::to_directed(const ToDirectedMode mode) MAY_THROW_EXCEPTION {
 		TRY(igraph_to_directed(&_, (igraph_to_directed_t)mode));
 		return *this;
 	}

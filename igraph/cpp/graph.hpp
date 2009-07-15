@@ -45,14 +45,6 @@ namespace igraph {
 		igraph_t _;
 		
 	public:
-		enum ToUndirectedMode {
-			ToUndirectedMode_Each = IGRAPH_TO_UNDIRECTED_EACH,
-			ToUndirectedMode_Collapse = IGRAPH_TO_UNDIRECTED_COLLAPSE,
-			// Backward compatibility.
-			EachArcToEdge = IGRAPH_TO_UNDIRECTED_EACH,
-			CollapseArcs = IGRAPH_TO_UNDIRECTED_COLLAPSE
-		};
-		
 		MEMORY_MANAGER_INTERFACE(Graph);
 		XXINTRNL_WRAPPER_CONSTRUCTOR_INTERFACE(Graph, igraph_t);
 		
@@ -134,6 +126,22 @@ namespace igraph {
 			AdjacencyMode_Plus = IGRAPH_ADJ_PLUS,
 			AdjacencyMode_Upper = IGRAPH_ADJ_UPPER,
 			AdjacencyMode_Lower = IGRAPH_ADJ_LOWER,
+		};
+
+		enum ToUndirectedMode {
+			ToUndirectedMode_Each = IGRAPH_TO_UNDIRECTED_EACH,
+			ToUndirectedMode_Collapse = IGRAPH_TO_UNDIRECTED_COLLAPSE,
+			// Backward compatibility.
+			EachArcToEdge = IGRAPH_TO_UNDIRECTED_EACH,
+			CollapseArcs = IGRAPH_TO_UNDIRECTED_COLLAPSE
+		};
+
+		enum ToDirectedMode {
+			ToDirectedMode_Arbitrary = IGRAPH_TO_DIRECTED_ARBITRARY,
+			ToDirectedMode_Mutual = IGRAPH_TO_DIRECTED_MUTUAL,
+			// Backward compatibility.
+			EachEdgeToArc = IGRAPH_TO_DIRECTED_ARBITRARY,
+			SplitEdges = IGRAPH_TO_DIRECTED_MUTUAL
 		};
 		
 		static ::tempobj::force_temporary_class<Graph>::type create(const VertexVector& edges, const Integer min_size = 0, const Directedness directedness = Undirected) MAY_THROW_EXCEPTION;
@@ -314,16 +322,8 @@ namespace igraph {
 #pragma mark -
 #pragma mark 10.10 Directedness conversion
 
-		enum ToDirectedMode {
-			ToDirectedMode_Arbitrary = IGRAPH_TO_DIRECTED_ARBITRARY,
-			ToDirectedMode_Mutual = IGRAPH_TO_DIRECTED_MUTUAL,
-			// Backward compatibility.
-			EachEdgeToArc = IGRAPH_TO_DIRECTED_ARBITRARY,
-			SplitEdges = IGRAPH_TO_DIRECTED_MUTUAL
-		};
-		
-		Graph& to_undirected(const ToDirectedMode mode = ToDirectedMode_Mutual) MAY_THROW_EXCEPTION;
-		Graph& to_directed(const ToUndirectedMode mode = ToUndirectedMode_Collapse) MAY_THROW_EXCEPTION;
+		Graph& to_undirected(const ToUndirectedMode mode = ToUndirectedMode_Collapse) MAY_THROW_EXCEPTION;
+		Graph& to_directed(const ToDirectedMode mode = ToDirectedMode_Mutual) MAY_THROW_EXCEPTION;
 
 
 #pragma mark -
@@ -734,27 +734,26 @@ namespace igraph {
 		 * first graph, d1 and d2 the average degree in the first and second
 		 * graphs.
 		 *
-		 * Wrapping function: igraph_compose()
 		 */
 		static ::tempobj::force_temporary_class<Graph>::type multiply(const Graph& g, long num_of_copy) MAY_THROW_EXCEPTION;
 
-		/// \brief Disjoint union of two graphs, same as disjoint_union()
+		/// \brief Disjoint union of two graphs, same as disjoint_union(*this,other)
 		::tempobj::force_temporary_class<Graph>::type operator+ (const Graph& other) const MAY_THROW_EXCEPTION;
-		/// \brief Merge (i.e. union) of two graphs, same as merge()
+		/// \brief Merge (i.e. union) of two graphs, same as merge(*this,other)
 		::tempobj::force_temporary_class<Graph>::type operator| (const Graph& other) const MAY_THROW_EXCEPTION;
-		/// \brief Intersection of two graphs, same as intersection()
+		/// \brief Intersection of two graphs, same as intersection(*this,other)
 		::tempobj::force_temporary_class<Graph>::type operator& (const Graph& other) const MAY_THROW_EXCEPTION;
-		/// \brief Difference between two graphs, same as difference()
+		/// \brief Difference between two graphs, same as difference(*this,other)
 		::tempobj::force_temporary_class<Graph>::type operator- (const Graph& other) const MAY_THROW_EXCEPTION;
-		/// \brief Complementerary graph, similar to complementer()
+		/// \brief Complementerary graph, similar to complementer(*this,NoSelfLoops)
 		::tempobj::force_temporary_class<Graph>::type operator~ () const MAY_THROW_EXCEPTION;
-		/// \brief Disjoint union of two graphs
+		/// \brief Disjoint union of two graphs, same as *this = *this + other
 		Graph& operator+= (const Graph& other) MAY_THROW_EXCEPTION;
-		/// \brief Merge (i.e. union) of two graphs
+		/// \brief Merge (i.e. union) of two graphs, same as *this = *this | other
 		Graph& operator|= (const Graph& other) MAY_THROW_EXCEPTION;
-		/// \brief Intersection of two graphs
+		/// \brief Intersection of two graphs, same as *this = *this & other
 		Graph& operator&= (const Graph& other) MAY_THROW_EXCEPTION;
-		/// \brief Difference between two graphs
+		/// \brief Difference between two graphs, same as *this = *this - other
 		Graph& operator-= (const Graph& other) MAY_THROW_EXCEPTION;
 		
 #pragma mark -

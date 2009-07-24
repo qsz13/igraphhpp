@@ -1,4 +1,5 @@
 #summary Some examples
+#labels Phase-Support
 
 <wiki:toc />
 
@@ -22,7 +23,7 @@ int main () {
 
 	Graph g = Graph::erdos_renyi_game(1000, 5.0/1000);
 	Real diameter = g.diameter();
-	printf("Diameter of a random graph with average degree 5: %f\n", (double) diameter);
+	printf("Diameter of a random graph with average degree 5: %lf\n", diameter);
 
 	return 0;
 }
@@ -41,7 +42,7 @@ int main () {
 	Vector dimvector("30 30");
 	Graph g = Graph::lattice(dimvector);
 
-	printf("Average path length (lattice):            %f\n", (double)g.average_path_length() );
+	printf("Average path length (lattice):            %lf\n", g.average_path_length() );
 
 	Vector edges(20);
 	srand(100);
@@ -49,7 +50,7 @@ int main () {
 		edges[i] = rand() % (int)g.size();
 
 	g.add_edges(edges);
-	printf("Average path length (randomized lattice): %f\n", (double)g.average_path_length() );
+	printf("Average path length (randomized lattice): %lf\n", g.average_path_length() );
 
 	return 0;
 }
@@ -80,12 +81,12 @@ int main () {
 	printf("Maximum degree is      %10i, vertex %2i.\n", (int)res.max(), (int)res.which_min());
 
 	res = g.closeness(VertexSelector::all());
-	printf("Maximum closeness is   %10f, vertex %2i.\n", (double)res.max(), (int)res.which_min());
+	printf("Maximum closeness is   %10lf, vertex %2i.\n", res.max(), (int)res.which_min());
 
 	// the support of C++ standard template library
 	res = g.betweenness(VertexSelector::all());
 	VertexVector::const_iterator it = max_element(res.begin(), res.end());
-	printf("Maximum betweenness is %10f, vertex %2i.\n", (double)*it, (int)(it-res.begin()));
+	printf("Maximum betweenness is %10lf, vertex %2i.\n", *it, (int)(it-res.begin()));
 
 	return 0;
 }

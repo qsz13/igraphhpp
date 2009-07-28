@@ -31,12 +31,6 @@ int main () {
 
 == Example 2 ==
 {{{
-#include <igraph/igraph.hpp>
-#include <cstdio>
-using namespace std;
-using namespace igraph;
-
-
 int main () {
 
 	Vector dimvector("30 30");

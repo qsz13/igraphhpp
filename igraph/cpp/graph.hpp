@@ -411,10 +411,22 @@ namespace igraph {
 		::tempobj::force_temporary_class<ReferenceVector<Vector> >::type maximal_independent_vertex_sets() const;
 		Integer independence_number() const MAY_THROW_EXCEPTION;
 
+
 #pragma mark -
 #pragma mark 12. Graph Isomorphism
 		
 		::tempobj::force_temporary_class<Graph>::type permute_vertices(const VertexVector& permutation) const MAY_THROW_EXCEPTION;
+
+
+#pragma mark -
+#pragma mark 13. Graph Motifs, Dyad Census and Triad Census
+	void dyad_census(Integer& mut, Integer& asym, Integer& null) const MAY_THROW_EXCEPTION;
+	::tempobj::force_temporary_class<Vector>::type triad_census() const MAY_THROW_EXCEPTION;
+	::tempobj::force_temporary_class<Vector>::type motifs_randesu(int size, const Vector& cut_prob) const MAY_THROW_EXCEPTION;
+	Integer motifs_randesu_no(int size, const Vector& cut_prob) const MAY_THROW_EXCEPTION;
+	Integer motifs_randesu_estimate(int size, const Vector& cut_prob, Integer sample_size) const MAY_THROW_EXCEPTION;
+	Integer motifs_randesu_estimate(int size, const Vector& cut_prob, const Vector& parsample) const MAY_THROW_EXCEPTION;
+
 
 #pragma mark -
 #pragma mark 14. Generating Layouts for Graph Drawing

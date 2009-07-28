@@ -909,6 +909,28 @@ namespace igraph {
 
 
 #pragma mark -
+#pragma mark 13. Graph Motifs, Dyad Census and Triad Census
+	void Graph::dyad_census(Integer& mut, Integer& asym, Integer& null) const MAY_THROW_EXCEPTION {
+		TRY( igraph_dyad_census(&_, &mut, &asym, &null) );
+	}
+	::tempobj::force_temporary_class<Vector>::type Graph::triad_census() const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_triad_census(&_, &res) );
+	}
+	::tempobj::force_temporary_class<Vector>::type Graph::motifs_randesu(int size, const Vector& cut_prob) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_VECTOR(res, igraph_motifs_randesu(&_, &res, size, &cut_prob._) );
+	}
+	Integer Graph::motifs_randesu_no(int size, const Vector& cut_prob) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_motifs_randesu_no(&_, &res, size, &cut_prob._) );
+	}
+	Integer Graph::motifs_randesu_estimate(int size, const Vector& cut_prob, Integer sample_size) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_motifs_randesu_estimate(&_, &res, size, &cut_prob._, sample_size, NULL) );
+	}
+	Integer Graph::motifs_randesu_estimate(int size, const Vector& cut_prob, const Vector& parsample) const MAY_THROW_EXCEPTION {
+		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_motifs_randesu_estimate(&_, &res, size, &cut_prob._, 0, &parsample._) );
+	}
+
+
+#pragma mark -
 #pragma mark 14. Generating Layouts for Graph Drawing
 
 	::tempobj::force_temporary_class<Matrix>::type Graph::layout_random() const MAY_THROW_EXCEPTION {

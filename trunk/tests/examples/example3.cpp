@@ -49,12 +49,12 @@ int main () {
 	printf("Maximum degree is      %10i, vertex %2i.\n", (int)res.max(), (int)res.which_min());
 
 	res = g.closeness(VertexSelector::all());
-	printf("Maximum closeness is   %10f, vertex %2i.\n", (double)res.max(), (int)res.which_min());
+	printf("Maximum closeness is   %10lf, vertex %2i.\n", res.max(), (int)res.which_min());
 
 	// the support of C++ standard template library
 	res = g.betweenness(VertexSelector::all());
 	VertexVector::const_iterator it = max_element(res.begin(), res.end());
-	printf("Maximum betweenness is %10f, vertex %2i.\n", (double)*it, (int)(it-res.begin()));
+	printf("Maximum betweenness is %10lf, vertex %2i.\n", *it, (int)(it-res.begin()));
 
 	return 0;
 }

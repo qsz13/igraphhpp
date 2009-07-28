@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <gsl/cpp/rng_minimal.hpp>
 #include <stdexcept>
 #include <cmath>
+#include <igraph/cpp/impl/igraph_extension.cpp>
 
 namespace igraph {
 
@@ -569,6 +570,9 @@ namespace igraph {
 		TRY(igraph_vector_ptr_init(&res, 0));
 		TRY(igraph_decompose(&_, &res, (igraph_connectedness_t)connectedness, max_component_number, min_size_of_components));
 		return ReferenceVector<Graph>::adopt<igraph_t>(res);
+	}	
+	::tempobj::force_temporary_class<Graph>::type Graph::max_component(Connectedness connectedness) const MAY_THROW_EXCEPTION {
+		XXINTRNL_FORWARD_GRAPH_CREATION(res, igraph_max_component(&_, &res, (igraph_connectedness_t)connectedness) );
 	}
 	Integer Graph::biconnected_components_count() const MAY_THROW_EXCEPTION {
 		XXINTRNL_TEMP_RETURN_NATIVE(Integer, res, igraph_biconnected_components(&_, &res, NULL, NULL) );

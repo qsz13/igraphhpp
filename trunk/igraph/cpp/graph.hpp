@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <igraph/cpp/community.hpp>
 #include <igraph/cpp/mincut.hpp>
 #include <igraph/cpp/arpack.hpp>
+#include <igraph/cpp/igraph_extension.hpp>
 
 namespace gsl {
 	class Random;
@@ -259,6 +260,9 @@ namespace igraph {
 		
 		bool is_connected(const Connectedness connectedness = WeaklyConnected) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<ReferenceVector<Graph> >::type decompose(Connectedness connectedness = WeaklyConnected, long max_component_number = -1, long min_size_of_components = -1) const MAY_THROW_EXCEPTION;
+		/// return the maximum component in the given graph
+		::tempobj::force_temporary_class<Graph>::type max_component(Connectedness connectedness = WeaklyConnected) const MAY_THROW_EXCEPTION;
+
 		Integer biconnected_components_count() const MAY_THROW_EXCEPTION;
 		Integer biconnected_components(ReferenceVector<VertexVector>& components, VertexVector& articulation_points) const MAY_THROW_EXCEPTION;
 		::tempobj::force_temporary_class<ReferenceVector<VertexVector> >::type biconnected_components() const MAY_THROW_EXCEPTION;

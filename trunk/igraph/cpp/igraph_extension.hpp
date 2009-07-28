@@ -1,5 +1,5 @@
 /*
-igraph examples
+igraph_extension ... collect the set of function that is not in the original igraph
 
 Copyright (C) 2009  Hon Wai, LAU <lau65536@gmail.com>
 
@@ -19,17 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-#include <igraph/igraph.hpp>
-#include <cstdio>
-using namespace std;
-using namespace igraph;
+#ifndef IGRAPH_EXTENSION_HPP
+#define IGRAPH_EXTENSION_HPP
 
+#include <igraph/igraph.h>
 
-int main () {
+int igraph_max_component(const igraph_t* graph, igraph_t* res, igraph_connectedness_t mode);
 
-	Graph g = Graph::erdos_renyi_game(1000, 5.0/1000);
-	Real diameter = g.diameter();
-	printf("Diameter of a random graph with average degree 5: %lf\n", diameter);
-
-	return 0;
-}
+#endif

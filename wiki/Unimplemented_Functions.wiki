@@ -49,7 +49,7 @@ Besides wrapping the original ones, we also need to create the corresponding one
 = 9 Graph, Vertex and Edge Attributes =
 All unimplemented.
 
-= 13 Graph Motifs, Dyad Census and Triad Census =
+= 12 Graph Isomorphism =
 All unimplemented.
 
 = 14 Generating Layouts for Graph Drawing =

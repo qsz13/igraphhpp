@@ -30,7 +30,7 @@ int main () {
 	Vector dimvector("30 30");
 	Graph g = Graph::lattice(dimvector);
 
-	printf("Average path length (lattice):            %f\n", (double)g.average_path_length() );
+	printf("Average path length (lattice):            %lf\n", g.average_path_length() );
 
 	Vector edges(20);
 	srand(100);
@@ -38,7 +38,7 @@ int main () {
 		edges[i] = rand() % (int)g.size();
 
 	g.add_edges(edges);
-	printf("Average path length (randomized lattice): %f\n", (double)g.average_path_length() );
+	printf("Average path length (randomized lattice): %lf\n", g.average_path_length() );
 
 	return 0;
 }
